@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>cnr_param</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="nicola.pedrocchi@stiima.cnr.it">feynman</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <depend>yaml-cpp</depend>
+  <depend>Boost</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
