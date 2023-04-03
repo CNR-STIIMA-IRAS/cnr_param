@@ -64,6 +64,31 @@ TEST(ServerTest, ServerUsage)
 
 TEST(ClientTest, ClientUsage)
 {
+  std::string what;
+  std::string value;
+  auto f1 = [&](const std::string& path)
+  {
+    bool ok = false;
+    EXECUTION_TIME(
+      ok = cnr::param::get(path, value, what);
+    )
+    std::cout << "OK. " << ok << "| VALUE: " << value 
+                << "| WHAT: " << what << std::endl;
+    return ok;
+  };
+
+  EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
+  value = value +"_CIAO";
+  EXPECT_TRUE( cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
+
+  EXPECT_TRUE( cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(f1("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic"));
+}
+
+
+TEST(ClientErrorTest, ClientNonExistentParam)
+{
   std::string defval = "DEFAULT";
   auto f1 = [](const std::string& path)
   {
@@ -73,8 +98,9 @@ TEST(ClientTest, ClientUsage)
     EXECUTION_TIME(
       ok = cnr::param::get(path, topic, what);
     )
-    std::cout<< "GOT: " << ok << std::endl;
-    std::cout<< "WHAT: " << what << std::endl;
+    std::cout << "GOT: " << ok << std::endl;
+    std::cout << "VALUE:" << topic << std::endl;
+    std::cout << "WHAT: " << what << std::endl;
     return ok;
   };
 
@@ -87,11 +113,10 @@ TEST(ClientTest, ClientUsage)
     std::cout << what << std::endl;
     return ok;
   };
-  EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
   EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST"));
-  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval));
-
+  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval)); 
 }
+
 
 TEST(DeveloperTest, DeveloperFunctions)
 {
