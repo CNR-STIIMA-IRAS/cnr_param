@@ -79,10 +79,10 @@ TEST(ClientTest, ClientUsage)
 
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
   value = value +"_CIAO";
-  EXPECT_TRUE( cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
 
-  EXPECT_TRUE( cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic"));
 }
 
