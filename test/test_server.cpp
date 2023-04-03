@@ -73,7 +73,8 @@ TEST(ClientTest, ClientUsage)
     EXECUTION_TIME(
       ok = cnr::param::get(path, topic, what);
     )
-    std::cout << what << std::endl;
+    std::cout<< "GOT: " << ok << std::endl;
+    std::cout<< "WHAT: " << what << std::endl;
     return ok;
   };
 
@@ -87,8 +88,8 @@ TEST(ClientTest, ClientUsage)
     return ok;
   };
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
-  EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__"));
-  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__", defval));
+  EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST"));
+  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval));
 
 }
 

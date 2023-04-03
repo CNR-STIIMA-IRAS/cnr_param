@@ -510,6 +510,7 @@ inline T extract(const YAML::Node& node, const std::string& key, const std::stri
   else
   {
     leaf = node;
+    ok = true;
   }
 
   if(ok)
