@@ -2,6 +2,8 @@
 #include <iostream>
 #include <yaml-cpp/yaml.h>
 
+#include <cnr_param/utils/filesystem.hpp>
+#include <cnr_param/utils/string.hpp>
 #include <cnr_param/utils/yaml.hpp>
 
 namespace cnr { namespace param {  namespace utils {
@@ -225,6 +227,47 @@ YAML::Node get_leaf(const std::vector<std::string>& keys, const YAML::Node& node
   }
   std::cout  << ">" <<std::endl;
   return YAML::Node();
+}
+
+/**
+ * @brief 
+ * 
+ * @param root 
+ * @return std::map<std::string, std::vector<std::string> > 
+ */
+std::map<std::string, std::vector<std::string> > toLeafMap(YAML::Node root)
+{
+  std::map<std::string, std::vector<std::string> > tree; //mapped file names;
+  std::vector<std::string> fns; //mapped file names;
+  fns.reserve(1000000);
+  cnr::param::utils::get_keys_tree("", root, fns);
+  
+  std::sort(fns.begin(),fns.end(),[](std::string a, std::string b) {return a<b;} );
+  fns.erase( std::unique( fns.begin(), fns.end() ), fns.end() );
+  for(const auto & fn : fns)
+  {
+    std::vector<std::string> pp = cnr::param::utils::tokenize(fn, "/");
+    fs::path path;
+    for(size_t i=0; i< pp.size()-1; i++)
+    {
+      path = path / pp.at(i);
+    }
+    tree[path.string()].push_back(pp.back());
+  }
+  return tree;
+}
+
+/**
+ * @brief 
+ * 
+ * @param root 
+ * @return std::vector<std::pair<std::string, YAML::Node>> 
+ */
+std::vector<std::pair<std::string, YAML::Node>> toNodeList(YAML::Node root)
+{
+  std::vector<std::pair<std::string, YAML::Node> > tree; //mapped file names;
+  cnr::param::utils::get_nodes_tree("", root, tree);
+  return tree;
 }
 
 }

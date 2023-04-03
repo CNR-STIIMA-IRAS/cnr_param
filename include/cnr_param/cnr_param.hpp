@@ -40,8 +40,9 @@ namespace param
 
 //======================================================================================================================
 //=== USER FUNCTIONS ===================================================================================================/**
-/* @brief check if the param exist
- *
+/**
+ * @brief 
+ * 
  * @param[in] key to find (full path)
  * @param[out] what: a message with the error (return false) or a warning (return true)
  * @return true if ok, or if default value has been superimposed, false otherwise.
@@ -75,17 +76,36 @@ bool get(const std::string& key, T& ret, std::string& what, const T& default_val
 template<typename T>
 bool get(const std::string& key, T& ret, std::string& what);
 
-///**
-// * @brief set the param, and return true if found and ok. Store the error(s) in 'what'. Typical error is the
-// * mismatch of types between the actual parameter and the required type
-// *
-// * @param[in] key: full path
-// * @param[in] val: element to be stored
-// * @param[out] what: a message with the error (return false) or a warning (return true)
-// * @return true if ok, or if default value has been superimposed, false otherwise.
-// */
-//template<typename T>
-//bool set(const std::string& key, const T& ret, std::string& what);
+/**
+* @brief set the param, and return true if found and ok. Store the error(s) in 'what'. Typical error is the
+* mismatch of types between the actual parameter and the required type
+*
+* @param[in] key: full path
+* @param[in] val: element to be stored
+* @param[out] what: a message with the error (return false) or a warning (return true)
+* @return true if ok, or if default value has been superimposed, false otherwise.
+*/
+template<typename T>
+bool set(const std::string& key, const T& ret, std::string& what);
+
+/**
+ * @brief 
+ * 
+ * @param node 
+ * @param key 
+ * @return true 
+ * @return false 
+ */
+bool has(const cnr::param::node_t& node, const std::string& key);
+
+/**
+ * @brief 
+ * 
+ * @param node 
+ * @return true 
+ * @return false 
+ */
+bool is_map(const cnr::param::node_t& node);
 
 /**
  * @brief 
@@ -138,6 +158,21 @@ bool get_leaf(const node_t& node, const std::string& key, node_t& leaf, std::str
  */
 template<typename T>
 bool at(const cnr::param::node_t& node, std::size_t i, T& element, std::string& what);
+
+
+/**
+ * @brief 
+ * 
+ * @tparam T 
+ * @param node 
+ * @param key
+ * @param element 
+ * @param what 
+ * @return true 
+ * @return false 
+ */
+template<typename T>
+bool at(const cnr::param::node_t& node, const std::string& key, T& element, std::string& what);
 //======================================================================================================================
 
 
@@ -152,7 +187,7 @@ bool at(const cnr::param::node_t& node, std::size_t i, T& element, std::string& 
  * @return T 
  */
 template<typename T>
-T get(const node_t& node);
+T extract(const node_t& node, const std::string& key ="", const std::string& error_heading_msgs ="");
 //======================================================================================================================
 
 //======================================================================================================================
@@ -236,7 +271,6 @@ bool get_sequence(const node_t& node, Eigen::MatrixBase<Derived>& ret, std::stri
  */
 template<typename T>
 bool get_map(const node_t& node, T& ret, std::stringstream& what);
-
 
 }  // namespace param
 }  // namespace cnr

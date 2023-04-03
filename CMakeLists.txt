@@ -74,8 +74,9 @@ add_library(cnr_param_utilities SHARED
   src/${PROJECT_NAME}/cnr_param.cpp
     src/${PROJECT_NAME}/utils/string.cpp
       src/${PROJECT_NAME}/utils/filesystem.cpp
-        src/${PROJECT_NAME}/utils/colors.cpp
-          src/${PROJECT_NAME}/utils/yaml.cpp)
+        src/${PROJECT_NAME}/utils/interprocess.cpp
+          src/${PROJECT_NAME}/utils/colors.cpp
+            src/${PROJECT_NAME}/utils/yaml.cpp)
 target_include_directories(cnr_param_utilities PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

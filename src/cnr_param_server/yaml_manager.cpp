@@ -24,123 +24,9 @@
 
 
 #include <cnr_param/utils/yaml.hpp>
-
-void printMemoryContent(const std::string& header, void* addr, bool check_node)
-{
-  //Check that memory was initialized to 1
-  const char *mem = static_cast<char*>(addr);
-  std::string strmem(mem);
-
-  std::cout << "^^^^^^^^^^^^^^^^^^^^" << std::endl;
-  std::cout << header << std::endl;
-  std::cout << strmem << std::endl;
-  std::cout << "^^^^^^^^^^^^^^^^^^^^" << std::endl;
-
-  if(check_node)
-  {
-    auto n = YAML::Load(strmem);
-    std::cout << "key: " << n.begin()->first << std::endl;
-    std::cout << "value: " << n.begin()->second << std::endl;
-    std::cout << "^^^^^^^^^^^^^^^^^^^^" << std::endl;
-  }
-}
-
-std::map<std::string, std::vector<std::string> > toLeafMap(YAML::Node root)
-{
-  std::map<std::string, std::vector<std::string> > tree; //mapped file names;
-  std::vector<std::string> fns; //mapped file names;
-  fns.reserve(1000000);
-  cnr::param::utils::get_keys_tree("", root, fns);
-  
-  std::sort(fns.begin(),fns.end(),[](std::string a, std::string b) {return a<b;} );
-  fns.erase( std::unique( fns.begin(), fns.end() ), fns.end() );
-  for(const auto & fn : fns)
-  {
-    std::vector<std::string> pp = cnr::param::utils::tokenize(fn, "/");
-    fs::path path;
-    for(size_t i=0; i< pp.size()-1; i++)
-    {
-      path = path / pp.at(i);
-    }
-    tree[path.string()].push_back(pp.back());
-  }
-  return tree;
-}
-
-std::vector<std::pair<std::string, YAML::Node>> toNodeList(YAML::Node root)
-{
-  std::vector<std::pair<std::string, YAML::Node> > tree; //mapped file names;
-  cnr::param::utils::get_nodes_tree("", root, tree);
-  return tree;
-}
+#include <cnr_param/utils/interprocess.hpp>
 
 
-boost::interprocess::mapped_region* createFileMapping(const std::string& absolute_path)
-{
-  auto l = __LINE__;
-  try
-  {
-    std::function<void(const char* ap)> filebuf_create = [](const char* ap) 
-    {
-      const std::size_t FileSize = 10000;
-      boost::interprocess::file_mapping::remove(ap);
-      std::filebuf fbuf;
-      auto res = fbuf.open(ap, std::ios_base::in | std::ios_base::out 
-                              | std::ios_base::trunc | std::ios_base::binary); 
-      if(!res)
-      { 
-        throw std::runtime_error("Failed in opening the filebuffer");
-      }
-      //Create a file mapping  
-      fbuf.pubseekoff(FileSize-1, std::ios_base::beg);
-      fbuf.sputc(0);
-    };
-
-    filebuf_create(absolute_path.c_str());
-
-    //Create a file mapping
-    boost::interprocess::file_mapping file(absolute_path.c_str(), boost::interprocess::read_write);
-
-    l = __LINE__;
-    //Map the whole file with read-write permissions in this process
-    boost::interprocess::mapped_region*  region = 
-      new boost::interprocess::mapped_region(file, boost::interprocess::read_write);
-
-    l = __LINE__;
-    //Get the address of the mapped region
-    void* addr        = region->get_address();
-
-    l = __LINE__;
-    std::size_t size  = region->get_size();
-   
-    l = __LINE__;
-    //Write all the memory to 1
-    std::memset(addr, 0, size );
-
-    return region;
-  }
-  catch(boost::interprocess::lock_exception& e)
-  {
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Aboslute path: " << absolute_path << std::endl;
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": last executed line " << l << ":" << e.what() << std::endl;
-  }
-  catch(boost::interprocess::bad_alloc& e)
-  {
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Aboslute path: " << absolute_path << std::endl;
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": last executed line " << l << ":" << e.what() << std::endl;
-  }
-  catch(boost::interprocess::interprocess_exception& e)
-  {
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Aboslute path: " << absolute_path << std::endl;
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": last executed line " << l << ":" << e.what() << std::endl;
-  }
-  catch(std::exception& e)
-  {
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Aboslute path: " << absolute_path << std::endl;
-    std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": last executed line " << l << ":" << e.what() << std::endl;
-  }
-  return nullptr;
-}
 
 
 
@@ -209,7 +95,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
 {
   fs::path absolute_root_path(absolute_root_path_string); 
 
-  std::map<std::string, std::vector<std::string> > tree = toLeafMap(root_); //mapped file names;
+  std::map<std::string, std::vector<std::string> > tree = cnr::param::utils::toLeafMap(root_); //mapped file names;
 
   for(const auto & leaf : tree)
   {
@@ -224,7 +110,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
       try
       {
         l = __LINE__;
-        auto regiorn = createFileMapping(ap.string());
+        auto regiorn = cnr::param::utils::createFileMapping(ap.string());
         if(!regiorn)
         {
           throw std::runtime_error("The file mapping cannot be created!");
@@ -239,7 +125,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
 
         std::memcpy(regiorn->get_address(), str.c_str(), str.size() );
         #if defined(NDEBUG)
-          printMemoryContent(ap.string(), regiorn->get_address(), false);
+          cnr::param::utils::printMemoryContent(ap.string(), regiorn->get_address(), false);
         #endif
         
       }
@@ -259,7 +145,7 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
 {
   fs::path absolute_root_path(absolute_root_path_string); 
 
-  std::vector<std::pair<std::string, YAML::Node> > tree = toNodeList(root_); //mapped file names;
+  std::vector<std::pair<std::string,YAML::Node>> tree = cnr::param::utils::toNodeList(root_); //mapped file names;
 
   for(const auto & node : tree)
   {
@@ -271,7 +157,7 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
     try
     {
       l = __LINE__;
-      auto region = createFileMapping(ap.string());
+      auto region = cnr::param::utils::createFileMapping(ap.string());
       if(!region)
       {
         throw std::runtime_error("The file mapping cannot be created!");
@@ -290,7 +176,7 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
       
       l = __LINE__;
       #if defined(NDEBUG)
-        printMemoryContent(ap.string(), region->get_address(), false);
+        cnr::param::utils::printMemoryContent(ap.string(), region->get_address(), false);
       #endif
     }
     catch(std::exception& e)

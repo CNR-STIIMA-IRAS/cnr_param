@@ -6,7 +6,9 @@
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
+#if !defined(UNUSED)
 #define UNUSED(expr) do { (void)(expr); } while (0)
+#endif
 
 #include <random>
 #include <cnr_param/utils/eigen.hpp>
@@ -69,7 +71,7 @@ inline bool resize(const double& m, int rows, int cols)
 }
 
 template<typename T>
-inline bool resize(std::vector<T>& m, int rows, int cols = 1)
+inline bool resize(std::vector<T>& m, int rows, int cols)
 {
   if(!rows || (cols!= 1))
   {

@@ -12,7 +12,6 @@
 #include <cnr_param/utils/filesystem.hpp>
 #include <cnr_param_server/args_parser.h>
 
-
 namespace std
 {
 istream& operator>>(istream& in, std::pair<std::string,int>& out)

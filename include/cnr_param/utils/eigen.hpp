@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <type_traits>
 
-namespace utils
+namespace cnr
 {
 namespace param
 {

@@ -1,13 +1,18 @@
 #include <cnr_param/utils/string.hpp>
 
-namespace cnr { namespace param {  namespace utils {
+namespace cnr
+{
+namespace param
+{
+namespace utils
+{
 
-std::vector<std::string> tokenize(const std::string& str, const std::string& delim)
+std::vector<std::string> tokenize(const std::string &str, const std::string &delim)
 {
   std::vector<std::string> tokens;
   int tokenStart = 0;
   auto delimPos = str.find_first_of(delim);
-  while(delimPos != std::string::npos)
+  while (delimPos != std::string::npos)
   {
     std::string tok = str.substr(tokenStart, delimPos - tokenStart);
     tokens.push_back(tok);
@@ -16,20 +21,20 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
     tokenStart = delimPos;
     delimPos = str.find_first_of(delim, delimPos);
 
-    if(delimPos == std::string::npos)
+    if (delimPos == std::string::npos)
     {
       std::string tok = str.substr(tokenStart, delimPos - tokenStart);
       tokens.push_back(tok);
-    }   
+    }
   }
   std::vector<std::string>::iterator it = tokens.begin();
-  while (it != tokens.end()) 
+  while (it != tokens.end())
   {
-    if (it->empty() ) 
+    if (it->empty())
     {
       it = tokens.erase(it);
     }
-    else 
+    else
     {
       ++it;
     }
@@ -37,4 +42,6 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
   return tokens;
 }
 
-} } }
+}
+}
+}

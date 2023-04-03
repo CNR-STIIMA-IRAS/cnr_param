@@ -71,6 +71,22 @@ void get_keys_tree(const std::string& ns, const YAML::Node& node, std::vector<st
 void get_nodes_tree(const std::string& ns, const YAML::Node& node,
                       std::vector< std::pair<std::string,YAML::Node> >& tree);
 
+/**
+ * @brief 
+ * 
+ * @param root 
+ * @return std::map<std::string, std::vector<std::string> > 
+ */
+std::map<std::string, std::vector<std::string> > toLeafMap(YAML::Node root);
+
+/**
+ * @brief 
+ * 
+ * @param root 
+ * @return std::vector<std::pair<std::string, YAML::Node>> 
+ */
+std::vector<std::pair<std::string, YAML::Node>> toNodeList(YAML::Node root);
+
 }  // namespace utils
 }  // namespace param
 }  // namespace cnr
