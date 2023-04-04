@@ -188,6 +188,20 @@ bool at(const cnr::param::node_t& node, const std::string& key, T& element, std:
  */
 template<typename T>
 T extract(const node_t& node, const std::string& key ="", const std::string& error_heading_msgs ="");
+
+/**
+ * @brief 
+ * 
+ * @tparam T 
+ * @param node 
+ * @param key 
+ * @param value 
+ * @return node_t 
+ */
+template<typename T>
+void insert(node_t& node, const std::string& key, const T& value);
+
+
 //======================================================================================================================
 
 //======================================================================================================================

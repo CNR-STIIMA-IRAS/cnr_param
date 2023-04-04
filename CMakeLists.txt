@@ -1,73 +1,77 @@
-cmake_minimum_required(VERSION 3.8)
+#############################
+## PRELIMINARIES           ##
+#############################
+cmake_minimum_required(VERSION 3.16.0)
 
-########################################################################################################################
-# Metadata
-########################################################################################################################
-# Read the package manifest.
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/package.xml" package_xml_str)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrConfigMacros.cmake)
 
-# Extract project name.
-if(NOT package_xml_str MATCHES "<name>([A-Za-z0-9_]+)</name>")
-  message(FATAL_ERROR "Could not parse project name from package manifest (aborting)")
-else()
-  set(extracted_name ${CMAKE_MATCH_1})
-endif()
+get_project_name("package.xml" extracted_name extracted_version)
 
-# Extract project version.
-if(NOT package_xml_str MATCHES "<version>([0-9]+.[0-9]+.[0-9]+)</version>")
-  message(FATAL_ERROR "Could not parse project version from package manifest (aborting)")
-else()
-  set(extracted_version ${CMAKE_MATCH_1})
-endif()
-
-########################################################################################################################
-# CMake project
-########################################################################################################################
 project(${extracted_name} VERSION ${extracted_version} LANGUAGES CXX)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+cnr_set_flags()
+#############################
+## END - PRELIMINARIES     ##
+#############################
+
+
+#############################
+## OPTIONS                 ##
+#############################
+option(USE_ROS1                 "ROS SUPPORT" OFF)
+option(ENABLE_TESTING           "ENABLE TESTING" OFF)
+option(ENABLE_COVERAGE_TESTING  "ENABLE COVERAGE TESTING" OFF)
+option(COMPILE_EXAMPLE          "COMPILE THE EXAMPLE" OFF)
+
+if(USE_ROS1)
+  set(ENABLE_TESTING ${CATKIN_ENABLE_TESTING})
 endif()
+#############################
+## END - OPTIONS           ##
+#############################
 
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
-
-########################################################################################################################
-# OPTIONS
-########################################################################################################################
-option(ENABLE_TESTING "ENABLE TESTING" OFF)
-option(ENABLE_COVERAGE_TESTING "ENABLE COVERAGE TESTING" OFF)
-
-########################################################################################################################
-# Dependencies
-#########################################################################################################################
+#############################
+## DEPENDANCIES            ##
+#############################
 find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 CONFIG REQUIRED)
+find_package(Eigen3 REQUIRED COMPONENTS Core Dense)
 
-# ================================================
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
 
-if(ENABLE_TESTING)
-  message(STATUS "Enable testing enable_testing")
-  enable_testing()
-  find_package(GTest REQUIRED)
+if(USE_ROS1)
+  find_package(catkin REQUIRED COMPONENTS roscpp)
+  catkin_package(
+    INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS}
+    CATKIN_DEPENDS roscpp
+  ) 
+endif()
 
-  if(ENABLE_COVERAGE_TESTING AND NOT WIN32)
-    set(CMAKE_CXX_FLAGS "-Wno-deprecated-register ${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS_DEBUG "-Wno-deprecated-register -O0 -g -fprofile-arcs -ftest-coverage ${CMAKE_CXX_FLAGS_DEBUG}")
-  endif(ENABLE_COVERAGE_TESTING AND NOT WIN32)
-endif(ENABLE_TESTING)
+cnr_install_directories(USE_ROS1 
+  CNR_INSTALL_INCLUDE_DIR CNR_INSTALL_LIB_DIR CNR_INSTALL_BIN_DIR CNR_INSTALL_SHARE_DIR)
+cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1)
+#############################
+## END DEPENDANCIES        ##
+#############################
 
+########################################################################################################################
+# Dependencies
+#########################################################################################################################
+find_package(Eigen3 CONFIG REQUIRED)
+
+
+#################
+## Build       ##
+#################
+list(APPEND DEPENDENCIES_INCLUDE_DIRS ${yaml-cpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
+if(USE_ROS1)
+  list(APPEND DEPENDENCIES_INCLUDE_DIRS ${catkin_INCLUDE_DIRS})
+endif()
+
+list(APPEND BUILD_INTERFACE_INCLUDE_DIRS ${DEPENDENCIES_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS include ${DEPENDENCIES_INCLUDE_DIRS} include)
 
 # ================================================
 add_library(cnr_param_utilities SHARED 
@@ -78,20 +82,14 @@ add_library(cnr_param_utilities SHARED
           src/${PROJECT_NAME}/utils/colors.cpp
             src/${PROJECT_NAME}/utils/yaml.cpp)
 target_include_directories(cnr_param_utilities PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-      PUBLIC ${yaml-cpp_INCLUDE_DIRS}
-        PUBLIC ${Boost_INCLUDE_DIRS}
-)
+  "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>"))
+
 target_link_libraries(cnr_param_utilities
   yaml-cpp Boost::system Boost::filesystem Boost::iostreams Boost::regex Eigen3::Eigen
 )
 target_compile_definitions(cnr_param_utilities PRIVATE "CNR_PARAM_BUILDING_LIBRARY")
-# ================================================
 
-
-
-##################################################################################
 add_executable(cnr_param_server 
   src/cnr_param_server/param_server.cpp
     src/cnr_param_server/args_parser.cpp
@@ -99,49 +97,73 @@ add_executable(cnr_param_server
 target_include_directories(cnr_param_server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-      PUBLIC ${yaml-cpp_INCLUDE_DIRS}
-        PUBLIC ${Boost_INCLUDE_DIRS}
 )
 target_link_libraries(cnr_param_server cnr_param_utilities
   yaml-cpp Boost::program_options Boost::system)
+#################
+## END - Build ##
+#################
 
-install(DIRECTORY include/
-  DESTINATION include
-)
-install(
-  TARGETS cnr_param_utilities cnr_param_server
-  EXPORT export_cnr_param
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
 
-# export targets
-set(export_targets ${export_targets};cnr_param_utilities)
-set(export_targets ${export_targets};cnr_param_server)
-export(EXPORT export_cnr_param
-   FILE "${PROJECT_BINARY_DIR}/export_cnr_param.cmake")
 
-# Create the cnr_paramConfig.cmake
-set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-configure_file(cnr_paramConfig.cmake.in
-   "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake" @ONLY)
 
-# Create the cnr_paramConfigVersion.cmake
-configure_file(cnr_paramConfigVersion.cmake.in
-   "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake" @ONLY)
- 
-install(FILES
-  "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake"
-  "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake"
-  DESTINATION "share/${PROJECT_NAME}/cmake" COMPONENT dev
+##################################################################################
+
+
+#############
+## Install ##
+#############
+install(DIRECTORY include/${PROJECT_NAME}
+        DESTINATION ${CNR_INSTALL_INCLUDE_DIR}
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN ".git" EXCLUDE
 )
 
-install(EXPORT export_cnr_param
-  DESTINATION "share/${PROJECT_NAME}/cmake"
-  FILE export_cnr_param.cmake
-  COMPONENT dev
+install(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION ${CNR_INSTALL_LIB_DIR}
+        LIBRARY DESTINATION ${CNR_INSTALL_LIB_DIR}
+        RUNTIME DESTINATION ${CNR_INSTALL_BIN_DIR}
 )
+
+if(USE_ROS1)
+  install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE)
+endif()
+###################
+## END - Install ##
+###################
+
+##################################
+## CMAKE CONFIG (IF NOT CATKIN) ##
+##################################
+if(NOT USE_ROS1) 
+  set(export_targets ${export_targets};cnr_param_utilities)
+  set(export_targets ${export_targets};cnr_param_server)
+  export(EXPORT export_cnr_param
+    FILE "${PROJECT_BINARY_DIR}/export_cnr_param.cmake")
+
+  # Create the cnr_paramConfig.cmake
+  set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+  configure_file(cnr_paramConfig.cmake.in
+    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake" @ONLY)
+
+  # Create the cnr_paramConfigVersion.cmake
+  configure_file(cnr_paramConfigVersion.cmake.in
+    "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake" @ONLY)
+  
+  install(FILES
+    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake"
+    "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake"
+    DESTINATION "share/${PROJECT_NAME}/cmake" COMPONENT dev
+  )
+
+  install(EXPORT export_cnr_param
+    DESTINATION "share/${PROJECT_NAME}/cmake"
+    FILE export_cnr_param.cmake
+    COMPONENT dev
+  )
+endif()
 
 
 ##########################

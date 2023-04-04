@@ -556,6 +556,64 @@ inline YAML::Node extract(const YAML::Node& node, const std::string& key, const 
   return ret;
 }
 
+template<typename T>
+void insert(node_t& node, const std::string& key, const T& value)
+{
+  try
+  {
+    if(key.length())
+    {
+      node[key] = value;
+    }
+    else
+    {
+      node = value;
+    }
+  }
+  catch(const std::exception& e)
+  {
+    throw std::runtime_error(e.what());
+  }
+}
+
+template< typename T >
+std::string int_to_hex( T i )
+{
+  std::stringstream stream;
+  stream << "0x" 
+         << std::setfill ('0') << std::setw(sizeof(T)*2) 
+         << std::hex << i;
+  return stream.str();
+}
+
+void insert(node_t& node, const std::string& key, const int& value, const std::string& format)
+{
+  std::string val;
+  if(format=="dec")
+  {
+    val = std::to_string(value);
+  }
+  else if(format=="hex")
+  {
+    val = int_to_hex(value);
+  }
+  try
+  {
+    if(key.length())
+    {
+      node[key] = val;
+    }
+    else
+    {
+      node = val;
+    }
+  }
+  catch(const std::exception& e)
+  {
+    throw std::runtime_error(e.what());
+  }
+}
+
 #define CATCH(X)\
   catch(YAML::Exception& e)\
   {\
