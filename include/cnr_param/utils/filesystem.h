@@ -4,26 +4,15 @@
 #include <string>
 #include <vector>
 
-#if defined(__cpp_lib_filesystem)
-    #include <filesystem>
-    namespace fs = std::filesystem;
-#else
-#if defined(__cpp_lib_experimental_filesystem)
-    #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1;
-    #include <experimental/filesystem>
-    namespace fs = std::experimental::filesystem;
-#else
-  #include <boost/filesystem.hpp>
-  namespace fs = boost::filesystem;
-#endif
-#endif
+#include <boost/filesystem.hpp>
 
-namespace cnr 
+namespace cnr
 {
 namespace param
 {
 namespace utils
 {
+
 /**
  * @brief check if the file path is OK
  * 
@@ -32,7 +21,7 @@ namespace utils
  * @return true 
  * @return false 
  */
-bool checkfilepath(const fs::path& fp, std::string& what);
+bool checkfilepath(const boost::filesystem::path& fp, std::string& what);
 
 /**
  * @brief 
@@ -43,7 +32,8 @@ bool checkfilepath(const fs::path& fp, std::string& what);
  * @return true 
  * @return false 
  */
-bool filepath(const std::string& fn, fs::path& out, std::string& what);
+bool filepath(const std::string& fn, boost::filesystem::path& out, std::string& what);
+
 /**
  * @brief 
  * 
@@ -53,7 +43,7 @@ bool filepath(const std::string& fn, fs::path& out, std::string& what);
  * @return true 
  * @return false 
  */
-bool dirpath(const std::string& fd, fs::path& out, std::string& what);
+bool dirpath(const std::string& fd, boost::filesystem::path& out, std::string& what);
 
 }  // namespace utils
 }  // namespace param

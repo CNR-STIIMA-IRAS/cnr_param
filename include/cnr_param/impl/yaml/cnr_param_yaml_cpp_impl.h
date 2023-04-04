@@ -36,10 +36,10 @@
 #ifndef CNR_PARAM_INCLUDE_CNR_PARAM_IMPL_YAML_CNR_PARAM_YAML_CPP_IMPL
 #define CNR_PARAM_INCLUDE_CNR_PARAM_IMPL_YAML_CNR_PARAM_YAML_CPP_IMPL
 
-#include <typeinfo>       // operator typeid
-#include <typeindex>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/containers/vector.hpp>
@@ -48,11 +48,11 @@
 #include <boost/interprocess/managed_mapped_file.hpp>
 #include <boost/type_index.hpp>
 
-#include <cnr_param/cnr_param.hpp>
-#include <cnr_param/utils/string.hpp>
-#include <cnr_param/utils/eigen.hpp>
-#include <cnr_param/utils/filesystem.hpp>
-#include <cnr_param/utils/interprocess.hpp>
+#include <cnr_param/cnr_param.h>
+#include <cnr_param/utils/string.h>
+#include <cnr_param/utils/eigen.h>
+#include <cnr_param/utils/filesystem.h>
+#include <cnr_param/utils/interprocess.h>
 
 #include <yaml-cpp/exceptions.h>
 
@@ -71,7 +71,7 @@ namespace param
 //                                                                                 //
 //                                                                                 //
 // =============================================================================== //
-inline bool absolutepath(const std::string& key, const bool check_if_exist, fs::path& ap, std::string& what)
+inline bool absolutepath(const std::string& key, const bool check_if_exist, boost::filesystem::path& ap, std::string& what)
 {
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
   if(!env_p)
@@ -85,7 +85,7 @@ inline bool absolutepath(const std::string& key, const bool check_if_exist, fs::
   {
     _key.pop_back();
   }
-  fs::path p = fs::path(std::string(env_p)) / (_key + ".yaml");
+  boost::filesystem::path p = boost::filesystem::path(std::string(env_p)) / (_key + ".yaml");
 
   if(check_if_exist)
   {
@@ -97,13 +97,13 @@ inline bool absolutepath(const std::string& key, const bool check_if_exist, fs::
       return false;
     }
   }
-  ap = fs::absolute(p);
+  ap = boost::filesystem::absolute(p);
   return true;
 }
 
 inline bool has(const std::string& key, std::string& what)
 {
-  fs::path ap; 
+  boost::filesystem::path ap; 
   if(!absolutepath(key, true, ap, what))
   {
     return false;
@@ -113,7 +113,7 @@ inline bool has(const std::string& key, std::string& what)
 
 inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
 {
-  fs::path ap; 
+  boost::filesystem::path ap; 
   if(!absolutepath(key, true, ap, what))
   {
     return false;
@@ -191,7 +191,7 @@ inline bool get(const std::string& key, T& ret, std::string& what)
 template<typename T>
 bool set(const std::string& key, const T& ret, std::string& what)
 {
-  fs::path ap; 
+  boost::filesystem::path ap; 
   if(!absolutepath(key, false, ap, what))
   {
     return false;

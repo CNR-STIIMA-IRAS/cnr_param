@@ -8,9 +8,10 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/regex.hpp>
 
-#include <cnr_param/utils/string.hpp>
-#include <cnr_param/utils/filesystem.hpp>
-#include <cnr_param_server/args_parser.h>
+#include <cnr_param/utils/string.h>
+#include <cnr_param/utils/filesystem.h>
+
+#include <cnr_param_server/utils/args_parser.h>
 
 namespace std
 {
@@ -143,7 +144,7 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
     {
       auto fn = vm["config-file"].as<std::string>();
       std::string what;
-      fs::path fp;
+      boost::filesystem::path fp;
       if(!cnr::param::utils::filepath(fn, fp, what))
       {
         std::cerr << what << std::endl;
@@ -194,7 +195,7 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
       for(const auto & p : pp)
       {
         std::string what; 
-        fs::path fp;
+        boost::filesystem::path fp;
         bool ok = cnr::param::utils::filepath(p, fp, what);
         if(!ok)
         {
@@ -215,7 +216,7 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
           throw po::validation_error(po::validation_error::invalid_option_value, "ns-and-path-to-file");
         }
         std::string what; 
-        fs::path fp;
+        boost::filesystem::path fp;
         bool ok = cnr::param::utils::filepath(p.second, fp, what);
         if(!ok) 
         { 

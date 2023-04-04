@@ -1,4 +1,4 @@
-#include <cnr_param/utils/string.hpp>
+#include <cnr_param/utils/string.h>
 
 namespace cnr
 {

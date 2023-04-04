@@ -1,4 +1,4 @@
-#include "cnr_param/cnr_param.hpp"
+#include "cnr_param/cnr_param.h"
 
 namespace cnr
 {

@@ -1,33 +1,28 @@
-#include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
+//#include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
+
 #include <algorithm>
 
 #include <string>
 #include <istream>
 #include <fstream>
-#include <yaml-cpp/yaml.h>
+#include <iterator>
+#include <sstream>
 
-#define BOOST_DATE_TIME_NO_LIB
+#include <yaml-cpp/yaml.h>
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/interprocess/managed_mapped_file.hpp>
-#include <iostream>
-#include <iterator>
-#include <sstream>
-#include <string>
-
-#include <cnr_param/utils/string.hpp>
-#include <cnr_param/utils/filesystem.hpp>
-#include <cnr_param_server/yaml_manager.h>
 
 
-#include <cnr_param/utils/yaml.hpp>
-#include <cnr_param/utils/interprocess.hpp>
+#include <cnr_param/utils/string.h>
+#include <cnr_param/utils/filesystem.h>
+#include <cnr_param/utils/yaml.h>
+#include <cnr_param/utils/interprocess.h>
 
-
-
+#include <cnr_param_server/utils/yaml_manager.h>
 
 
 // ====================================================================================================
@@ -40,7 +35,6 @@
 YAMLParser::YAMLParser(const std::map<std::string, std::vector<std::string> >& nodes_map)
 {
   root_ = YAML::Node(YAML::NodeType::Map);
-  std::cout << nodes_map.size() << std::endl;
   for(const auto & node_pair : nodes_map)
   {
     auto& ns_string = node_pair.first;
@@ -74,7 +68,7 @@ YAMLStreamer::YAMLStreamer(const YAML::Node& root, const std::string& path_to_sh
   : root_(root)
 {
   std::string what;
-  fs::path absolute_root_path; 
+  boost::filesystem::path absolute_root_path; 
   if(!cnr::param::utils::dirpath(path_to_shared_files, absolute_root_path, what))
   {
     std::string err = std::string(__PRETTY_FUNCTION__) + ":" + std::to_string(__LINE__) + ": " + what;
@@ -93,18 +87,18 @@ YAMLStreamer::YAMLStreamer(const YAML::Node& root, const std::string& path_to_sh
 
 bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
 {
-  fs::path absolute_root_path(absolute_root_path_string); 
+  boost::filesystem::path absolute_root_path(absolute_root_path_string); 
 
   std::map<std::string, std::vector<std::string> > tree = cnr::param::utils::toLeafMap(root_); //mapped file names;
 
   for(const auto & leaf : tree)
   {
-    fs::create_directories(absolute_root_path / leaf.first);
+    boost::filesystem::create_directories(absolute_root_path / leaf.first);
 
     for(const auto & fn : leaf.second )
     {
-      fs::path rp = fs::path(leaf.first) / fn;
-      fs::path ap = fs::absolute(absolute_root_path / rp);
+      boost::filesystem::path rp = boost::filesystem::path(leaf.first) / fn;
+      boost::filesystem::path ap = boost::filesystem::absolute(absolute_root_path / rp);
 
       auto l = __LINE__;
       try
@@ -143,7 +137,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
 
 bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
 {
-  fs::path absolute_root_path(absolute_root_path_string); 
+  boost::filesystem::path absolute_root_path(absolute_root_path_string); 
 
   std::vector<std::pair<std::string,YAML::Node>> tree = cnr::param::utils::toNodeList(root_); //mapped file names;
 
@@ -151,8 +145,8 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
   {
     auto keys = cnr::param::utils::tokenize(node.first, "/");
     
-    fs::path rp = fs::path(node.first).string() + ".yaml";
-    fs::path ap = fs::absolute(absolute_root_path / rp);
+    boost::filesystem::path rp = boost::filesystem::path(node.first).string() + ".yaml";
+    boost::filesystem::path ap = boost::filesystem::absolute(absolute_root_path / rp);
     auto l = __LINE__;
     try
     {

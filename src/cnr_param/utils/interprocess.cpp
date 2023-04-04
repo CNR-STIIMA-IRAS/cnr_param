@@ -1,9 +1,9 @@
 #include <functional>
 #include <string>
 
-#include <cnr_param/utils/string.hpp>
-#include <cnr_param/utils/filesystem.hpp>
-#include <cnr_param/utils/interprocess.hpp>
+#include <cnr_param/utils/string.h>
+#include <cnr_param/utils/filesystem.h>
+#include <cnr_param/utils/interprocess.h>
 
 namespace cnr 
 {
@@ -44,7 +44,7 @@ boost::interprocess::mapped_region* createFileMapping(const std::string& absolut
       for(std::size_t i=0;i<tree.size()-1;i++)
         root_dir += tree.at(i) +"/";
 
-      fs::create_directories(root_dir);
+      boost::filesystem::create_directories(root_dir);
       
       const std::size_t FileSize = 10000;
       boost::interprocess::file_mapping::remove(ap);

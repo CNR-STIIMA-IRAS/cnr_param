@@ -1,4 +1,4 @@
-#include <cnr_param/utils/colors.hpp>
+#include <cnr_param/utils/colors.h>
 
 namespace cnr { namespace param { namespace utils {
 

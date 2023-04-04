@@ -11,7 +11,7 @@
 #endif
 
 #include <random>
-#include <cnr_param/utils/eigen.hpp>
+#include <cnr_param/utils/eigen.h>
 
 
 namespace cnr 

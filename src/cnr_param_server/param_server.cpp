@@ -7,9 +7,8 @@
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
-#include <cnr_param_server/args_parser.h>
-#include <cnr_param_server/yaml_manager.h>
-
+#include <cnr_param_server/utils/args_parser.h>
+#include <cnr_param_server/utils/yaml_manager.h>
 
 
 int main(int argc, char* argv[])
@@ -27,7 +26,6 @@ int main(int argc, char* argv[])
    {
       std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
    }
-
 
    // Parsing of program inputs
    ArgParser args(argc, argv, default_shmem_name);

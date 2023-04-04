@@ -1,24 +1,14 @@
 
-#ifndef CNR_PARAM__CNR_PARAM_SERVER_ARGS_PARSER
-#define CNR_PARAM__CNR_PARAM_SERVER_ARGS_PARSER
+#ifndef SRC_CNR_PARAM_INCLUDE_CNR_PARAM_SERVER_UTILS_ARGS_PARSER
+#define SRC_CNR_PARAM_INCLUDE_CNR_PARAM_SERVER_UTILS_ARGS_PARSER
 
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
 #include <boost/program_options/errors.hpp>
 #include <boost/program_options.hpp>
-
-#ifdef __cpp_lib_filesystem
-    #include <filesystem>
-    namespace fs = std::filesystem;
-#elif __cpp_lib_experimental_filesystem
-    #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1;
-    #include <experimental/filesystem>
-    namespace fs = std::experimental::filesystem;
-#else
-  #include <boost/filesystem.hpp>
-  namespace fs = boost::filesystem;
-#endif
 
 namespace po = boost::program_options;
 
@@ -44,7 +34,7 @@ private:
   std::map<std::string, bool> reset_ns_map_;
   std::pair<bool, size_t> size_all_shmem_;
   std::map<std::string, size_t> size_shmem_map_;
-  std::map<std::string, std::vector<fs::path> > ns_fn_map_;
+  std::map<std::string, std::vector<boost::filesystem::path> > ns_fn_map_;
 
   const std::string default_shmem_id_;
   
@@ -60,4 +50,4 @@ public:
   std::map<std::string, std::vector<std::string> > getNamespacesMap() const;
 };
 
-#endif  /* CNR_PARAM__CNR_PARAM_SERVER_ARGS_PARSER */
+#endif  /* SRC_CNR_PARAM_INCLUDE_CNR_PARAM_SERVER_UTILS_ARGS_PARSER */

@@ -289,6 +289,6 @@ bool get_map(const node_t& node, T& ret, std::stringstream& what);
 }  // namespace param
 }  // namespace cnr
 
-#include <cnr_param/impl/cnr_param_impl.hpp>
+#include <cnr_param/impl/cnr_param_impl.h>
 
 #endif  /* INCLUDE_CNR_PARAM_CNR_PARAM */

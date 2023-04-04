@@ -2,9 +2,9 @@
 #include <iostream>
 #include <yaml-cpp/yaml.h>
 
-#include <cnr_param/utils/filesystem.hpp>
-#include <cnr_param/utils/string.hpp>
-#include <cnr_param/utils/yaml.hpp>
+#include <cnr_param/utils/filesystem.h>
+#include <cnr_param/utils/string.h>
+#include <cnr_param/utils/yaml.h>
 
 namespace cnr { namespace param {  namespace utils {
 
@@ -247,7 +247,7 @@ std::map<std::string, std::vector<std::string> > toLeafMap(YAML::Node root)
   for(const auto & fn : fns)
   {
     std::vector<std::string> pp = cnr::param::utils::tokenize(fn, "/");
-    fs::path path;
+    boost::filesystem::path path;
     for(size_t i=0; i< pp.size()-1; i++)
     {
       path = path / pp.at(i);

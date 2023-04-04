@@ -76,39 +76,45 @@ list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS include ${DEPENDENCIES_INCLUDE_DIRS} 
 # ================================================
 add_library(cnr_param_utilities SHARED 
   src/${PROJECT_NAME}/cnr_param.cpp
-    src/${PROJECT_NAME}/utils/string.cpp
+    src/${PROJECT_NAME}/utils/colors.cpp
       src/${PROJECT_NAME}/utils/filesystem.cpp
         src/${PROJECT_NAME}/utils/interprocess.cpp
-          src/${PROJECT_NAME}/utils/colors.cpp
+          src/${PROJECT_NAME}/utils/string.cpp
             src/${PROJECT_NAME}/utils/yaml.cpp)
 target_include_directories(cnr_param_utilities PUBLIC
   "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
-    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>"))
+    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
-target_link_libraries(cnr_param_utilities
+target_link_libraries(cnr_param_utilities ${BOOST_LIBRARIES}
   yaml-cpp Boost::system Boost::filesystem Boost::iostreams Boost::regex Eigen3::Eigen
 )
 target_compile_definitions(cnr_param_utilities PRIVATE "CNR_PARAM_BUILDING_LIBRARY")
 
+
+add_library(cnr_param_server_utilities SHARED 
+              src/cnr_param_server/utils/args_parser.cpp
+                src/cnr_param_server/utils/yaml_manager.cpp)
+target_include_directories(cnr_param_server_utilities PUBLIC
+  "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
+
+target_link_libraries(cnr_param_server_utilities cnr_param_utilities
+  yaml-cpp Boost::system Boost::filesystem Boost::iostreams Boost::regex Eigen3::Eigen
+)
+target_compile_definitions(cnr_param_server_utilities PRIVATE "CNR_PARAM_BUILDING_LIBRARY")
+
 add_executable(cnr_param_server 
   src/cnr_param_server/param_server.cpp
-    src/cnr_param_server/args_parser.cpp
-      src/cnr_param_server/yaml_manager.cpp)
+)
 target_include_directories(cnr_param_server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(cnr_param_server cnr_param_utilities
-  yaml-cpp Boost::program_options Boost::system)
+target_link_libraries(cnr_param_server cnr_param_server_utilities cnr_param_utilities
+  yaml-cpp Boost::program_options)
 #################
 ## END - Build ##
 #################
-
-
-
-
-##################################################################################
-
 
 #############
 ## Install ##
@@ -119,7 +125,8 @@ install(DIRECTORY include/${PROJECT_NAME}
         PATTERN ".git" EXCLUDE
 )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS cnr_param_utilities cnr_param_server
+        EXPORT export_cnr_param
         ARCHIVE DESTINATION ${CNR_INSTALL_LIB_DIR}
         LIBRARY DESTINATION ${CNR_INSTALL_LIB_DIR}
         RUNTIME DESTINATION ${CNR_INSTALL_BIN_DIR}

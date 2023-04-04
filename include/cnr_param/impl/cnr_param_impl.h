@@ -40,7 +40,7 @@
 #elif defined(ROS1_AVAILABLE)
   #error "NOT YET IMPLEMENTED"  
 #else
-  #include <cnr_param/impl/yaml/cnr_param_yaml_cpp_impl.hpp>
+  #include <cnr_param/impl/yaml/cnr_param_yaml_cpp_impl.h>
 #endif
 
 
