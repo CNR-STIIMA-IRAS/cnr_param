@@ -6,10 +6,10 @@
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
-#include <cnr_param/cnr_param.hpp>
+#include <cnr_param/cnr_param.h>
 
-#include <cnr_param_server/args_parser.h>
-#include <cnr_param_server/yaml_manager.h>
+#include <cnr_param_server/utils/args_parser.h>
+#include <cnr_param_server/utils/yaml_manager.h>
 
 #include <gtest/gtest.h>
 
@@ -50,7 +50,7 @@ TEST(ServerTest, ServerUsage)
    // Parsing of program inputs
    const int argc = 3;
    std::string fn = std::string(TEST_DIR) + "/example.config";
-   std::cout << fn << std::endl;
+
    const char* const argv[] = {"test", "--config", fn.c_str()};
    ArgParser args(argc, argv, default_shmem_name);
 
@@ -72,8 +72,11 @@ TEST(ClientTest, ClientUsage)
     EXECUTION_TIME(
       ok = cnr::param::get(path, value, what);
     )
-    std::cout << "OK. " << ok << "| VALUE: " << value 
-                << "| WHAT: " << what << std::endl;
+    if(!ok)
+    {
+      std::cout << "OK: " << ok << "| VALUE: " << value 
+                  << "| WHAT: " << what << std::endl;
+    }
     return ok;
   };
 
@@ -84,6 +87,14 @@ TEST(ClientTest, ClientUsage)
 
   EXPECT_TRUE(cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic"));
+
+  int val = 9, before, after;
+  EXPECT_TRUE(cnr::param::set("/a", val, what));
+  EXPECT_TRUE(cnr::param::get("/a", before, what));
+  EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
+  EXPECT_TRUE(cnr::param::get("/a", after, what));
+  EXPECT_TRUE( before - after == 0 );
+  std::cout << "Value: before: " << before << " after: " << after << " Diff: " << before - after << std::endl;
 }
 
 
@@ -98,9 +109,10 @@ TEST(ClientErrorTest, ClientNonExistentParam)
     EXECUTION_TIME(
       ok = cnr::param::get(path, topic, what);
     )
-    std::cout << "GOT: " << ok << std::endl;
-    std::cout << "VALUE:" << topic << std::endl;
-    std::cout << "WHAT: " << what << std::endl;
+    if(!ok)
+    {
+      std::cout << "GOT: " << ok <<  " | VALUE:" << topic << " | WHAT: " << what << std::endl;
+    }
     return ok;
   };
 
@@ -140,7 +152,10 @@ TEST(DeveloperTest, DeveloperFunctions)
     EXECUTION_TIME(
       ok = cnr::param::get_leaf(root, leaf_key, leaf, what);
     )
-    std::cout << what << std::endl;
+    if(!ok)
+    {
+      std::cout << what << std::endl;
+    }
     return ok;
   };
 

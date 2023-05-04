@@ -1,5 +1,5 @@
-#ifndef INCLUDE_CNR_PARAM_CNR_PARAM
-#define INCLUDE_CNR_PARAM_CNR_PARAM
+#ifndef SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM
+#define SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM
 
 #include <vector>
 #include <string>
@@ -291,4 +291,5 @@ bool get_map(const node_t& node, T& ret, std::stringstream& what);
 
 #include <cnr_param/impl/cnr_param_impl.h>
 
-#endif  /* INCLUDE_CNR_PARAM_CNR_PARAM */
+
+#endif  /* SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM */

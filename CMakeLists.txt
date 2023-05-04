@@ -34,7 +34,7 @@ endif()
 ## DEPENDANCIES            ##
 #############################
 find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 REQUIRED COMPONENTS Core Dense)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -56,12 +56,6 @@ cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1)
 ## END DEPENDANCIES        ##
 #############################
 
-########################################################################################################################
-# Dependencies
-#########################################################################################################################
-find_package(Eigen3 CONFIG REQUIRED)
-
-
 #################
 ## Build       ##
 #################
@@ -80,16 +74,17 @@ add_library(cnr_param_utilities SHARED
       src/${PROJECT_NAME}/utils/filesystem.cpp
         src/${PROJECT_NAME}/utils/interprocess.cpp
           src/${PROJECT_NAME}/utils/string.cpp
-            src/${PROJECT_NAME}/utils/yaml.cpp)
+            src/${PROJECT_NAME}/utils/yaml.cpp
+              include/${PROJECT_NAME}/utils/eigen.h)
 target_include_directories(cnr_param_utilities PUBLIC
   "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
-target_link_libraries(cnr_param_utilities ${BOOST_LIBRARIES}
-  yaml-cpp Boost::system Boost::filesystem Boost::iostreams Boost::regex Eigen3::Eigen
+target_link_libraries(cnr_param_utilities 
+  PUBLIC yaml-cpp
+  PUBLIC Boost::system
+  PUBLIC Boost::filesystem
 )
-target_compile_definitions(cnr_param_utilities PRIVATE "CNR_PARAM_BUILDING_LIBRARY")
-
 
 add_library(cnr_param_server_utilities SHARED 
               src/cnr_param_server/utils/args_parser.cpp
@@ -98,10 +93,12 @@ target_include_directories(cnr_param_server_utilities PUBLIC
   "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
-target_link_libraries(cnr_param_server_utilities cnr_param_utilities
-  yaml-cpp Boost::system Boost::filesystem Boost::iostreams Boost::regex Eigen3::Eigen
+target_link_libraries(cnr_param_server_utilities 
+  PUBLIC cnr_param_utilities
+  PUBLIC Boost::program_options
+  PUBLIC Boost::iostreams
+  PUBLIC Boost::regex
 )
-target_compile_definitions(cnr_param_server_utilities PRIVATE "CNR_PARAM_BUILDING_LIBRARY")
 
 add_executable(cnr_param_server 
   src/cnr_param_server/param_server.cpp
@@ -110,8 +107,9 @@ target_include_directories(cnr_param_server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(cnr_param_server cnr_param_server_utilities cnr_param_utilities
-  yaml-cpp Boost::program_options)
+target_link_libraries(cnr_param_server 
+  PUBLIC cnr_param_server_utilities
+)
 #################
 ## END - Build ##
 #################
@@ -179,13 +177,12 @@ endif()
 if(ENABLE_TESTING)
   include(GoogleTest)
   add_executable(cnr_param_server_test 
-    src/cnr_param_server/args_parser.cpp
-    src/cnr_param_server/yaml_manager.cpp
+    src/cnr_param_server/utils/args_parser.cpp
+    src/cnr_param_server/utils/yaml_manager.cpp
     test/test_server.cpp)
   if(${CMAKE_VERSION} VERSION_GREATER  "3.16.0")
-    target_link_libraries(cnr_param_server_test 
-      cnr_param_utilities Threads::Threads GTest::gtest_main
-        Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
+    target_link_libraries(cnr_param_server_test cnr_param_utilities
+       Threads::Threads GTest::gtest_main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
   else()
     target_link_libraries(cnr_param_server_test cnr_param_utilities GTest::gtest_main)
     if(THREADS_HAVE_PTHREAD_ARG)
@@ -195,8 +192,7 @@ if(ENABLE_TESTING)
       target_link_libraries(cnr_param_server_test "${CMAKE_THREAD_LIBS_INIT}")
     endif()
   endif()
-  target_compile_definitions(cnr_param_server_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
-  
+  target_compile_definitions(cnr_param_server_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
   gtest_discover_tests(cnr_param_server_test)
  endif(ENABLE_TESTING)
 

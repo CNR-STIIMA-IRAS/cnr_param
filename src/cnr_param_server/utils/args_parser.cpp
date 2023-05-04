@@ -150,7 +150,7 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
         std::cerr << what << std::endl;
         throw po::validation_error(po::validation_error::invalid_option_value, "config-file");
       }
-      std::cout << "Parsing Config file " << fn << std::endl;
+
       std::ifstream fConfig{ fn.c_str() };
       if (fConfig)
       {
