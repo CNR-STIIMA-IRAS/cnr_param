@@ -175,16 +175,15 @@ endif()
 ## Testing              ##
 ##########################
 if(ENABLE_TESTING)
-  include(GoogleTest)
   add_executable(cnr_param_server_test 
     src/cnr_param_server/utils/args_parser.cpp
     src/cnr_param_server/utils/yaml_manager.cpp
     test/test_server.cpp)
   if(${CMAKE_VERSION} VERSION_GREATER  "3.16.0")
     target_link_libraries(cnr_param_server_test cnr_param_utilities
-       Threads::Threads GTest::gtest_main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
+       Threads::Threads GTest::Main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
   else()
-    target_link_libraries(cnr_param_server_test cnr_param_utilities GTest::gtest_main)
+    target_link_libraries(cnr_param_server_test cnr_param_utilities GTest::Main)
     if(THREADS_HAVE_PTHREAD_ARG)
       target_compile_options(cnr_param_server_test PUBLIC "-pthread")
     endif()
