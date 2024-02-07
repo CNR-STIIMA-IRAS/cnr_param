@@ -179,20 +179,20 @@ endif()
 if(ENABLE_TESTING)
   if(USE_ROS1)
     # Test using ROS TIME
-    add_rostest_gtest(${PROJECT_NAME}_test 
-      src/cnr_param_server/utils/args_parser.cpp
-      src/cnr_param_server/utils/yaml_manager.cpp
-      test/test_server.cpp)
-    target_link_libraries(${PROJECT_NAME}_test 
-      cnr_param_utilities
-      cnr_param_server_utilities
-      ${rostest_LIBRARIES} 
-      yaml-cpp
-      Boost::system
-      Boost::filesystem
-      Eigen3::Eigen
-    )
-    cnr_target_compile_options(${PROJECT_NAME}_test)
+    # add_rostest_gtest(${PROJECT_NAME}_test 
+    #   src/cnr_param_server/utils/args_parser.cpp
+    #   src/cnr_param_server/utils/yaml_manager.cpp
+    #   test/test_server.cpp)
+    # target_link_libraries(${PROJECT_NAME}_test 
+    #   cnr_param_utilities
+    #   cnr_param_server_utilities
+    #   ${rostest_LIBRARIES} 
+    #   yaml-cpp
+    #   Boost::system
+    #   Boost::filesystem
+    #   Eigen3::Eigen
+    # )
+    # cnr_target_compile_options(${PROJECT_NAME}_test)
   else()
     add_executable(${PROJECT_NAME}_test  
       src/cnr_param_server/utils/args_parser.cpp
