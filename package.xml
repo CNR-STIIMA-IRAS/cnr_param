@@ -8,7 +8,7 @@
   <license>BSD-3-Clause</license>
 
   <depend>yaml-cpp</depend>
-  <depend>Boost</depend>
+  <depend>boost</depend>
 
   <export>
     <build_type>cmake</build_type>
