@@ -208,7 +208,13 @@ if(ENABLE_TESTING)
   target_include_directories(${PROJECT_NAME}_test PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-)
+  )
+  target_link_libraries(${PROJECT_NAME}_test 
+    PUBLIC yaml-cpp
+    PUBLIC Boost::system
+    PUBLIC Boost::filesystem
+    PUBLIC Eigen3::Eigen
+  )
 endif(ENABLE_TESTING)
 
 
