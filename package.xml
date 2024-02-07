@@ -9,6 +9,7 @@
 
   <depend>yaml-cpp</depend>
   <depend>boost</depend>
+  <depend>eigen</depend>
 
   <export>
     <build_type>cmake</build_type>
