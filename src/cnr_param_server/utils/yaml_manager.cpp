@@ -104,19 +104,26 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
       try
       {
         l = __LINE__;
-        auto regiorn = cnr::param::utils::createFileMapping(ap.string());
-        if(!regiorn)
-        {
-          throw std::runtime_error("The file mapping cannot be created!");
-        }
-
-        l = __LINE__;
         
         auto keys = cnr::param::utils::tokenize(rp.string(), "/");
         auto node = cnr::param::utils::get_leaf(keys, root_);
         std::string str = YAML::Dump(node);
+
+        l = __LINE__;
+        auto regiorn = cnr::param::utils::createFileMapping(ap.string(),2*str.size());
+        if(!regiorn)
+        {
+          throw std::runtime_error("The file mapping cannot be created!");
+        }
         str +="\n";
 
+        if( str.size() > regiorn->get_size())
+        {
+          std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": BUG --- TO BE FIXED!!!! " << std::endl;
+          std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Aboslute path: " << ap << std::endl;
+          std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": Available Memory Size : " << regiorn->get_size() << " / Required Memory Size:" << str.size() << std::endl;
+          return false;
+        }
         std::memcpy(regiorn->get_address(), str.c_str(), str.size() );
         #if defined(NDEBUG)
           cnr::param::utils::printMemoryContent(ap.string(), regiorn->get_address(), false);
@@ -151,13 +158,6 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
     try
     {
       l = __LINE__;
-      auto region = cnr::param::utils::createFileMapping(ap.string());
-      if(!region)
-      {
-        throw std::runtime_error("The file mapping cannot be created!");
-      }
-
-      l = __LINE__;
       YAML::Node _node;
       _node[keys.back()] = node.second;
 
@@ -165,6 +165,13 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
       std::string str = YAML::Dump(_node);
       str +="\n";
       
+      l = __LINE__;
+      auto region = cnr::param::utils::createFileMapping(ap.string(),2*str.size());
+      if(!region)
+      {
+        throw std::runtime_error("The file mapping cannot be created!");
+      }
+
       l = __LINE__;
       std::memcpy(region->get_address(), str.c_str(), str.size() );
       

@@ -13,6 +13,64 @@
 
 #include <gtest/gtest.h>
 
+namespace detail
+{
+  struct unwrapper
+  {
+    explicit unwrapper(std::exception_ptr pe) : pe_(pe) {}
+
+    operator bool() const
+    {
+      return bool(pe_);
+    }
+
+    friend auto operator<<(std::ostream& os, unwrapper const& u) -> std::ostream&
+    {
+      try
+      {
+          std::rethrow_exception(u.pe_);
+          return os << "no exception";
+      }
+      catch(std::runtime_error const& e)
+      {
+          return os << "runtime_error: " << e.what();
+      }
+      catch(std::logic_error const& e)
+      {
+          return os << "logic_error: " << e.what();
+      }
+      catch(std::exception const& e)
+      {
+          return os << "exception: " << e.what();
+      }
+      catch(...)
+      {
+          return os << "non-standard exception";
+      }
+    }
+    std::exception_ptr pe_;
+  };
+}
+
+auto unwrap(std::exception_ptr pe)
+{
+  return detail::unwrapper(pe);
+}
+
+template<class F>
+::testing::AssertionResult does_not_throw(F&& f)
+{
+  try
+  {
+     f();
+     return ::testing::AssertionSuccess();
+  }
+  catch(...)
+  {
+     return ::testing::AssertionFailure() << unwrap(std::current_exception());
+  }
+}
+
 #if !defined(TEST_DIR)
 #error "The TES_DIR macro MUST be defined to run the program"
 #endif
@@ -43,23 +101,79 @@ TEST(HelloTest, BasicAssertions)
   EXPECT_EQ(7 * 6, 42);
 }
 
+ArgParser* args = nullptr;
+YAMLParser* yaml_parser = nullptr;
+YAMLStreamer* yaml_streamer = nullptr;
+
+TEST(ServerTest, ServerArgs)
+{
+  const std::string default_shmem_name = "param_server_default_shmem";
+  
+  // Parsing of program inputs
+  const int argc = 3;
+  std::string fn = std::string(TEST_DIR) + "/example.config";
+
+  const char* const argv[] = {"test", "--config", fn.c_str()};
+
+  EXPECT_TRUE(does_not_throw([&]{ args=new ArgParser(argc, argv, default_shmem_name); }));
+
+  EXPECT_TRUE(args);
+}
+
+TEST(ServerTest, YamlParser)
+{
+  // Parsing of the file contents, and storing in YAML::Node root
+
+  EXPECT_TRUE(does_not_throw([&]{ yaml_parser = new YAMLParser(args->getNamespacesMap()); }));
+
+  EXPECT_TRUE(yaml_parser);
+}
+
+TEST(ServerTest, YamlStreamer)
+{ 
+  // Streaming of all the files in mapping_files: shared memes mapped on files
+  // The tree is build under the 'param_root_directory'
+
+  EXPECT_TRUE(does_not_throw([&]{ yaml_streamer = new YAMLStreamer(yaml_parser->root(), param_root_directory); }));
+
+  EXPECT_TRUE(yaml_streamer);
+
+  EXPECT_NO_FATAL_FAILURE(delete yaml_parser);
+  EXPECT_NO_FATAL_FAILURE(delete yaml_streamer);
+  EXPECT_NO_FATAL_FAILURE(delete args);
+}
+
+
 TEST(ServerTest, ServerUsage)
 {
-   const std::string default_shmem_name = "param_server_default_shmem";
-   
-   // Parsing of program inputs
-   const int argc = 3;
-   std::string fn = std::string(TEST_DIR) + "/example.config";
+  const std::string default_shmem_name = "param_server_default_shmem";
+  
+  // Parsing of program inputs
+  const int argc = 3;
+  std::string fn = std::string(TEST_DIR) + "/example.config";
 
-   const char* const argv[] = {"test", "--config", fn.c_str()};
-   ArgParser args(argc, argv, default_shmem_name);
+  const char* const argv[] = {"test", "--config", fn.c_str()};
 
-   // Parsing of the file contents, and storing in YAML::Node root
-   YAMLParser yaml_parser(args.getNamespacesMap());
+  EXPECT_TRUE(does_not_throw([&]{ args=new ArgParser(argc, argv, default_shmem_name); }));
 
-   // Streaming of all the files in mapping_files: shared memes mapped on files
-   // The tree is build under the 'param_root_directory'
-   YAMLStreamer yaml_streamer(yaml_parser.root(), param_root_directory); 
+  EXPECT_TRUE(args);
+
+  // Parsing of the file contents, and storing in YAML::Node root
+
+  EXPECT_TRUE(does_not_throw([&]{ yaml_parser = new YAMLParser(args->getNamespacesMap()); }));
+
+  EXPECT_TRUE(yaml_parser);
+  
+  // Streaming of all the files in mapping_files: shared memes mapped on files
+  // The tree is build under the 'param_root_directory'
+
+  EXPECT_TRUE(does_not_throw([&]{ yaml_streamer = new YAMLStreamer(yaml_parser->root(), param_root_directory); }));
+
+  EXPECT_TRUE(yaml_parser);
+
+  EXPECT_NO_FATAL_FAILURE(delete yaml_parser);
+  EXPECT_NO_FATAL_FAILURE(delete yaml_streamer);
+  EXPECT_NO_FATAL_FAILURE(delete args);
 }
 
 TEST(ClientTest, ClientUsage)

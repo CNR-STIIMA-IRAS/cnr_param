@@ -196,7 +196,8 @@ bool set(const std::string& key, const T& ret, std::string& what)
   {
     return false;
   }
-  auto region = cnr::param::utils::createFileMapping(ap.string());
+  std::size_t fsz = 2 * boost::filesystem::file_size(ap);
+  auto region = cnr::param::utils::createFileMapping(ap.string(),fsz);
   if(!region)
   {
     what = "IMpossible to create the file mapping '" + ap.string() +"'";

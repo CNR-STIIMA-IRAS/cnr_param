@@ -32,12 +32,12 @@ void printMemoryContent(const std::string& header, void* addr, bool check_node)
   }
 }
 
-boost::interprocess::mapped_region* createFileMapping(const std::string& absolute_path)
+boost::interprocess::mapped_region* createFileMapping(const std::string& absolute_path, const std::size_t& file_size)
 {
   auto l = __LINE__;
   try
   {
-    std::function<void(const char* ap)> filebuf_create = [](const char* ap) 
+    std::function<void(const char* ap)> filebuf_create = [&file_size](const char* ap) 
     {
       auto tree = cnr::param::utils::tokenize(std::string(ap),"/");
       std::string root_dir = "/";
@@ -46,7 +46,6 @@ boost::interprocess::mapped_region* createFileMapping(const std::string& absolut
 
       boost::filesystem::create_directories(root_dir);
       
-      const std::size_t FileSize = 10000;
       boost::interprocess::file_mapping::remove(ap);
       std::filebuf fbuf;
       auto res = fbuf.open(ap, std::ios_base::in | std::ios_base::out 
@@ -56,7 +55,7 @@ boost::interprocess::mapped_region* createFileMapping(const std::string& absolut
         throw std::runtime_error("Failed in opening the filebuffer");
       }
       //Create a file mapping  
-      fbuf.pubseekoff(FileSize-1, std::ios_base::beg);
+      fbuf.pubseekoff(file_size-1, std::ios_base::beg);
       fbuf.sputc(0);
     };
 

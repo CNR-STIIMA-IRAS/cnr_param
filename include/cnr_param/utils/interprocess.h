@@ -36,7 +36,7 @@ void printMemoryContent(const std::string& header, void* addr, bool check_node);
  * @param absolute_path 
  * @return boost::interprocess::mapped_region* 
  */
-boost::interprocess::mapped_region* createFileMapping(const std::string& absolute_path);
+boost::interprocess::mapped_region* createFileMapping(const std::string& absolute_path, const std::size_t& file_size);
 
 }  // namespace utils
 }  // namespace param
