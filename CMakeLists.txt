@@ -84,6 +84,7 @@ target_link_libraries(cnr_param_utilities
   PUBLIC yaml-cpp
   PUBLIC Boost::system
   PUBLIC Boost::filesystem
+  PUBLIC Eigen3::Eigen
 )
 
 add_library(cnr_param_server_utilities SHARED 
@@ -204,7 +205,7 @@ if(ENABLE_TESTING)
     target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
     gtest_discover_tests(${PROJECT_NAME}_test )
   endif()
-  target_include_directories(${PROJECT_NAME}_test  PUBLIC
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
