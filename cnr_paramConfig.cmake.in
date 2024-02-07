@@ -9,6 +9,11 @@ set(cnr_param_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${cnr_param_DIR}/export_cnr_param.cmake")
 
+include(CMakeFindDependencyMacro)
+find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
+find_dependency(yaml-cpp REQUIRED)
+find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
+
 # These are IMPORTED targets created by cnr_paramTargets.cmake
 set(cnr_param_LIBRARIES cnr_param_utilities)
 

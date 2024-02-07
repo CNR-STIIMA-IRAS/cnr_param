@@ -123,7 +123,7 @@ install(DIRECTORY include/${PROJECT_NAME}
         PATTERN ".git" EXCLUDE
 )
 
-install(TARGETS cnr_param_utilities cnr_param_server
+install(TARGETS cnr_param_utilities cnr_param_server cnr_param_server_utilities
         EXPORT export_cnr_param
         ARCHIVE DESTINATION ${CNR_INSTALL_LIB_DIR}
         LIBRARY DESTINATION ${CNR_INSTALL_LIB_DIR}
