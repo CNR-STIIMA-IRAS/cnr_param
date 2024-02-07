@@ -204,6 +204,10 @@ if(ENABLE_TESTING)
     target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
     gtest_discover_tests(${PROJECT_NAME}_test )
   endif()
+  target_include_directories(${PROJECT_NAME}_test  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 endif(ENABLE_TESTING)
 
 
