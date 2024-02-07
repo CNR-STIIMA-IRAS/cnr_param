@@ -148,7 +148,7 @@ jobs:
         ProcessorCount(N)
 
         execute_process(
-          COMMAND ctest
+          COMMAND ctest --rerun-failed --output-on-failure
           WORKING_DIRECTORY build
           RESULT_VARIABLE result
         )
