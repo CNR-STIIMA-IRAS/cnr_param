@@ -76,7 +76,7 @@ add_library(cnr_param_utilities SHARED
           src/${PROJECT_NAME}/utils/string.cpp
             src/${PROJECT_NAME}/utils/yaml.cpp
               include/${PROJECT_NAME}/utils/eigen.h)
-target_include_directories(cnr_param_utilities PUBLIC
+target_include_directories(${PROJECT_NAME}_test _utilities PUBLIC
   "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
@@ -183,7 +183,7 @@ if(ENABLE_TESTING)
       src/cnr_param_server/utils/yaml_manager.cpp
       test/test_server.cpp)
     target_link_libraries(${PROJECT_NAME}_test 
-      ${PROJECT_NAME}
+      cnr_param_utilities
       ${rostest_LIBRARIES} 
       yaml-cpp
       Boost::system
