@@ -190,7 +190,6 @@ if(ENABLE_TESTING)
       Boost::filesystem
       Eigen3::Eigen
     )
-    target_compile_definitions(${PROJECT_NAME}_test PUBLIC FORCE_ROS_TIME_USE=1)
     cnr_target_compile_options(${PROJECT_NAME}_test)
   else()
     add_executable(${PROJECT_NAME}_test  
@@ -209,9 +208,9 @@ if(ENABLE_TESTING)
         target_link_libraries(${PROJECT_NAME}_test "${CMAKE_THREAD_LIBS_INIT}")
       endif()
     endif()
-    target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
     gtest_discover_tests(${PROJECT_NAME}_test )
   endif()
+  target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
   target_include_directories(${PROJECT_NAME}_test PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

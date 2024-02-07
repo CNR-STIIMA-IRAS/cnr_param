@@ -72,7 +72,7 @@ template<class F>
 }
 
 #if !defined(TEST_DIR)
-#error "The TES_DIR macro MUST be defined to run the program"
+#error "The TEST_DIR macro MUST be defined to run the program"
 #endif
 
 std::map<std::string, std::map<std::string, std::vector<double> > > statistics;
