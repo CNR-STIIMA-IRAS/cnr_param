@@ -44,6 +44,7 @@ jobs:
         env:
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
+          CMAKE_ARGS : -DUSE_ROS1=ON -DENABLE_TESTING=ON -DENABLE_COVERAGE_TESTING=ON -DCOMPILE_EXAMPLE=ON
       - name: code_coverage
         run: './.coverage.sh'
 
