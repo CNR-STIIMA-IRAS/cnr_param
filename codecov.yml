@@ -1,0 +1,31 @@
+---
+ignore:
+  - "build"
+  - "devel"
+  - "test"
+
+fixes:
+  - "src/node_example/::"
+
+codecov:
+  require_ci_to_pass: yes
+  token: dc6c3b82-47d4-4d2d-99a4-0aa76a4640ef
+
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: no
