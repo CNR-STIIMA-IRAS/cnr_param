@@ -557,7 +557,7 @@ inline YAML::Node extract(const YAML::Node& node, const std::string& key, const 
 }
 
 template<typename T>
-void insert(node_t& node, const std::string& key, const T& value)
+inline void insert(node_t& node, const std::string& key, const T& value)
 {
   try
   {
@@ -586,7 +586,7 @@ std::string int_to_hex( T i )
   return stream.str();
 }
 
-void insert(node_t& node, const std::string& key, const int& value, const std::string& format)
+inline void insert(node_t& node, const std::string& key, const int& value, const std::string& format)
 {
   std::string val;
   if(format=="dec")
@@ -685,19 +685,19 @@ inline bool get_scalar(const YAML::Node& node, double& ret, std::stringstream& w
 }
 
 template<>
-bool get_scalar(const YAML::Node& node, int& ret, std::stringstream& what)
+inline bool get_scalar(const YAML::Node& node, int& ret, std::stringstream& what)
 {
   return _get_scalar<int>(node, ret, what);
 }
 
 template<>
-bool get_scalar(const YAML::Node& node, bool& ret, std::stringstream& what)
+inline bool get_scalar(const YAML::Node& node, bool& ret, std::stringstream& what)
 {
   return _get_scalar<bool>(node, ret, what);
 }
 
 template<>
-bool get_scalar(const YAML::Node& node, std::string& ret, std::stringstream& what)
+inline bool get_scalar(const YAML::Node& node, std::string& ret, std::stringstream& what)
 {
   return _get_scalar<std::string>(node, ret, what);
 }
