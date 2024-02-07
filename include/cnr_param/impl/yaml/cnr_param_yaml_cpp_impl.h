@@ -196,13 +196,7 @@ bool set(const std::string& key, const T& ret, std::string& what)
   {
     return false;
   }
-  std::size_t fsz = 2 * boost::filesystem::file_size(ap);
-  auto region = cnr::param::utils::createFileMapping(ap.string(),fsz);
-  if(!region)
-  {
-    what = "IMpossible to create the file mapping '" + ap.string() +"'";
-    return false;
-  }
+
   auto keys = cnr::param::utils::tokenize(key, "/");
 
   YAML::Node _node;
@@ -210,7 +204,14 @@ bool set(const std::string& key, const T& ret, std::string& what)
 
   std::string str = YAML::Dump(_node);
   str +="\n";
-      
+  
+  std::size_t fsz = 2 * str.size();
+  auto region = cnr::param::utils::createFileMapping(ap.string(),fsz);
+  if(!region)
+  {
+    what = "IMpossible to create the file mapping '" + ap.string() +"'";
+    return false;
+  }
   std::memcpy(region->get_address(), str.c_str(), str.size() );
   
   return true;
