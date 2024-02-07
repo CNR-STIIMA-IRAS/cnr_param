@@ -145,6 +145,7 @@ install(TARGETS cnr_param_utilities cnr_param_server cnr_param_server_utilities
 ##################################
 if(NOT USE_ROS1) 
   set(export_targets ${export_targets};cnr_param_utilities)
+  set(export_targets ${export_targets};cnr_param_server_utilities)
   set(export_targets ${export_targets};cnr_param_server)
   export(EXPORT export_cnr_param
     FILE "${PROJECT_BINARY_DIR}/export_cnr_param.cmake")
@@ -184,6 +185,7 @@ if(ENABLE_TESTING)
       test/test_server.cpp)
     target_link_libraries(${PROJECT_NAME}_test 
       cnr_param_utilities
+      cnr_param_server_utilities
       ${rostest_LIBRARIES} 
       yaml-cpp
       Boost::system
