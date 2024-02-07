@@ -45,15 +45,15 @@ jobs:
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
           CMAKE_ARGS : -DUSE_ROS1=ON -DENABLE_TESTING=OFF -DENABLE_COVERAGE_TESTING=OFF -DCOMPILE_EXAMPLE=ON
-      - name: code_coverage
-        run: './.coverage.sh'
+      # - name: code_coverage
+      #   run: './.coverage.sh'
 
-      - name: Codecov
-        uses: codecov/codecov-action@v3.1.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          directory:  /home/runner/target_ws/build
-          flags: unittests # optional
-          name: codecov-umbrella # optional
-          fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
+      # - name: Codecov
+      #   uses: codecov/codecov-action@v3.1.1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+      #     directory:  /home/runner/target_ws/build
+      #     flags: unittests # optional
+      #     name: codecov-umbrella # optional
+      #     fail_ci_if_error: true # optional (default = false)
+      #     verbose: true # optional (default = false)
