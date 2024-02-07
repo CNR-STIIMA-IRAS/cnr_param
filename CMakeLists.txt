@@ -175,25 +175,36 @@ endif()
 ## Testing              ##
 ##########################
 if(ENABLE_TESTING)
-  add_executable(cnr_param_server_test 
-    src/cnr_param_server/utils/args_parser.cpp
-    src/cnr_param_server/utils/yaml_manager.cpp
-    test/test_server.cpp)
-  if(${CMAKE_VERSION} VERSION_GREATER  "3.16.0")
-    target_link_libraries(cnr_param_server_test cnr_param_utilities
-       Threads::Threads GTest::Main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
+  if(USE_ROS1)
+    # Test using ROS TIME
+    add_rostest_gtest(${PROJECT_NAME}_test 
+      src/cnr_param_server/utils/args_parser.cpp
+      src/cnr_param_server/utils/yaml_manager.cpp
+      test/test_server.cpp)
+    target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME} ${CNR_LOGGER_TARGET_LINK_LIBRARIES} ${rostest_LIBRARIES} )
+    target_compile_definitions(${PROJECT_NAME}_test PUBLIC FORCE_ROS_TIME_USE=1)
+    cnr_target_compile_options(${PROJECT_NAME}_test)
   else()
-    target_link_libraries(cnr_param_server_test cnr_param_utilities GTest::Main)
-    if(THREADS_HAVE_PTHREAD_ARG)
-      target_compile_options(cnr_param_server_test PUBLIC "-pthread")
+    add_executable(${PROJECT_NAME}_test  
+      src/cnr_param_server/utils/args_parser.cpp
+      src/cnr_param_server/utils/yaml_manager.cpp
+      test/test_server.cpp)
+    if(${CMAKE_VERSION} VERSION_GREATER  "3.16.0")
+      target_link_libraries(${PROJECT_NAME}_test  cnr_param_utilities
+        Threads::Threads GTest::Main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
+    else()
+      target_link_libraries(${PROJECT_NAME}_test cnr_param_utilities GTest::Main)
+      if(THREADS_HAVE_PTHREAD_ARG)
+        target_compile_options(${PROJECT_NAME}_test PUBLIC "-pthread")
+      endif()
+      if(CMAKE_THREAD_LIBS_INIT)
+        target_link_libraries(${PROJECT_NAME}_test "${CMAKE_THREAD_LIBS_INIT}")
+      endif()
     endif()
-    if(CMAKE_THREAD_LIBS_INIT)
-      target_link_libraries(cnr_param_server_test "${CMAKE_THREAD_LIBS_INIT}")
-    endif()
+    target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
+    gtest_discover_tests(${PROJECT_NAME}_test )
   endif()
-  target_compile_definitions(cnr_param_server_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
-  gtest_discover_tests(cnr_param_server_test)
- endif(ENABLE_TESTING)
+endif(ENABLE_TESTING)
 
 
 ##########################
@@ -205,7 +216,7 @@ if( ENABLE_TESTING AND ENABLE_COVERAGE_TESTING AND NOT WIN32 )
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
     add_code_coverage(
       NAME coverage_report
-      DEPENDENCIES cnr_param_server_test
+      DEPENDENCIES ${PROJECT_NAME}_test 
     )
   else()
     ## NOTHING TO DO, SINCE GTEST ALREADY CREATES THE COVERAGE
