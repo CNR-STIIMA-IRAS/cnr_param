@@ -130,11 +130,11 @@ install(TARGETS cnr_param_utilities cnr_param_server cnr_param_server_utilities
         RUNTIME DESTINATION ${CNR_INSTALL_BIN_DIR}
 )
 
-if(USE_ROS1)
-  install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-  PATTERN ".svn" EXCLUDE)
-endif()
+# if(USE_ROS1)
+#   install(DIRECTORY launch/
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+#   PATTERN ".svn" EXCLUDE)
+# endif()
 ###################
 ## END - Install ##
 ###################
