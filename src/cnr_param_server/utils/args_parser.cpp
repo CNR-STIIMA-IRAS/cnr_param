@@ -73,7 +73,7 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
       ("version,v", "print version std::string")
       ("help,h", "produce help message")
       ("config-file,c", 
-        po::value< std::string>()->value_name("filepath 8absolute or relative"),
+        po::value< std::string>()->value_name("filepath absolute or relative"),
         "config file name. It stores all the inline commands");
 
     shmem_options_.add_options()

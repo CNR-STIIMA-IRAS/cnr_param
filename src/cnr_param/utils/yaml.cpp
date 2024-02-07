@@ -199,7 +199,12 @@ void get_nodes_tree(const std::string& ns, const YAML::Node& node, std::vector< 
 
 YAML::Node get_leaf(const std::vector<std::string>& keys, const YAML::Node& node)
 {
-  auto        it = keys.begin();
+  if(keys.size()==0)
+  {
+    return node;
+  }
+
+  auto it = keys.begin();
   std::string key = keys.front();
   for(YAML::const_iterator yt=node.begin(); yt!=node.end();++yt) 
   {
