@@ -182,7 +182,14 @@ if(ENABLE_TESTING)
       src/cnr_param_server/utils/args_parser.cpp
       src/cnr_param_server/utils/yaml_manager.cpp
       test/test_server.cpp)
-    target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME} ${CNR_LOGGER_TARGET_LINK_LIBRARIES} ${rostest_LIBRARIES} )
+    target_link_libraries(${PROJECT_NAME}_test 
+      PUBLIC ${PROJECT_NAME}
+      PUBLIC ${rostest_LIBRARIES} 
+      PUBLIC yaml-cpp
+      PUBLIC Boost::system
+      PUBLIC Boost::filesystem
+      PUBLIC Eigen3::Eigen
+    )
     target_compile_definitions(${PROJECT_NAME}_test PUBLIC FORCE_ROS_TIME_USE=1)
     cnr_target_compile_options(${PROJECT_NAME}_test)
   else()
@@ -209,12 +216,7 @@ if(ENABLE_TESTING)
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
   )
-  target_link_libraries(${PROJECT_NAME}_test 
-    PUBLIC yaml-cpp
-    PUBLIC Boost::system
-    PUBLIC Boost::filesystem
-    PUBLIC Eigen3::Eigen
-  )
+
 endif(ENABLE_TESTING)
 
 
