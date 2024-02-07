@@ -101,53 +101,13 @@ TEST(HelloTest, BasicAssertions)
   EXPECT_EQ(7 * 6, 42);
 }
 
-ArgParser* args = nullptr;
-YAMLParser* yaml_parser = nullptr;
-YAMLStreamer* yaml_streamer = nullptr;
-
-TEST(ServerTest, ServerArgs)
-{
-  const std::string default_shmem_name = "param_server_default_shmem";
-  
-  // Parsing of program inputs
-  const int argc = 3;
-  std::string fn = std::string(TEST_DIR) + "/example.config";
-
-  const char* const argv[] = {"test", "--config", fn.c_str()};
-
-  EXPECT_TRUE(does_not_throw([&]{ args=new ArgParser(argc, argv, default_shmem_name); }));
-
-  EXPECT_TRUE(args);
-}
-
-TEST(ServerTest, YamlParser)
-{
-  // Parsing of the file contents, and storing in YAML::Node root
-
-  EXPECT_TRUE(does_not_throw([&]{ yaml_parser = new YAMLParser(args->getNamespacesMap()); }));
-
-  EXPECT_TRUE(yaml_parser);
-}
-
-TEST(ServerTest, YamlStreamer)
-{ 
-  // Streaming of all the files in mapping_files: shared memes mapped on files
-  // The tree is build under the 'param_root_directory'
-
-  EXPECT_TRUE(does_not_throw([&]{ yaml_streamer = new YAMLStreamer(yaml_parser->root(), param_root_directory); }));
-
-  EXPECT_TRUE(yaml_streamer);
-
-  EXPECT_NO_FATAL_FAILURE(delete yaml_parser);
-  EXPECT_NO_FATAL_FAILURE(delete yaml_streamer);
-  EXPECT_NO_FATAL_FAILURE(delete args);
-}
-
-
 TEST(ServerTest, ServerUsage)
 {
   const std::string default_shmem_name = "param_server_default_shmem";
-  
+  ArgParser* args = nullptr;
+  YAMLParser* yaml_parser = nullptr;
+  YAMLStreamer* yaml_streamer = nullptr;
+
   // Parsing of program inputs
   const int argc = 3;
   std::string fn = std::string(TEST_DIR) + "/example.config";

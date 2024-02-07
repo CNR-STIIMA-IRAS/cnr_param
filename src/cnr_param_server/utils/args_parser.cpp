@@ -1,3 +1,4 @@
+#include <boost/filesystem/path.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -202,7 +203,11 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
           std::cerr << what << std::endl;
           throw po::validation_error(po::validation_error::invalid_option_value, "path-to-file", p);
         }
-        ns_fn_map_[ default_shmem_id_ ].push_back(fp);
+        if(ns_fn_map_.find(default_shmem_id_)==ns_fn_map_.end())
+        {
+          ns_fn_map_[default_shmem_id_] = std::vector<boost::filesystem::path>(); 
+        }
+        ns_fn_map_.at( default_shmem_id_ ).push_back(fp);
       }
     } 
       
@@ -222,6 +227,10 @@ ArgParser::ArgParser(int argc, const char* const argv[], const std::string& defa
         { 
           std::cerr << what << std::endl;
           throw po::validation_error(po::validation_error::invalid_option_value,"ns-and-path-to-file" );
+        }
+        if(ns_fn_map_.find(p.first )==ns_fn_map_.end())
+        {
+          ns_fn_map_[p.first ] = std::vector<boost::filesystem::path>(); 
         }
         ns_fn_map_[ p.first ].push_back(fp);
       }
@@ -294,12 +303,15 @@ const std::map<std::string, size_t>& ArgParser::getSizeMap() const
 
 std::map<std::string, std::vector<std::string> > ArgParser::getNamespacesMap() const
 {
-  std::map<std::string, std::vector<std::string>> ret;
-  for(const auto & ns_fn : ns_fn_map_)
+  std::map<std::string, std::vector<std::string>> ret{};
+  if(ns_fn_map_.size()>0)
   {
-    for(const auto & fn : ns_fn.second )
+    for(const auto & ns_fn : ns_fn_map_)
     {
-      ret[ns_fn.first].push_back(fn.c_str());
+      for(const auto & fn : ns_fn.second )
+      {
+        ret[ns_fn.first].push_back(fn.c_str());
+      }
     }
   }
   return ret;
