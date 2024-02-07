@@ -4,14 +4,25 @@
   <name>cnr_param</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
+  <author email="nicola.pedrocchi@stiima.cnr.it">Nicola Pedrocchi</author>
   <maintainer email="nicola.pedrocchi@stiima.cnr.it">feynman</maintainer>
   <license>BSD-3-Clause</license>
 
-  <depend>yaml-cpp</depend>
-  <depend>boost</depend>
-  <depend>eigen</depend>
-
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">cmake</buildtool_depend>
+  
+  <build_depend>yaml-cpp</build_depend>
+  <build_depend>boost</build_depend>
+  <build_depend>eigen</build_depend>
+  
+  <depend condition="$ROS_VERSION == 1">roscpp</depend>
+  
+  <test_depend>curl</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">rostest</test_depend>
+  <test_depend condition="$ROS_VERSION == 1">code_coverage</test_depend>
+  
   <export>
-    <build_type>cmake</build_type>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">cmake</build_type>
   </export>
 </package>
