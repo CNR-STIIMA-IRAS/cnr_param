@@ -248,27 +248,15 @@ bool get_scalar(const node_t& node, std::string& ret, std::stringstream& what);
 template<typename T>
 bool get_sequence(const node_t& node, T& ret, std::stringstream& what);
 
-template<typename T>
-bool get_sequence(const node_t& node, std::vector<T>& ret, std::stringstream& what);
-
-template<typename T>
-bool get_sequence(const node_t& node, std::vector< std::vector<T> >& ret, std::stringstream& what);
-
-template<typename T, std::size_t  N>
-bool get_sequence(const node_t& node, std::array<T,N>& ret, std::stringstream& what);
-
-template<typename T, std::size_t N, std::size_t M>
-bool get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what);
-
-/**
- * @brief 
- * 
- * @tparam Derived 
- * @param key 
- * @return Eigen::MatrixBase<Derived> 
- */
-template<typename Derived>
-bool get_sequence(const node_t& node, Eigen::MatrixBase<Derived>& ret, std::stringstream& what);
+// /**
+//  * @brief 
+//  * 
+//  * @tparam Derived 
+//  * @param key 
+//  * @return Eigen::MatrixBase<Derived> 
+//  */
+// template<typename Derived>
+// bool get_sequence(const node_t& node, Eigen::MatrixBase<Derived>& ret, std::stringstream& what);
 
 //======================================================================================================================
 //== MAP FUNCTION

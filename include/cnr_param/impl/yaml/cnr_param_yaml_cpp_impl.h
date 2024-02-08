@@ -40,6 +40,8 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <type_traits>
+#include <Eigen/Core>
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/containers/vector.hpp>
@@ -523,7 +525,7 @@ inline T extract(const YAML::Node& node, const std::string& key, const std::stri
     }
     else if(leaf.IsSequence())
     {
-      ok = get_sequence<T>(leaf, ret, what);
+      ok = get_sequence(leaf, ret, what);
     } 
     else if(leaf.IsMap())
     {
@@ -647,7 +649,6 @@ inline void insert(node_t& node, const std::string& key, const int& value, const
 template<typename T>
 inline bool _get_scalar(const YAML::Node& node, T& ret, std::stringstream& what)
 {
-  bool ok = false;
   YAML::Node config(node);
   if(!config.IsScalar())
   {
@@ -657,17 +658,16 @@ inline bool _get_scalar(const YAML::Node& node, T& ret, std::stringstream& what)
           << "' but the node is not a scalar." << std::endl
             << "Node: " << std::endl
               << node << std::endl;
+    return false;
   }
-  else
+  
+  try
   {
-    try
-    {
-      ret = node.as<T>();
-      ok = true;
-    }
-    CATCH(ret);
+    ret = node.as<T>();
+    return true;
   }
-  return ok;
+  CATCH(ret);
+  return false;
 }
 
 template<typename T>
@@ -711,21 +711,32 @@ inline bool get_scalar(const YAML::Node& node, std::string& ret, std::stringstre
 // =============================================================================================
 // SEQUENCE
 // =============================================================================================
-template<typename T>
-inline bool get_sequence(const node_t& node, T& ret, std::stringstream& what)
-{
-  UNUSED(node);
-  UNUSED(ret);
-  what << "The type ' " <<
-      boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
-        << "' is not supported. You must specilized your own 'get_sequence' template function";
-  return false;
-}
+template <typename C> struct is_vector : std::false_type {};
+template <typename T,typename A> struct is_vector< std::vector<T,A> > : std::true_type {};
 
-template<typename T>
-inline bool get_sequence(const YAML::Node& node, std::vector<T>& ret, std::stringstream& what)
+template<typename Derived>
+struct is_matrix_expression : std::is_base_of<Eigen::MatrixBase<std::decay_t<Derived> >, std::decay_t<Derived> > {};
+
+// ffwd declarations
+template<typename Derived>
+bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const & ret, std::stringstream& what);
+
+template<typename T, typename A>
+bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::stringstream& what);
+
+template<typename T, typename A>
+bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::stringstream& what);
+
+template<typename T, std::size_t  N>
+bool _get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstream& what);
+
+template<typename T, std::size_t N, std::size_t M>
+bool _get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what);
+
+
+template<typename T, typename A>
+inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::stringstream& what)
 {
-  bool ok = false;
   YAML::Node config(node);
   if(!config.IsSequence())
   {
@@ -735,52 +746,50 @@ inline bool get_sequence(const YAML::Node& node, std::vector<T>& ret, std::strin
           << "' but the node is not a sequence." << std::endl
             << "Node: " << std::endl
               << node << std::endl;
+    return false;
   }
-  else
+  
+  try
   {
-
-    try
+    bool ok = false;
+    ret.clear();
+    for(std::size_t i=0; i<node.size();i++)
     {
-      ret.clear();
-      ret.resize(node.size());
-      for(std::size_t i=0; i<node.size();i++)
+      T v = T();
+      if(node[i].IsScalar())
       {
-        T v = T();
-        if(node[i].IsScalar())
-        {
-          ok = get_scalar<T>(node[i], v);
-        }
-        else if(node[i].IsSequence())
-        {
-          ok = get_sequence<T>(node[i], v);
-        }
-        else if(node[i].IsMap())
-        {
-          ok = get_map<T>(node[i], v);
-        }
-
-        if(!ok)
-        {
-          what  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-                  << "Error in the extraction of the element #" << i << ". Type of the sequence: "
-                    << boost::typeindex::type_id_with_cvr<decltype(std::vector<T>())>().pretty_name() 
-                      << "' but the node is not a sequence." << std::endl
-                        << "Node: " << std::endl
-                          << node << std::endl;
-          break;
-        }
-        ret.push_back(v);
-
+        ok = get_scalar<T>(node[i], v, what);
       }
-      ok = true;
+      else if(node[i].IsSequence())
+      {
+        ok = get_sequence<T>(node[i], v, what);
+      }
+      else if(node[i].IsMap())
+      {
+        ok = get_map<T>(node[i], v, what);
+      }
+
+      if(!ok)
+      {
+        what  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+                << "Error in the extraction of the element #" << i << ". Type of the sequence: "
+                  << boost::typeindex::type_id_with_cvr<decltype(std::vector<T>())>().pretty_name() 
+                    << "' but the node is not a sequence." << std::endl
+                      << "Node: " << std::endl
+                        << node << std::endl;
+        break;
+      }
+      ret.push_back(v);
     }
-    CATCH(ret);
+    return ok;
   }
-  return ok;
+  CATCH(ret);
+  
+  return false;
 }
 
-template<typename T>
-inline bool get_sequence(const YAML::Node& node, std::vector<std::vector<T>>& ret, std::stringstream& what)
+template<typename T, typename A>
+inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::stringstream& what)
 {
   bool ok = false;
   YAML::Node config(node);
@@ -797,7 +806,7 @@ inline bool get_sequence(const YAML::Node& node, std::vector<std::vector<T>>& re
   {
     try
     {
-      ret.resize(config.size());
+      ret.clear();
       for(std::size_t i=0; i<node.size();i++)
       {
         if(!config[i].IsSequence())
@@ -830,7 +839,7 @@ inline bool get_sequence(const YAML::Node& node, std::vector<std::vector<T>>& re
 }
 
 template<typename T, std::size_t  N>
-bool get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstream& what)
+bool _get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstream& what)
 {
   bool ok = false;
   try
@@ -858,13 +867,13 @@ bool get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstrea
 }
 
 template<typename T, std::size_t N, std::size_t M>
-bool get_sequence(const node_t& node, std::array<std::array<T,M>,N> ret, std::stringstream& what)
+bool _get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what)
 {
   bool ok = false;
   try
   {
     std::vector<std::vector<T>> tmp;
-    ok = get_sequence(node, tmp, what);
+    ok = _get_sequence(node, tmp, what);
     if(!ok || (tmp.size()!=N) || (tmp.front().size()!=M))
     {
       what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
@@ -888,17 +897,8 @@ bool get_sequence(const node_t& node, std::array<std::array<T,M>,N> ret, std::st
   return ok;
 }
 
-
-/**
- * @brief 
- * 
- * @tparam Derived 
- * @param key 
- * @return Eigen::MatrixBase<Derived> 
- */
-#if 1
 template<typename Derived>
-inline bool get_sequence(const YAML::Node& node, Eigen::MatrixBase<Derived> const & ret, std::stringstream& what)
+inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const & ret, std::stringstream& what)
 {
   bool ok = false;
   Eigen::MatrixBase<Derived>& _ret = const_cast< Eigen::MatrixBase<Derived>& >(ret);
@@ -913,7 +913,7 @@ inline bool get_sequence(const YAML::Node& node, Eigen::MatrixBase<Derived> cons
     if (should_be_a_vector)
     {
       std::vector<double> vv;
-      ok = get_sequence(config, vv, what);
+      ok = _get_sequence(config, vv, what);
       if(!ok)
       {
         what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
@@ -942,7 +942,7 @@ inline bool get_sequence(const YAML::Node& node, Eigen::MatrixBase<Derived> cons
     else  // matrix expected
     {
       std::vector<std::vector<double>> vv;
-      ok = get_sequence(node, vv, what);
+      ok = _get_sequence(node, vv, what);
       if(!ok)
       {
         std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
@@ -989,7 +989,29 @@ inline bool get_sequence(const YAML::Node& node, Eigen::MatrixBase<Derived> cons
   }
   return true;
 }
-#endif
+
+
+template<typename T>
+inline bool _get_sequence(const node_t& node, T& ret, std::stringstream& what)
+{
+  if constexpr(is_matrix_expression<T>::value)
+  {
+    return _get_sequence_eigen(node,ret,what);
+  }
+  UNUSED(node);
+  UNUSED(ret);
+
+  what << "The type ' " <<
+      boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
+        << "' is not supported. You must specilized your own 'get_sequence' template function";
+  return false;
+}
+
+template<typename T>
+inline bool get_sequence(const node_t& node, T& ret, std::stringstream& what)
+{
+  return _get_sequence(node, ret, what);
+}
 
 template<typename T>
 inline bool get_map(const node_t& node, T& ret, std::stringstream& what)

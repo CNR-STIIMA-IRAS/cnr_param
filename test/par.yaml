@@ -1,0 +1,23 @@
+n1:
+  n2:
+    p1: 5
+    c1: "ciao"
+  n3:
+    v1:
+    - "s1"
+    - "s2"
+    - "s3"
+    v10: [1,2,3,4]
+  n4:
+    vv1:
+    - ["s11","s12","s13"]
+    - ["s21","s22","s23"]
+    - ["s31","s32","s33"]
+    vv10:
+    - [11, 12, 13]
+    - [21, 22, 23]
+    - [31, 32, 33]
+    test_vector_complex_type:
+    - {name: ciao, value: 10.0}
+    - {name: hello, value: 20.0}
+    - {name: byebye, value: 30.0}

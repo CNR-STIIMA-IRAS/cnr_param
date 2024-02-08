@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <ostream>
 #include <utility>
 #include <iostream>
 #include <string>
@@ -234,6 +235,156 @@ TEST(DeveloperTest, DeveloperFunctions)
   };
 
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/", "feedback_joint_state_topic"));
+}
+
+TEST(DeveloperTest,GetVector)
+{
+  std::string what;
+  std::vector<std::string> vv;
+  bool ret = true;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v1", vv, what));
+  if(ret)
+  {
+    std::cout << "[";
+    for(const auto & v: vv)
+    {
+      std::cout << v << ", ";
+    }
+    std::cout << "]" << std::endl;
+  }
+  else
+  {
+    std::cout << "Failed: " << what << std::endl;
+  }
+
+  std::vector<double> dd;
+  EXPECT_FALSE(ret = cnr::param::get("n1/n3/v1", dd, what));
+  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v10", dd, what));
+  std::cout << "[";
+  for(const auto & v: dd)
+  {
+    std::cout << v << ", ";
+  }
+  std::cout << "]" << std::endl;
+
+  Eigen::VectorXd ee;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v10", ee, what));
+  if(ret)
+  {
+    std::cout << ee.transpose() << std::endl;
+  }
+  else
+  {
+    std::cout << "Failed: " << what << std::endl;
+  }
+}
+
+TEST(DeveloperTest,GetMatrix)
+{
+  std::string what;
+  std::vector<std::vector<std::string>> vv;
+  bool ret = true;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv1", vv, what));
+  std::cout << "[\n";
+  for(const auto & v: vv)
+  {
+    std::cout << " [ " ;
+    for(const auto & s: v)
+    {
+      std::cout << s << ", ";
+    }
+    std::cout << "] " << std::endl;
+  }
+  std::cout << "]" << std::endl;
+
+  std::vector<std::vector<double>> dd;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv10", dd, what));
+  std::cout << "[\n";
+  for(const auto & v: dd)
+  {
+    std::cout << " [ " ;
+    for(const auto & s: v)
+    {
+      std::cout << s << ", ";
+    }
+    std::cout << "] " << std::endl;
+  }
+  std::cout << "]" << std::endl;
+
+  Eigen::MatrixXd ee;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv10", ee, what));
+  std::cout << ee << std::endl;
+
+  EXPECT_FALSE(ret = cnr::param::get("n1/n4/vv1", ee, what));
+}
+
+
+struct ComplexType
+{
+  std::string name;
+  double value;
+};
+
+namespace cnr { namespace param {
+  template<> bool get_map(const node_t& node, ComplexType& ret, std::stringstream& what)
+  {
+    try
+    {
+    if(node["name"] && node["value"])
+    {
+      ret.name = node["name"].as<std::string>();
+      ret.value = node["value"].as<double>();
+      return true;
+    }
+    }
+    catch(YAML::Exception& e)
+  {
+      what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+        << "YAML Exception, Error in the extraction of an object of type '"
+          << boost::typeindex::type_id_with_cvr<decltype( ret )>().pretty_name() 
+            << "'" << std::endl
+              << "Node: " << std::endl
+                << node << std::endl
+                  << "What: " << std::endl
+                    << e.what() << std::endl;
+    }
+    catch (std::exception& e)
+    {
+      what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+        << "Exception, Error in the extraction of an object of type '"
+          << boost::typeindex::type_id_with_cvr<decltype( ret )>().pretty_name() 
+            << "'" << std::endl
+              << "Node: " << std::endl
+                << node << std::endl
+                  << "What: " << std::endl
+                    << e.what() << std::endl;
+    }
+    return false;
+  }
+}}
+
+
+TEST(DeveloperTest,GetComplexType)
+{
+  std::string what;
+  std::vector<ComplexType> vv;
+  bool ret = true;
+  EXPECT_TRUE(ret = cnr::param::get("n1/n4/test_vector_complex_type", vv, what));
+  if(ret)
+  {
+    std::cout << "[\n";
+    for(const auto & v: vv)
+    {
+      std::cout << " [ " ;
+      std::cout << v.name << "," << v.value;
+      std::cout << "] " << std::endl;
+    }
+    std::cout << "]" << std::endl;
+  }
+  else
+  {
+    std::cerr << what << std::endl;
+  }
 }
 
 int main(int argc, char **argv) {

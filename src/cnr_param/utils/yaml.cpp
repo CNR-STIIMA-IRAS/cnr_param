@@ -224,7 +224,7 @@ YAML::Node get_leaf(const std::vector<std::string>& keys, const YAML::Node& node
       }
     }
   }
-  std::cout << "Weird error " << key << " < " ;
+  std::cout << "Weird error " << key << " < ";
   for(YAML::const_iterator yt=node.begin(); yt!=node.end();++yt) 
   {
     const std::string& node_key = yt->first.as<std::string>();
