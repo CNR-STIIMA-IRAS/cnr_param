@@ -5,17 +5,29 @@
 #include <string>
 #include <iostream>
 
-//#include <boost/interprocess/detail/os_file_functions.hpp>
-#include<boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 #include <cnr_param_server/utils/args_parser.h>
 #include <cnr_param_server/utils/yaml_manager.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 int main(int argc, char* argv[])
 {
   const std::string default_shmem_name = "param_server_default_shmem";
-  const std::string default_param_root_directory = "/tmp/cnr_param";
+  std::string default_param_root_directory;
+
+  #if defined(_WIN32)
+  // Windows
+  char tempPath[MAX_PATH];
+  GetTempPath(MAX_PATH, tempPath);
+  default_param_root_directory = std::string(tempPath) + "cnr_param";
+  #else
+  // Assume Linux/Unix/Mac
+  default_param_root_directory = "/tmp/cnr_param";
+  #endif
 
   std::string param_root_directory;
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
@@ -28,9 +40,9 @@ int main(int argc, char* argv[])
   {
     // Check if default_param_root_directory exists; if not, create it
     boost::filesystem::path dir(default_param_root_directory);
-    if (not boost::filesystem::exists(dir))
+    if (!boost::filesystem::exists(dir))
     {
-      if (not boost::filesystem::create_directories(dir)) {
+      if (!boost::filesystem::create_directories(dir)) {
         std::cerr << "Failed to create directory: " << default_param_root_directory << std::endl;
         return 1; // or handle error appropriately
       }
@@ -38,7 +50,13 @@ int main(int argc, char* argv[])
     param_root_directory = default_param_root_directory;
   }
 
-  int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), true);
+  // Set environment variable differently for Windows
+  #if defined(_WIN32)
+  int rc = _putenv_s("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str());
+  #else
+  int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), 1);
+  #endif
+
   if(rc!=0)
   {
     std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
