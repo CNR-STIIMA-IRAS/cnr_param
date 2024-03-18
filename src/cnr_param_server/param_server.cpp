@@ -17,45 +17,46 @@
 int main(int argc, char* argv[])
 {
   const std::string default_shmem_name = "param_server_default_shmem";
-  std::string default_param_root_directory;
 
-  #if defined(_WIN32)
-  // Windows
-  char tempPath[MAX_PATH];
-  GetTempPath(MAX_PATH, tempPath);
-  default_param_root_directory = std::string(tempPath) + "cnr_param";
-  #else
-  // Assume Linux/Unix/Mac
-  default_param_root_directory = "/tmp/cnr_param";
-  #endif
-
-  std::string param_root_directory;
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
-
+  std::string param_root_directory;
   if(env_p)
   {
     param_root_directory = std::string(env_p);
   }
   else
   {
-    // Check if default_param_root_directory exists; if not, create it
-    boost::filesystem::path dir(default_param_root_directory);
-    if (!boost::filesystem::exists(dir))
-    {
-      if (!boost::filesystem::create_directories(dir)) {
-        std::cerr << "Failed to create directory: " << default_param_root_directory << std::endl;
-        return 1; // or handle error appropriately
-      }
-    }
-    param_root_directory = default_param_root_directory;
+    //Use a default directory
+#if defined(_WIN32)
+    // Windows
+    char tempPath[MAX_PATH];
+    GetTempPath(MAX_PATH, tempPath);
+    param_root_directory = std::string(tempPath) + "cnr_param";
+#else
+    // Linux/Unix/Mac
+    param_root_directory = "/tmp/cnr_param";
+#endif
   }
 
-  // Set environment variable differently for Windows
-  #if defined(_WIN32)
+  // Check if param_root_directory exists; if not, create it
+  boost::filesystem::path dir(param_root_directory);
+  if (!boost::filesystem::exists(dir))
+  {
+    if (!boost::filesystem::create_directories(dir))
+    {
+      std::cerr << "Failed to create directory: " << param_root_directory << std::endl;
+      return 1;
+    }
+  }
+
+  // Set environment variable
+#if defined(_WIN32)
+  // Windows
   int rc = _putenv_s("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str());
-  #else
+#else
+  // Linux/Unix/Mac
   int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), 1);
-  #endif
+#endif
 
   if(rc!=0)
   {
