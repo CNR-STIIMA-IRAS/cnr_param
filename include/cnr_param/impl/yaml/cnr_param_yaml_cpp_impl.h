@@ -75,6 +75,11 @@ namespace param
 // =============================================================================== //
 inline bool absolutepath(const std::string& key, const bool check_if_exist, boost::filesystem::path& ap, std::string& what)
 {
+  if((key.size()==0)||(key.front()!='/'))
+  {
+    what = "The key '"+key+"' is ill-formed. cnr_param support only aboslute path, i.e., the key must start with '/'";
+    return false;
+  }
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
   if(!env_p)
   {
@@ -137,7 +142,16 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
   std::string strmem(mem);
 
   auto config = YAML::Load(strmem);
+  if(config.size()==0)
+  {
+    what = "The namespace server is empty";
+    return false;
+  }
   auto tokens = cnr::param::utils::tokenize(key, "/");
+  if(tokens.size()==0){
+    what = "The key'"+key+"' is ill-formed, none '/' is present. Only Aboslute path are supported in cnr_param";
+    return false;
+  }
   node = config[tokens.back()];
   
   return bool(config[tokens.back()]);

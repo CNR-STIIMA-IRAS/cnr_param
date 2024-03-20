@@ -168,8 +168,11 @@ TEST(ClientTest, ClientUsage)
   EXPECT_TRUE(cnr::param::get("/a", before, what));
   EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
   EXPECT_TRUE(cnr::param::get("/a", after, what));
-  EXPECT_TRUE( before - after == 0 );
+  EXPECT_TRUE(before - after == 0 );
   std::cout << "Value: before: " << before << " after: " << after << " Diff: " << before - after << std::endl;
+
+  EXPECT_FALSE(cnr::param::get("a", before, what));
+  std::cout << "What: " << what << std::endl;
 }
 
 
@@ -242,7 +245,7 @@ TEST(DeveloperTest,GetVector)
   std::string what;
   std::vector<std::string> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v1", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v1", vv, what));
   if(ret)
   {
     std::cout << "[";
@@ -258,8 +261,8 @@ TEST(DeveloperTest,GetVector)
   }
 
   std::vector<double> dd;
-  EXPECT_FALSE(ret = cnr::param::get("n1/n3/v1", dd, what));
-  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v10", dd, what));
+  EXPECT_FALSE(ret = cnr::param::get("/n1/n3/v1", dd, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", dd, what));
   std::cout << "[";
   for(const auto & v: dd)
   {
@@ -268,7 +271,7 @@ TEST(DeveloperTest,GetVector)
   std::cout << "]" << std::endl;
 
   Eigen::VectorXd ee;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n3/v10", ee, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", ee, what));
   if(ret)
   {
     std::cout << ee.transpose() << std::endl;
@@ -284,7 +287,7 @@ TEST(DeveloperTest,GetMatrix)
   std::string what;
   std::vector<std::vector<std::string>> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv1", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv1", vv, what));
   std::cout << "[\n";
   for(const auto & v: vv)
   {
@@ -298,7 +301,7 @@ TEST(DeveloperTest,GetMatrix)
   std::cout << "]" << std::endl;
 
   std::vector<std::vector<double>> dd;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv10", dd, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", dd, what));
   std::cout << "[\n";
   for(const auto & v: dd)
   {
@@ -312,10 +315,10 @@ TEST(DeveloperTest,GetMatrix)
   std::cout << "]" << std::endl;
 
   Eigen::MatrixXd ee;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n4/vv10", ee, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", ee, what));
   std::cout << ee << std::endl;
 
-  EXPECT_FALSE(ret = cnr::param::get("n1/n4/vv1", ee, what));
+  EXPECT_FALSE(ret = cnr::param::get("/n1/n4/vv1", ee, what));
 }
 
 
@@ -369,7 +372,7 @@ TEST(DeveloperTest,GetComplexType)
   std::string what;
   std::vector<ComplexType> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("n1/n4/test_vector_complex_type", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/test_vector_complex_type", vv, what));
   if(ret)
   {
     std::cout << "[\n";
