@@ -45,6 +45,7 @@ if(USE_ROS1)
   find_package(catkin REQUIRED COMPONENTS roscpp)
   catkin_package(
     INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS}
+    LIBRARIES cnr_param_utilities
     CATKIN_DEPENDS roscpp
   ) 
 endif()
