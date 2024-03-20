@@ -31,9 +31,14 @@
 *.out
 *.app
 
+*.txt.user*
+*.orig*
+*.autosave*
+
 build/
 Testing/
 .cache/
 .vscode/
 
 compile_commands.json
+

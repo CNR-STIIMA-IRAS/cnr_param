@@ -5,38 +5,74 @@
 #include <string>
 #include <iostream>
 
-#include <boost/interprocess/detail/os_file_functions.hpp>
+#include <boost/filesystem.hpp>
 
 #include <cnr_param_server/utils/args_parser.h>
 #include <cnr_param_server/utils/yaml_manager.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 int main(int argc, char* argv[])
 {
+  const std::string default_shmem_name = "param_server_default_shmem";
 
-   const std::string default_shmem_name = "param_server_default_shmem";
-   const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path();
-   
-   std::string param_root_directory;
-   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
-   param_root_directory = (env_p) ? std::string(env_p) : default_param_root_directory;
+  const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
+  std::string param_root_directory;
+  if(env_p)
+  {
+    param_root_directory = std::string(env_p);
+  }
+  else
+  {
+    //Use a default directory
+#if defined(_WIN32)
+    // Windows
+    char tempPath[MAX_PATH];
+    GetTempPath(MAX_PATH, tempPath);
+    param_root_directory = std::string(tempPath) + "cnr_param";
+#else
+    // Linux/Unix/Mac
+    param_root_directory = "/tmp/cnr_param";
+#endif
+  }
 
-   int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), true);
-   if(rc!=0)
-   {
-      std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
-   }
+  // Check if param_root_directory exists; if not, create it
+  boost::filesystem::path dir(param_root_directory);
+  if (!boost::filesystem::exists(dir))
+  {
+    if (!boost::filesystem::create_directories(dir))
+    {
+      std::cerr << "Failed to create directory: " << param_root_directory << std::endl;
+      return 1;
+    }
+  }
 
-   // Parsing of program inputs
-   ArgParser args(argc, argv, default_shmem_name);
+  // Set environment variable
+#if defined(_WIN32)
+  // Windows
+  int rc = _putenv_s("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str());
+#else
+  // Linux/Unix/Mac
+  int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), 1);
+#endif
 
-   // Parsing of the file contents, and storing in YAML::Node root
-   YAMLParser yaml_parser(args.getNamespacesMap());
+  if(rc!=0)
+  {
+    std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
+  }
 
-   // Streaming of all the files in mapping_files: shared memes mapped on files
-   // The tree is build under the 'param_root_directory'
-   YAMLStreamer yaml_streamer(yaml_parser.root(), param_root_directory);
+  // Parsing of program inputs
+  ArgParser args(argc, argv, default_shmem_name);
 
-   // Done!
+  // Parsing of the file contents, and storing in YAML::Node root
+  YAMLParser yaml_parser(args.getNamespacesMap());
+
+  // Streaming of all the files in mapping_files: shared memes mapped on files
+  // The tree is build under the 'param_root_directory'
+  YAMLStreamer yaml_streamer(yaml_parser.root(), param_root_directory);
+
+  // Done!
   return 0;
 }
