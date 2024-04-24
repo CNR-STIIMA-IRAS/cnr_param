@@ -1,0 +1,21 @@
+# - Config file for the cnr_param package
+# It defines the following variables
+#  cnr_param_INCLUDE_DIRS - include directories for FooBar
+#  cnr_param_LIBRARIES    - libraries to link against
+#  cnr_param_EXECUTABLE   - the bar executable
+
+set(cnr_param_INCLUDE_DIRS "/usr/local/include")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${cnr_param_DIR}/export_cnr_param.cmake")
+
+include(CMakeFindDependencyMacro)
+find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
+find_dependency(yaml-cpp REQUIRED)
+find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
+
+# These are IMPORTED targets created by cnr_paramTargets.cmake
+set(cnr_param_LIBRARIES cnr_param_utilities)
+
+set(cnr_param_EXECUTABLE cnr_param_server)
+
