@@ -124,9 +124,14 @@ TEST(ServerTest, ServerUsage)
 
   // Parsing of program inputs
   const int argc = 3;
-  std::string fn = std::string(TEST_DIR) + "/example.config";
-
-  const char* const argv[] = { "test", "--config", fn.c_str() };
+  const char* const argv[] = { "test", 
+    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
+    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
+    "--ns-and-path-to-file", "/ns1,"    TEST_DIR "/config/drape_cell_hw.yaml",
+    "--ns-and-path-to-file", "/ns2,"    TEST_DIR "/config/drape_cell_hw.yaml",
+    "--ns-and-path-to-file", "/ns1/ns2," TEST_DIR "/config/drape_cell_hw.yaml",
+    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/par.yaml",
+};
 
   EXPECT_TRUE(does_not_throw([&] { args = new ArgParser(argc, argv, default_shmem_name); }));
 
