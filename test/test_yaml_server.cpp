@@ -1,3 +1,7 @@
+/**
+ * @file test_yaml_server.cpp
+ * @brief This file contains the unit tests for the YAML server functionality.
+ */
 #include <cstdlib>
 #include <ostream>
 #include <iostream>
@@ -409,7 +413,20 @@ TEST(DeveloperTest, GetComplexType)
   }
 }
 
-GetComplexType
+
+/**
+ * @brief The main function of the program.
+ *
+ * This function initializes the parameter root directory based on the value of the environment variable "CNR_PARAM_ROOT_DIRECTORY".
+ * If the environment variable is not set, it uses the default parameter root directory.
+ * It then sets the environment variable "CNR_PARAM_ROOT_DIRECTORY" to the chosen value.
+ * If setting the environment variable fails, it prints an error message.
+ * Finally, it initializes the Google Test framework and runs all the tests.
+ *
+ * @param argc The number of command-line arguments.
+ * @param argv An array of command-line arguments.
+ * @return The exit code of the program.
+ */
 int main(int argc, char** argv)
 {
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
