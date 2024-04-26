@@ -1,42 +1,17 @@
 #ifndef SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM
 #define SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM
 
-#include <vector>
 #include <string>
-
-#include <sstream>
-#include <vector>
-#include <string>
-#include <boost/array.hpp>
-#include <boost/type_index.hpp>
-#include <bitset>
-
-#include <Eigen/Core>
-
-#include "cnr_param/visibility_control.h"
-
-
-
-#if defined(ROS2_AVAILABLE)
-  #error "NOT YET IMPLEMENTED"  
-#elif defined(ROS1_AVAILABLE)
-  #error "NOT YET IMPLEMENTED"  
-#else
-  #include <yaml-cpp/yaml.h>
-  namespace cnr
-  {
-  namespace param
-  {
-    using node_t = YAML::Node;
-  }
-  }
-#endif
-
 
 namespace cnr
 {
 namespace param
 {
+
+enum class ModulesID : uint8_t
+{
+  ROS1 = 0b001, RO2=0b010, MAPPED_FILE=0b100
+};
 
 //======================================================================================================================
 //=== USER FUNCTIONS ===================================================================================================/**
@@ -88,186 +63,11 @@ bool get(const std::string& key, T& ret, std::string& what);
 template<typename T>
 bool set(const std::string& key, const T& ret, std::string& what);
 
-/**
- * @brief 
- * 
- * @param node 
- * @param key 
- * @return true 
- * @return false 
- */
-bool has(const cnr::param::node_t& node, const std::string& key);
-
-/**
- * @brief 
- * 
- * @param node 
- * @return true 
- * @return false 
- */
-bool is_map(const cnr::param::node_t& node);
-
-/**
- * @brief 
- * 
- * @param key 
- * @return true 
- * @return false 
- */
-bool is_sequence(const std::string& key);
-
-/**
- * @brief 
- * 
- * @param node 
- * @return true 
- * @return false 
- */
-bool is_sequence(const cnr::param::node_t& node);
-
-/**
- * @brief 
- * 
- * @param node 
- * @return std::size_t 
- */
-std::size_t size(const cnr::param::node_t& node);
-
-/**
- * @brief Get the leaf object
- * 
- * @param node 
- * @param key 
- * @param leaf 
- * @param what 
- * @return true 
- * @return false 
- */
-bool get_leaf(const node_t& node, const std::string& key, node_t& leaf, std::string& what);
-
-/**
- * @brief 
- * 
- * @tparam T 
- * @param node 
- * @param i 
- * @param element 
- * @param what 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool at(const cnr::param::node_t& node, std::size_t i, T& element, std::string& what);
-
-
-/**
- * @brief 
- * 
- * @tparam T 
- * @param node 
- * @param key
- * @param element 
- * @param what 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool at(const cnr::param::node_t& node, const std::string& key, T& element, std::string& what);
-//======================================================================================================================
-
-
-//======================================================================================================================
-//== SERVICE FUNCTION
-//======================================================================================================================
-/**
- * @brief Get the templated object from the node. 
- * 
- * @tparam T 
- * @param node 
- * @return T 
- */
-template<typename T>
-T extract(const node_t& node, const std::string& key ="", const std::string& error_heading_msgs ="");
-
-/**
- * @brief 
- * 
- * @tparam T 
- * @param node 
- * @param key 
- * @param value 
- * @return node_t 
- */
-template<typename T>
-void insert(node_t& node, const std::string& key, const T& value);
-
-
-//======================================================================================================================
-
-//======================================================================================================================
-//== SCALAR FUNCTION
-//======================================================================================================================
-/**
- * @brief Get the scalar object: YOU SHOULD SPECILIZE THE TEMPLATE IF YOU WANT AN AUTOMATIC LOADING 
- * OF YOUR SPECIFIC OBJECT BEYOND THE ONES ALREADY IMPLEMENTED
- * 
- * @tparam T 
- * @param node 
- * @param ret 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool get_scalar(const node_t& node, T& ret, std::stringstream& what); // TO REIMPLEMENT ITS OWN COMPLEX TYPE
-
-template<>
-bool get_scalar(const node_t& node, double& ret, std::stringstream& what);
-
-template<>
-bool get_scalar(const node_t& node, int& ret, std::stringstream& what);
-
-template<>
-bool get_scalar(const node_t& node, bool& ret, std::stringstream& what);
-
-template<>
-bool get_scalar(const node_t& node, std::string& ret, std::stringstream& what);
-
-//======================================================================================================================
-//== SEQUENCE FUNCTION
-//======================================================================================================================
-/**
- * @brief Get the sequence object:  YOU SHOULD SPECILIZE THE TEMPLATE IF YOU WANT AN AUTOMATIC LOADING 
- * OF YOUR SPECIFIC OBJECT BEYOND THE ONES ALREADY IMPLEMENTED
- * 
- * @tparam T 
- * @param node 
- * @param ret 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool get_sequence(const node_t& node, T& ret, std::stringstream& what);
-
-//======================================================================================================================
-//== MAP FUNCTION
-//======================================================================================================================
-/**
- * @brief Get the map object:  YOU SHOULD SPECILIZE THE TEMPLATE IF YOU WANT AN AUTOMATIC LOADING 
- * OF YOUR SPECIFIC OBJECT BEYOND THE ONES ALREADY IMPLEMENTED
- * 
- * @tparam T 
- * @param node 
- * @param ret 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool get_map(const node_t& node, T& ret, std::stringstream& what);
 
 }  // namespace param
 }  // namespace cnr
 
-#include <cnr_param/impl/cnr_param_impl.h>
+// #include <cnr_param/impl/cnr_param_impl.h>
 
 
 #endif  /* SRC_CNR_PARAM_INCLUDE_CNR_PARAM_CNR_PARAM */

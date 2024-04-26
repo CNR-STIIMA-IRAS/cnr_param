@@ -1,12 +1,11 @@
 #ifndef SRC_CNR_PARAM_INCLUDE_CNR_PARAM_SERVER_YAML_MANAGER
 #define SRC_CNR_PARAM_INCLUDE_CNR_PARAM_SERVER_YAML_MANAGER
 
-#include <iostream>
 #include <vector>
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-#include <cnr_param/visibility_control.h>
+#include <cnr_param/utils/visibility_control.h>
 
 #include <string>
 

@@ -12,7 +12,7 @@
 #include <cnr_param/utils/string.h>
 #include <cnr_param/utils/filesystem.h>
 
-#include <cnr_param_server/utils/args_parser.h>
+#include <cnr_param/yaml_mapped_file/args_parser.h>
 
 namespace std
 {

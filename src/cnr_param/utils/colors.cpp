@@ -1,6 +1,12 @@
+#include <string>
 #include <cnr_param/utils/colors.h>
 
-namespace cnr { namespace param { namespace utils {
+namespace cnr
+{
+namespace param
+{
+namespace utils
+{
 
 std::string RESET()
 {
@@ -71,4 +77,6 @@ std::string BOLDWHITE()
   return "\033[1m\033[37m";
 }
 
-}}}
+}  // namespace utils
+}  // namespace param
+}  // namespace cnr

@@ -129,6 +129,6 @@ std::string to_string(const Eigen::MatrixBase<Derived>& m, bool transpose = true
 }  // namespace utils
 
 
-#include <cnr_param/impl/eigen_impl.h>
+#include <cnr_param/utils/eigen_impl.hpp>
 
 #endif  /* INCLUDE_CNR_PARAM_UTILS_EIGEN */

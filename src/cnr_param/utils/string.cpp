@@ -1,3 +1,5 @@
+#include <vector>
+#include <string>
 #include <cnr_param/utils/string.h>
 
 namespace cnr

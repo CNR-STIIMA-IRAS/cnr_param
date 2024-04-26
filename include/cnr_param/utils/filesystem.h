@@ -2,8 +2,6 @@
 #define CNR_PARAM_INCLUDE_CNR_PARAM_UTILS_FILESYSTEM
 
 #include <string>
-#include <vector>
-
 #include <boost/filesystem.hpp>
 
 namespace cnr

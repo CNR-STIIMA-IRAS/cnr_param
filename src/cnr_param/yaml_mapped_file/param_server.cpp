@@ -7,8 +7,8 @@
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
-#include <cnr_param_server/utils/args_parser.h>
-#include <cnr_param_server/utils/yaml_manager.h>
+#include <cnr_param/yaml_mapped_file/args_parser.h>
+#include <cnr_param/yaml_mapped_file/yaml_manager.h>
 
 
 int main(int argc, char* argv[])

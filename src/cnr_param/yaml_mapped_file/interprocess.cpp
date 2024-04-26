@@ -1,9 +1,10 @@
 #include <functional>
 #include <string>
+#include <iostream>
 
 #include <cnr_param/utils/string.h>
 #include <cnr_param/utils/filesystem.h>
-#include <cnr_param/utils/interprocess.h>
+#include <cnr_param/yaml_mapped_file/interprocess.h>
 
 namespace cnr 
 {

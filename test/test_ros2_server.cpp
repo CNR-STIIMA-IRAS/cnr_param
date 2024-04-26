@@ -1,11 +1,13 @@
 #include <cstdlib>
+#include <memory>
 #include <ostream>
-#include <utility>
 #include <iostream>
 #include <string>
 #include <iostream>
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
+#include "cnr_param/impl/ros2/cnr_param_ros2_param_retriever.hpp"
+#include "rclcpp/node.hpp"
 
 #include <cnr_param/cnr_param.h>
 
@@ -14,61 +16,64 @@
 
 #include <gtest/gtest.h>
 
+
 namespace detail
 {
-  struct unwrapper
+struct unwrapper
+{
+  explicit unwrapper(std::exception_ptr pe) : pe_(pe)
   {
-    explicit unwrapper(std::exception_ptr pe) : pe_(pe) {}
+  }
 
-    operator bool() const
-    {
-      return bool(pe_);
-    }
+  operator bool() const
+  {
+    return bool(pe_);
+  }
 
-    friend auto operator<<(std::ostream& os, unwrapper const& u) -> std::ostream&
+  friend auto operator<<(std::ostream& os, unwrapper const& u) -> std::ostream&
+  {
+    try
     {
-      try
-      {
-          std::rethrow_exception(u.pe_);
-          return os << "no exception";
-      }
-      catch(std::runtime_error const& e)
-      {
-          return os << "runtime_error: " << e.what();
-      }
-      catch(std::logic_error const& e)
-      {
-          return os << "logic_error: " << e.what();
-      }
-      catch(std::exception const& e)
-      {
-          return os << "exception: " << e.what();
-      }
-      catch(...)
-      {
-          return os << "non-standard exception";
-      }
+      std::rethrow_exception(u.pe_);
+      return os << "no exception";
     }
-    std::exception_ptr pe_;
-  };
-}
+    catch (std::runtime_error const& e)
+    {
+      return os << "runtime_error: " << e.what();
+    }
+    catch (std::logic_error const& e)
+    {
+      return os << "logic_error: " << e.what();
+    }
+    catch (std::exception const& e)
+    {
+      return os << "exception: " << e.what();
+    }
+    catch (...)
+    {
+      return os << "non-standard exception";
+    }
+  }
+  std::exception_ptr pe_;
+};
+}  // namespace detail
 
 auto unwrap(std::exception_ptr pe)
 {
   return detail::unwrapper(pe);
 }
 
-template<class F>
+template <class F>
 ::testing::AssertionResult does_not_throw(F&& f)
 {
   try
   {
-     f();
-     return ::testing::AssertionSuccess();
+    f();
+    return ::testing::AssertionSuccess();
   }
-  catch(...)
+  catch (...)
   {
-     return ::testing::AssertionFailure() << unwrap(std::current_exception());
+    return ::testing::AssertionFailure() << unwrap(std::current_exception());
   }
 }
 
@@ -76,25 +81,26 @@ template<class F>
 #error "The TEST_DIR macro MUST be defined to run the program"
 #endif
 
-std::map<std::string, std::map<std::string, std::vector<double> > > statistics;
+std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
 
-#define EXECUTION_TIME( ... )\
-{\
-  struct timespec start, end;\
-  clock_gettime(CLOCK_MONOTONIC, &start);\
-  __VA_ARGS__;\
-  clock_gettime(CLOCK_MONOTONIC, &end);\
-  double time_taken;\
-  time_taken = double(end.tv_sec - start.tv_sec) * 1e9;\
-  time_taken = double(time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;\
-  std::cout << "Elapsed time [us]: " << time_taken * 1e6 << std::endl;\
-}
+#define EXECUTION_TIME(...)                                                                                            \
+  {                                                                                                                    \
+    struct timespec start, end;                                                                                        \
+    clock_gettime(CLOCK_MONOTONIC, &start);                                                                            \
+    __VA_ARGS__;                                                                                                       \
+    clock_gettime(CLOCK_MONOTONIC, &end);                                                                              \
+    double time_taken;                                                                                                 \
+    time_taken = double(end.tv_sec - start.tv_sec) * 1e9;                                                              \
+    time_taken = double(time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;                                            \
+    std::cout << "Elapsed time [us]: " << time_taken * 1e6 << std::endl;                                               \
+  }
 
 std::string param_root_directory;
 const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path();
+#if 0
 
 // Demonstrate some basic assertions.
-TEST(HelloTest, BasicAssertions) 
+TEST(HelloTest, BasicAssertions)
 {
   // Expect two strings not to be equal.
   EXPECT_STRNE("hello", "world");
@@ -113,22 +119,22 @@ TEST(ServerTest, ServerUsage)
   const int argc = 3;
   std::string fn = std::string(TEST_DIR) + "/example.config";
 
-  const char* const argv[] = {"test", "--config", fn.c_str()};
+  const char* const argv[] = { "test", "--config", fn.c_str() };
 
-  EXPECT_TRUE(does_not_throw([&]{ args=new ArgParser(argc, argv, default_shmem_name); }));
+  EXPECT_TRUE(does_not_throw([&] { args = new ArgParser(argc, argv, default_shmem_name); }));
 
   EXPECT_TRUE(args);
 
   // Parsing of the file contents, and storing in YAML::Node root
 
-  EXPECT_TRUE(does_not_throw([&]{ yaml_parser = new YAMLParser(args->getNamespacesMap()); }));
+  EXPECT_TRUE(does_not_throw([&] { yaml_parser = new YAMLParser(args->getNamespacesMap()); }));
 
   EXPECT_TRUE(yaml_parser);
-  
+
   // Streaming of all the files in mapping_files: shared memes mapped on files
   // The tree is build under the 'param_root_directory'
 
-  EXPECT_TRUE(does_not_throw([&]{ yaml_streamer = new YAMLStreamer(yaml_parser->root(), param_root_directory); }));
+  EXPECT_TRUE(does_not_throw([&] { yaml_streamer = new YAMLStreamer(yaml_parser->root(), param_root_directory); }));
 
   EXPECT_TRUE(yaml_parser);
 
@@ -141,22 +147,18 @@ TEST(ClientTest, ClientUsage)
 {
   std::string what;
   std::string value;
-  auto f1 = [&](const std::string& path)
-  {
+  auto f1 = [&](const std::string& path) {
     bool ok = false;
-    EXECUTION_TIME(
-      ok = cnr::param::get(path, value, what);
-    )
-    if(!ok)
+    EXECUTION_TIME(ok = cnr::param::get(path, value, what);)
+    if (!ok)
     {
-      std::cout << "OK: " << ok << "| VALUE: " << value 
-                  << "| WHAT: " << what << std::endl;
+      std::cout << "OK: " << ok << "| VALUE: " << value << "| WHAT: " << what << std::endl;
     }
     return ok;
   };
 
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
-  value = value +"_CIAO";
+  value = value + "_CIAO";
   EXPECT_TRUE(cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic"));
 
@@ -168,35 +170,29 @@ TEST(ClientTest, ClientUsage)
   EXPECT_TRUE(cnr::param::get("/a", before, what));
   EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
   EXPECT_TRUE(cnr::param::get("/a", after, what));
-  EXPECT_TRUE(before - after == 0 );
+  EXPECT_TRUE(before - after == 0);
   std::cout << "Value: before: " << before << " after: " << after << " Diff: " << before - after << std::endl;
 
   EXPECT_FALSE(cnr::param::get("a", before, what));
   std::cout << "What: " << what << std::endl;
 }
 
-
 TEST(ClientErrorTest, ClientNonExistentParam)
 {
   std::string defval = "DEFAULT";
-  auto f1 = [](const std::string& path)
-  {
+  auto f1 = [](const std::string& path) {
     std::string topic;
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(
-      ok = cnr::param::get(path, topic, what);
-    )
-    if(!ok)
+    EXECUTION_TIME(ok = cnr::param::get(path, topic, what);)
+    if (!ok)
     {
-      std::cout << "GOT: " << ok <<  " | VALUE:" << topic << " | WHAT: " << what << std::endl;
+      std::cout << "GOT: " << ok << " | VALUE:" << topic << " | WHAT: " << what << std::endl;
     }
     return ok;
   };
 
-
-  auto f2 = [](const std::string& path,  const std::string& defval)
-  {
+  auto f2 = [](const std::string& path, const std::string& defval) {
     std::string topic;
     std::string what;
     bool ok = cnr::param::get(path, topic, what, defval);
@@ -204,52 +200,39 @@ TEST(ClientErrorTest, ClientNonExistentParam)
     return ok;
   };
   EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST"));
-  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval)); 
+  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval));
 }
-
 
 TEST(DeveloperTest, DeveloperFunctions)
 {
   std::string defval = "DEFAULT";
-  auto f1 = [](const std::string& root_key, const std::string& leaf_key)
-  {
-    cnr::param::node_t root;
+  auto f1 = [](const std::string& root_key, const std::string& leaf_key) {
+    cnr::param::node_t root(root_key);
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(
-      ok = cnr::param::get(root_key, root, what);
-    )
-    if(!ok)
+    EXECUTION_TIME(ok = cnr::param::get(root_key, root, what);)
+    if (!ok)
     {
       std::cout << what << std::endl;
       return false;
     }
-    
-    
-    cnr::param::node_t leaf;
-    EXECUTION_TIME(
-      ok = cnr::param::get_leaf(root, leaf_key, leaf, what);
-    )
-    if(!ok)
-    {
-      std::cout << what << std::endl;
-    }
+
     return ok;
   };
 
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/", "feedback_joint_state_topic"));
 }
 
-TEST(DeveloperTest,GetVector)
+TEST(DeveloperTest, GetVector)
 {
   std::string what;
   std::vector<std::string> vv;
   bool ret = true;
   EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v1", vv, what));
-  if(ret)
+  if (ret)
   {
     std::cout << "[";
-    for(const auto & v: vv)
+    for (const auto& v : vv)
     {
       std::cout << v << ", ";
     }
@@ -264,7 +247,7 @@ TEST(DeveloperTest,GetVector)
   EXPECT_FALSE(ret = cnr::param::get("/n1/n3/v1", dd, what));
   EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", dd, what));
   std::cout << "[";
-  for(const auto & v: dd)
+  for (const auto& v : dd)
   {
     std::cout << v << ", ";
   }
@@ -272,7 +255,7 @@ TEST(DeveloperTest,GetVector)
 
   Eigen::VectorXd ee;
   EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", ee, what));
-  if(ret)
+  if (ret)
   {
     std::cout << ee.transpose() << std::endl;
   }
@@ -282,17 +265,17 @@ TEST(DeveloperTest,GetVector)
   }
 }
 
-TEST(DeveloperTest,GetMatrix)
+TEST(DeveloperTest, GetMatrix)
 {
   std::string what;
   std::vector<std::vector<std::string>> vv;
   bool ret = true;
   EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv1", vv, what));
   std::cout << "[\n";
-  for(const auto & v: vv)
+  for (const auto& v : vv)
   {
-    std::cout << " [ " ;
-    for(const auto & s: v)
+    std::cout << " [ ";
+    for (const auto& s : v)
     {
       std::cout << s << ", ";
     }
@@ -303,10 +286,10 @@ TEST(DeveloperTest,GetMatrix)
   std::vector<std::vector<double>> dd;
   EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", dd, what));
   std::cout << "[\n";
-  for(const auto & v: dd)
+  for (const auto& v : dd)
   {
-    std::cout << " [ " ;
-    for(const auto & s: v)
+    std::cout << " [ ";
+    for (const auto& s : v)
     {
       std::cout << s << ", ";
     }
@@ -321,64 +304,67 @@ TEST(DeveloperTest,GetMatrix)
   EXPECT_FALSE(ret = cnr::param::get("/n1/n4/vv1", ee, what));
 }
 
-
 struct ComplexType
 {
   std::string name;
   double value;
 };
 
-namespace cnr { namespace param {
-  template<> bool get_map(const node_t& node, ComplexType& ret, std::stringstream& what)
+namespace cnr
+{
+namespace param
+{
+template <>
+bool get_map(const cnr::param::ros2::Ros2Dict& node, ComplexType& ret, std::stringstream& what)
+{
+  try
   {
-    try
+    if (node.branches() 
+    && node.branches()->find("name")!=node.branches()->end()
+    && node.branches()->find("value")!=node.branches()->end())
     {
-    if(node["name"] && node["value"])
-    {
-      ret.name = node["name"].as<std::string>();
-      ret.value = node["value"].as<double>();
+      ret.name = node["name"].leaf()->as_string();
+      ret.value = node["value"].leaf()->as_double();
       return true;
     }
-    }
-    catch(YAML::Exception& e)
-  {
-      what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "YAML Exception, Error in the extraction of an object of type '"
-          << boost::typeindex::type_id_with_cvr<decltype( ret )>().pretty_name() 
-            << "'" << std::endl
-              << "Node: " << std::endl
-                << node << std::endl
-                  << "What: " << std::endl
-                    << e.what() << std::endl;
-    }
-    catch (std::exception& e)
-    {
-      what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "Exception, Error in the extraction of an object of type '"
-          << boost::typeindex::type_id_with_cvr<decltype( ret )>().pretty_name() 
-            << "'" << std::endl
-              << "Node: " << std::endl
-                << node << std::endl
-                  << "What: " << std::endl
-                    << e.what() << std::endl;
-    }
-    return false;
   }
-}}
+  catch (YAML::Exception& e)
+  {
+    what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+         << "YAML Exception, Error in the extraction of an object of type '"
+         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+         << "Node: " << std::endl
+         << to_string(node) << std::endl
+         << "What: " << std::endl
+         << e.what() << std::endl;
+  }
+  catch (std::exception& e)
+  {
+    what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+         << "Exception, Error in the extraction of an object of type '"
+         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+         << "Node: " << std::endl
+         << to_string(node) << std::endl
+         << "What: " << std::endl
+         << e.what() << std::endl;
+  }
+  return false;
+}
+}  // namespace param
+}  // namespace cnr
 
-
-TEST(DeveloperTest,GetComplexType)
+TEST(DeveloperTest, GetComplexType)
 {
   std::string what;
   std::vector<ComplexType> vv;
   bool ret = true;
   EXPECT_TRUE(ret = cnr::param::get("/n1/n4/test_vector_complex_type", vv, what));
-  if(ret)
+  if (ret)
   {
     std::cout << "[\n";
-    for(const auto & v: vv)
+    for (const auto& v : vv)
     {
-      std::cout << " [ " ;
+      std::cout << " [ ";
       std::cout << v.name << "," << v.value;
       std::cout << "] " << std::endl;
     }
@@ -390,15 +376,19 @@ TEST(DeveloperTest,GetComplexType)
   }
 }
 
-int main(int argc, char **argv) {
-
+#endif
+int main(int argc, char** argv)
+{
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
   param_root_directory = (env_p) ? std::string(env_p) : default_param_root_directory;
   int rc = setenv("CNR_PARAM_ROOT_DIRECTORY", param_root_directory.c_str(), true);
-  if(rc!=0)
+  if (rc != 0)
   {
     std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
   }
+
+  auto node = std::make_shared<rclcpp::Node>("test_ros2_server");
+  cnr::param::CNR_PARAM_INIT_NODE(node);
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

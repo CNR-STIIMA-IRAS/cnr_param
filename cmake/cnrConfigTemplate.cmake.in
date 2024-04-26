@@ -18,4 +18,3 @@ find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
 set(cnr_param_LIBRARIES cnr_param_utilities)
 
 set(cnr_param_EXECUTABLE cnr_param_server)
-

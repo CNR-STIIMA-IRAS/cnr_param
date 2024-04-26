@@ -1,0 +1,19 @@
+test_ros2_parameters_node:
+  ros__parameters:
+    bool_value: True
+    int_number: 5
+    float_number: 3.14
+    str_text: "Hello Universe"
+    bool_array: [True, False, True]
+    int_array: [10, 11, 12, 13]
+    int_array2: [10.1, 11.2, 12.3, 13.4]
+    float_array: [7.5, 400.4]
+    float_array2: [7, 400]
+    str_array: ['Nice', 'more', 'params']
+    bytes_array: [0x01, 0xF1, 0xA2]
+    nested_param:
+      another_int: 7
+      another_int2: 7.0
+      nested_param:
+        another_int: 7
+        another_int2: 7.0

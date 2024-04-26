@@ -1,40 +1,5 @@
-/*
- *  Software License Agreement (New BSD License)
- *
- *  Copyright 2020 National Council of Research of Italy (CNR)
- *
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of the copyright holder(s) nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- */
-
-#ifndef CNR_PARAM_INCLUDE_CNR_PARAM_IMPL_YAML_CNR_PARAM_YAML_CPP_IMPL
-#define CNR_PARAM_INCLUDE_CNR_PARAM_IMPL_YAML_CNR_PARAM_YAML_CPP_IMPL
+#ifndef CNR_PARAM__INCLUDE__CNR_PARAM__YAML_MAPPED_FILE__IMPL__PARAM__HPP
+#define CNR_PARAM__INCLUDE__CNR_PARAM__YAML_MAPPED_FILE__IMPL__PARAM__HPP
 
 #include <string>
 #include <vector>
@@ -42,7 +7,7 @@
 #include <iomanip>
 #include <type_traits>
 #include <Eigen/Core>
-
+#include <yaml-cpp/exceptions.h>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -50,13 +15,12 @@
 #include <boost/interprocess/managed_mapped_file.hpp>
 #include <boost/type_index.hpp>
 
-#include <cnr_param/cnr_param.h>
 #include <cnr_param/utils/string.h>
 #include <cnr_param/utils/eigen.h>
 #include <cnr_param/utils/filesystem.h>
-#include <cnr_param/utils/interprocess.h>
+#include <cnr_param/yaml_mapped_file/interprocess.h>
 
-#include <yaml-cpp/exceptions.h>
+#include <cnr_param/yaml_mapped_file/param.h>
 
 #if !defined(UNUSED)
 #define UNUSED(expr) do { (void)(expr); } while (0)
@@ -65,6 +29,8 @@
 namespace cnr 
 {
 namespace param
+{
+namespace yaml
 {
 
 // =============================================================================== //
@@ -97,7 +63,7 @@ inline bool absolutepath(const std::string& key, const bool check_if_exist, boos
   if(check_if_exist)
   {
     std::string errmsg;
-    if(!cnr::param::utils::checkfilepath(p.string(), errmsg))
+    if(!utils::checkfilepath(p.string(), errmsg))
     {
       what = (what.size() ? (what + "\n") : std::string("") ) +
         "The param '" + key + "' is not in param server.\n what(): " + errmsg;
@@ -147,7 +113,7 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
     what = "The namespace server is empty";
     return false;
   }
-  auto tokens = cnr::param::utils::tokenize(key, "/");
+  auto tokens = utils::tokenize(key, "/");
   if(tokens.size()==0){
     what = "The key'"+key+"' is ill-formed, none '/' is present. Only Aboslute path are supported in cnr_param";
     return false;
@@ -164,6 +130,92 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
 // =============================================================================== //
 
 
+//======================================================================================================================
+//== SERVICE FUNCTION
+//======================================================================================================================
+/**
+ * @brief Get the templated object from the node. 
+ * 
+ * @tparam T 
+ * @param node 
+ * @return T 
+ */
+template<typename T>
+inline T extract(const YAML::Node& node, const std::string& key, const std::string& error_heading_msgs)
+{
+  T ret;
+  bool ok = false;
+  std::stringstream what;
+  YAML::Node leaf;
+  if(key.length())
+  {
+    if(node[key])
+    {
+      leaf = node[key];
+      ok = true;
+    }
+    else
+    {
+      what <<(error_heading_msgs.length() ? error_heading_msgs  : 
+          (__PRETTY_FUNCTION__  + std::string(":") + std::to_string(__LINE__) + ": "))
+            << "Tried to extract a '"
+              << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
+                << "' but the type node key '"<< key <<"' is not available" << std::endl
+                  << "Node: " << std::endl
+                    << node << std::endl;
+    }
+  }
+  else
+  {
+    leaf = node;
+    ok = true;
+  }
+
+  if(ok)
+  {
+    if(leaf.IsScalar())
+    {
+      ok = get_scalar(leaf, ret, what);
+    }
+    else if(leaf.IsSequence())
+    {
+      ok = get_sequence(leaf, ret, what);
+    } 
+    else if(leaf.IsMap())
+    {
+      ok = get_map<T>(leaf, ret, what);
+    }
+    else
+    {
+      what
+        <<(error_heading_msgs.length() ? error_heading_msgs  : 
+          (__PRETTY_FUNCTION__  + std::string(":") + std::to_string(__LINE__) + ": "))
+            << "Tried to extract a '"
+              << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
+                << "' but the type node is undefined." << std::endl
+                  << "Node: " << std::endl
+                    << node << std::endl;
+    }
+  }
+
+  if(!ok)
+  {
+    throw std::runtime_error(what.str().c_str());
+  }
+  return ret;
+}
+
+template<>
+inline YAML::Node extract(const YAML::Node& node, const std::string& key, const std::string& error_heading_msgs)
+{
+  UNUSED(key);
+  UNUSED(error_heading_msgs);
+  YAML::Node ret(node);
+  return ret;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /**
@@ -180,20 +232,20 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
 template<typename T>
 inline bool get(const std::string& key, T& ret, std::string& what)
 {
-  if (!cnr::param::has(key, what))
+  if (!has(key, what))
   {
     return false;
   }
 
   YAML::Node node;
-  if (!cnr::param::recover(key, node, what))
+  if (!recover(key, node, what))
   {
     return false;
   }
 
   try
   {
-    ret = cnr::param::extract<T>(node);
+    ret = extract<T>(node);
   }
   catch (std::exception& e)
   {
@@ -213,7 +265,7 @@ bool set(const std::string& key, const T& ret, std::string& what)
     return false;
   }
 
-  auto keys = cnr::param::utils::tokenize(key, "/");
+  auto keys = utils::tokenize(key, "/");
 
   YAML::Node _node;
   _node[keys.back()] = ret;
@@ -222,7 +274,7 @@ bool set(const std::string& key, const T& ret, std::string& what)
   str +="\n";
   
   std::size_t fsz = 2 * str.size();
-  auto region = cnr::param::utils::createFileMapping(ap.string(),fsz);
+  auto region = utils::createFileMapping(ap.string(),fsz);
   if(!region)
   {
     what = "IMpossible to create the file mapping '" + ap.string() +"'";
@@ -247,10 +299,10 @@ bool set(const std::string& key, const T& ret, std::string& what)
 template<typename T>
 inline bool get(const std::string& key, T& ret, std::string& what, const T& default_val)
 {
-  if (!cnr::param::has(key, what))
+  if (!has(key, what))
   {
     what = (what.size() ? (what + "\n") : std::string("") ) + "Try to superimpose default value...";
-    if (!cnr::param::utils::resize(ret, default_val))
+    if (!utils::resize(ret, default_val))
     {
       what += " Error!";
       return false;
@@ -261,14 +313,14 @@ inline bool get(const std::string& key, T& ret, std::string& what, const T& defa
   }
 
   YAML::Node node;
-  if (!cnr::param::recover(key, node, what))
+  if (!recover(key, node, what))
   {
     return false;
   }
 
   try
   {
-    ret = cnr::param::extract<T>(node);
+    ret = extract<T>(node);
   }
   catch (std::exception& e)
   {
@@ -287,9 +339,22 @@ inline bool get(const std::string& key, T& ret, std::string& what, const T& defa
  * @return true 
  * @return false 
  */
-inline bool has(const cnr::param::node_t& node, const std::string& key)
+inline bool has(const YAML::Node& node, const std::string& key)
 {
   return bool(node[key]);
+}
+
+
+/**
+ * @brief 
+ * 
+ * @param node 
+ * @return true 
+ * @return false 
+ */
+inline bool is_sequence(const YAML::Node& node)
+{
+  return node.IsSequence();
 }
 
 /**
@@ -303,7 +368,7 @@ inline bool is_sequence(const std::string& key)
 {
   YAML::Node node;
   std::string what;
-  if (!cnr::param::recover(key, node, what))
+  if (!recover(key, node, what))
   {
     return false;
   }
@@ -317,7 +382,7 @@ inline bool is_sequence(const std::string& key)
  * @return true 
  * @return false 
  */
-inline bool is_map(const cnr::param::node_t& node)
+inline bool is_map(const YAML::Node& node)
 {
   return node.IsMap();
 }
@@ -326,21 +391,9 @@ inline bool is_map(const cnr::param::node_t& node)
  * @brief 
  * 
  * @param node 
- * @return true 
- * @return false 
- */
-inline bool is_sequence(const cnr::param::node_t& node)
-{
-  return node.IsSequence();
-}
-
-/**
- * @brief 
- * 
- * @param node 
  * @return size_t 
  */
-inline size_t size(const cnr::param::node_t& node)
+inline size_t size(const YAML::Node& node)
 {
   if(!is_sequence(node))
   {
@@ -362,7 +415,7 @@ inline size_t size(const cnr::param::node_t& node)
  * @return true 
  * @return false 
  */
-inline bool get_leaf(const node_t& node, const std::string& key, node_t& leaf, std::string& what)
+inline bool get_leaf(const YAML::Node& node, const std::string& key, YAML::Node& leaf, std::string& what)
 {
    if(node[key])
    {
@@ -385,7 +438,7 @@ inline bool get_leaf(const node_t& node, const std::string& key, node_t& leaf, s
  * @return false 
  */
 template<typename T>
-inline bool at(const cnr::param::node_t& node, std::size_t i, T& element, std::string& what)
+inline bool at(const YAML::Node& node, std::size_t i, T& element, std::string& what)
 {
   if(!is_sequence(node))
   {
@@ -422,7 +475,7 @@ inline bool at(const cnr::param::node_t& node, std::size_t i, T& element, std::s
  * @return false 
  */
 template<>
-inline bool at(const cnr::param::node_t& node, std::size_t i, cnr::param::node_t& element, std::string& what)
+inline bool at(const YAML::Node& node, std::size_t i, YAML::Node& element, std::string& what)
 {
   if(!is_sequence(node))
   {
@@ -452,7 +505,7 @@ inline bool at(const cnr::param::node_t& node, std::size_t i, cnr::param::node_t
  * @return false 
  */
 template<typename T>
-inline bool at(const cnr::param::node_t& node, const std::string& key, T& element, std::string& what)
+inline bool at(const YAML::Node& node, const std::string& key, T& element, std::string& what)
 {
   if(!is_map(node))
   {
@@ -479,7 +532,7 @@ inline bool at(const cnr::param::node_t& node, const std::string& key, T& elemen
 }
 
 template<>
-inline bool at(const cnr::param::node_t& node, const std::string& key, cnr::param::node_t& element, std::string& what)
+inline bool at(const YAML::Node& node, const std::string& key, YAML::Node& element, std::string& what)
 {
   if(!is_map(node))
   {
@@ -499,83 +552,8 @@ inline bool at(const cnr::param::node_t& node, const std::string& key, cnr::para
 // =============================================================================================
 
 
-
 template<typename T>
-inline T extract(const YAML::Node& node, const std::string& key, const std::string& error_heading_msgs)
-{
-  T ret;
-  bool ok = false;
-  std::stringstream what;
-  YAML::Node leaf;
-  if(key.length())
-  {
-    if(node[key])
-    {
-      leaf = node[key];
-      ok = true;
-    }
-    else
-    {
-      what <<(error_heading_msgs.length() ? error_heading_msgs  : 
-          (__PRETTY_FUNCTION__  + std::string(":") + std::to_string(__LINE__) + ": "))
-            << "Tried to extract a ' "
-              << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
-                << "' but the type node key '"<< key <<"' is not available" << std::endl
-                  << "Node: " << std::endl
-                    << node << std::endl;
-    }
-  }
-  else
-  {
-    leaf = node;
-    ok = true;
-  }
-
-  if(ok)
-  {
-    if(leaf.IsScalar())
-    {
-      ok = get_scalar(leaf, ret, what);
-    }
-    else if(leaf.IsSequence())
-    {
-      ok = get_sequence(leaf, ret, what);
-    } 
-    else if(leaf.IsMap())
-    {
-      ok = get_map<T>(leaf, ret, what);
-    }
-    else
-    {
-      what
-        <<(error_heading_msgs.length() ? error_heading_msgs  : 
-          (__PRETTY_FUNCTION__  + std::string(":") + std::to_string(__LINE__) + ": "))
-            << "Tried to extract a ' "
-              << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
-                << "' but the type node is undefined." << std::endl
-                  << "Node: " << std::endl
-                    << node << std::endl;
-    }
-  }
-
-  if(!ok)
-  {
-    throw std::runtime_error(what.str().c_str());
-  }
-  return ret;
-}
-
-template<>
-inline YAML::Node extract(const YAML::Node& node, const std::string& key, const std::string& error_heading_msgs)
-{
-  UNUSED(key);
-  UNUSED(error_heading_msgs);
-  YAML::Node ret(node);
-  return ret;
-}
-
-template<typename T>
-inline void insert(node_t& node, const std::string& key, const T& value)
+inline void insert(YAML::Node& node, const std::string& key, const T& value)
 {
   try
   {
@@ -604,7 +582,7 @@ std::string int_to_hex( T i )
   return stream.str();
 }
 
-inline void insert(node_t& node, const std::string& key, const int& value, const std::string& format)
+inline void insert(YAML::Node& node, const std::string& key, const int& value, const std::string& format)
 {
   std::string val;
   if(format=="dec")
@@ -667,7 +645,7 @@ inline bool _get_scalar(const YAML::Node& node, T& ret, std::stringstream& what)
   if(!config.IsScalar())
   {
     what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-      << "Tried to extract a ' "
+      << "Tried to extract a '"
         << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
           << "' but the node is not a scalar." << std::endl
             << "Node: " << std::endl
@@ -685,7 +663,7 @@ inline bool _get_scalar(const YAML::Node& node, T& ret, std::stringstream& what)
 }
 
 template<typename T>
-inline bool get_scalar(const node_t& node, T& ret, std::stringstream& what)
+inline bool get_scalar(const YAML::Node& node, T& ret, std::stringstream& what)
 {
   UNUSED(node);
   UNUSED(ret);
@@ -745,7 +723,7 @@ template<typename T, std::size_t  N>
 bool _get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstream& what);
 
 template<typename T, std::size_t N, std::size_t M>
-bool _get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what);
+bool _get_sequence(const YAML::Node& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what);
 
 
 template<typename T, typename A>
@@ -755,7 +733,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
   if(!config.IsSequence())
   {
     what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": " 
-      << "Tried to extract a ' "
+      << "Tried to extract a '"
         << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
           << "' but the node is not a sequence." << std::endl
             << "Node: " << std::endl
@@ -810,7 +788,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
   if(!config.IsSequence())
   {
     what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-      << "Tried to extract a ' "
+      << "Tried to extract a '"
         << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
           << "' but the node is not a sequence." << std::endl
             << "Node: " << std::endl
@@ -826,7 +804,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
         if(!config[i].IsSequence())
         {
           what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-            << "Tried to extract a ' "
+            << "Tried to extract a '"
               << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
                 << "' but the node is not a sequence." << std::endl
                   << "Node: " << std::endl
@@ -863,7 +841,7 @@ bool _get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstre
     if(!ok || (tmp.size()==N))
     {
       what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "Tried to extract a ' "
+        << "Tried to extract a '"
           << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
             << "' ?error in size?" << std::endl
               << "Node: " << std::endl
@@ -881,7 +859,7 @@ bool _get_sequence(const YAML::Node& node, std::array<T,N>& ret, std::stringstre
 }
 
 template<typename T, std::size_t N, std::size_t M>
-bool _get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what)
+bool _get_sequence(const YAML::Node& node, std::array<std::array<T,M>,N>& ret, std::stringstream& what)
 {
   bool ok = false;
   try
@@ -891,7 +869,7 @@ bool _get_sequence(const node_t& node, std::array<std::array<T,M>,N>& ret, std::
     if(!ok || (tmp.size()!=N) || (tmp.front().size()!=M))
     {
       what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "Tried to extract a ' "
+        << "Tried to extract a '"
           << boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
             << "' ?error in size?" << std::endl
               << "Node: " << std::endl
@@ -938,7 +916,7 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
       }
 
       int dim = static_cast<int>(vv.size());
-      if (!cnr::param::utils::resize(_ret, (expected_rows == 1 ? 1 : dim), (expected_rows == 1 ? dim : 1)))
+      if (!utils::resize(_ret, (expected_rows == 1 ? 1 : dim), (expected_rows == 1 ? dim : 1)))
       {
         what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
             << "It was expected a Vector (" +
@@ -968,7 +946,7 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
 
       int rows = static_cast<int>(vv.size());
       int cols = static_cast<int>(vv.front().size());
-      if (!cnr::param::utils::resize(_ret, rows, cols))
+      if (!utils::resize(_ret, rows, cols))
       {
         what << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
             << "It was expected a Vector (" +
@@ -1006,7 +984,7 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
 
 
 template<typename T>
-inline bool _get_sequence(const node_t& node, T& ret, std::stringstream& what)
+inline bool _get_sequence(const YAML::Node& node, T& ret, std::stringstream& what)
 {
   if constexpr(is_matrix_expression<T>::value)
   {
@@ -1022,13 +1000,13 @@ inline bool _get_sequence(const node_t& node, T& ret, std::stringstream& what)
 }
 
 template<typename T>
-inline bool get_sequence(const node_t& node, T& ret, std::stringstream& what)
+inline bool get_sequence(const YAML::Node& node, T& ret, std::stringstream& what)
 {
   return _get_sequence(node, ret, what);
 }
 
 template<typename T>
-inline bool get_map(const node_t& node, T& ret, std::stringstream& what)
+inline bool get_map(const YAML::Node& node, T& ret, std::stringstream& what)
 {
   UNUSED(ret);
   what<< "The type ' "
@@ -1041,6 +1019,7 @@ inline bool get_map(const node_t& node, T& ret, std::stringstream& what)
 
 }
 }
+}
 
-#endif  /* CNR_PARAM_INCLUDE_CNR_PARAM_IMPL_YAML_CNR_PARAM_YAML_CPP_IMPL */
+#endif  /* CNR_PARAM__INCLUDE__CNR_PARAM__YAML_MAPPED_FILE__IMPL__PARAM__HPP */
 

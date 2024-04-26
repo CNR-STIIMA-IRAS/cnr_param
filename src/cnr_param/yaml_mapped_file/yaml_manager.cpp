@@ -19,10 +19,9 @@
 
 #include <cnr_param/utils/string.h>
 #include <cnr_param/utils/filesystem.h>
-#include <cnr_param/utils/yaml.h>
-#include <cnr_param/utils/interprocess.h>
-
-#include <cnr_param_server/utils/yaml_manager.h>
+#include <cnr_param/yaml_mapped_file/yaml.h>
+#include <cnr_param/yaml_mapped_file/interprocess.h>
+#include <cnr_param/yaml_mapped_file/yaml_manager.h>
 
 
 // ====================================================================================================
