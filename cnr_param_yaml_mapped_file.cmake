@@ -16,12 +16,14 @@ target_include_directories(cnr_param_yaml_mapped_file PUBLIC
     "$<INSTALL_INTERFACE:${YAML_MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
 target_link_libraries(cnr_param_yaml_mapped_file 
-  PUBLIC cnr_param_utils
-  PUBLIC yaml-cpp
+  PUBLIC cnr_param::cnr_param_utilities
+  PUBLIC $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
+  PUBLIC $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:yaml-cpp>
   PUBLIC Boost::system
   PUBLIC Boost::filesystem
   PUBLIC Eigen3::Eigen
 )
+add_library(cnr_param::cnr_param_yaml_mapped_file ALIAS cnr_param_yaml_mapped_file)
 
 list(APPEND TARGETS_LIST cnr_param_yaml_mapped_file)
 

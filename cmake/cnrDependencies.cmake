@@ -20,6 +20,11 @@ endif()
 
 if(COMPILE_MAPPED_FILE_MODULE)
   find_package(yaml-cpp REQUIRED)
+  if(yaml-cpp VERSION_LESS "0.8")
+    set(YAML_CPP_HAS_NAMESPACE 0)
+  else()
+      set(YAML_CPP_HAS_NAMESPACE 1)
+  endif()
 endif()
 
 set(Boost_USE_STATIC_LIBS OFF)

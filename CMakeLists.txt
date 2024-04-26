@@ -54,7 +54,7 @@ cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1 USE_ROS2)
 #################
 ## Build       ##
 #################
-include(cnr_param_utils.cmake)
+include(cnr_param_utilities.cmake)
 
 if(COMPILE_ROS2_MODULE)
   include(cnr_param_ros2.cmake)
