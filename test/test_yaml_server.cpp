@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <ostream>
-#include <utility>
 #include <iostream>
 #include <string>
 #include <iostream>
@@ -92,10 +91,15 @@ std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
     std::cout << "Elapsed time [us]: " << time_taken * 1e6 << std::endl;                                               \
   }
 
+// ====================================================================================================================
+// === GLOBAL VARIABLES ===============================================================================================
+// ====================================================================================================================
 std::string param_root_directory;
 const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path();
 
-// Demonstrate some basic assertions.
+// ====================================================================================================================
+// === HelloTest, BasicAssertions =====================================================================================
+// ====================================================================================================================
 TEST(HelloTest, BasicAssertions)
 {
   // Expect two strings not to be equal.
@@ -104,6 +108,9 @@ TEST(HelloTest, BasicAssertions)
   EXPECT_EQ(7 * 6, 42);
 }
 
+// ====================================================================================================================
+// === ServerTest, ServerUsage ========================================================================================
+// ====================================================================================================================
 TEST(ServerTest, ServerUsage)
 {
   const std::string default_shmem_name = "param_server_default_shmem";
@@ -139,6 +146,9 @@ TEST(ServerTest, ServerUsage)
   EXPECT_NO_FATAL_FAILURE(delete args);
 }
 
+// ====================================================================================================================
+// === ClientTest, ClientUsage ========================================================================================
+// ====================================================================================================================
 TEST(ClientTest, ClientUsage)
 {
   std::string what;
@@ -173,6 +183,9 @@ TEST(ClientTest, ClientUsage)
   std::cout << "What: " << what << std::endl;
 }
 
+// ====================================================================================================================
+// === ClientErrorTest, ClientNonExistentParam ========================================================================
+// ====================================================================================================================
 TEST(ClientErrorTest, ClientNonExistentParam)
 {
   std::string defval = "DEFAULT";
@@ -199,6 +212,9 @@ TEST(ClientErrorTest, ClientNonExistentParam)
   EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval));
 }
 
+// ====================================================================================================================
+// === DeveloperTest, DeveloperFunctions ==============================================================================
+// ====================================================================================================================
 TEST(DeveloperTest, DeveloperFunctions)
 {
   std::string defval = "DEFAULT";
@@ -225,6 +241,9 @@ TEST(DeveloperTest, DeveloperFunctions)
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/", "feedback_joint_state_topic"));
 }
 
+// ====================================================================================================================
+// === DeveloperTest, GetVector =======================================================================================
+// ====================================================================================================================
 TEST(DeveloperTest, GetVector)
 {
   std::string what;
@@ -267,6 +286,9 @@ TEST(DeveloperTest, GetVector)
   }
 }
 
+// ====================================================================================================================
+// === DeveloperTest, GetMatrix =======================================================================================
+// ====================================================================================================================
 TEST(DeveloperTest, GetMatrix)
 {
   std::string what;
@@ -306,6 +328,13 @@ TEST(DeveloperTest, GetMatrix)
   EXPECT_FALSE(ret = cnr::param::yaml::get("/n1/n4/vv1", ee, what));
 }
 
+
+// ====================================================================================================================
+// === DeveloperTest, GetComplexType ==================================================================================
+// First we define a complex type
+// then we inherit the get_map function to extract the complex type from the YAML node
+// finally, we run the test
+// ====================================================================================================================
 struct ComplexType
 {
   std::string name;
@@ -380,6 +409,7 @@ TEST(DeveloperTest, GetComplexType)
   }
 }
 
+GetComplexType
 int main(int argc, char** argv)
 {
   const char* env_p = std::getenv("CNR_PARAM_ROOT_DIRECTORY");
