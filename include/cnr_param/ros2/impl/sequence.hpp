@@ -2,8 +2,8 @@
 #define CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__SEQUENCE__HPP
 
 #include <string>
-#include <cnr_param/utils/type_traits.h>
-#include <cnr_param/utils/eigen.h>
+#include <cnr_param/core/type_traits.h>
+#include <cnr_param/core/eigen.h>
 
 #include <cnr_param/ros2/param_retriever.h>
 

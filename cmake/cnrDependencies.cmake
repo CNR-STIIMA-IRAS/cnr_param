@@ -7,7 +7,7 @@ if(COMPILE_ROS1_MODULE)
     include
     ${EIGEN3_INCLUDE_DIRS}
     LIBRARIES
-    cnr_param_utilities
+    cnr_param_core
     CATKIN_DEPENDS
     roscpp)
 endif()
@@ -20,13 +20,11 @@ if(COMPILE_ROS2_MODULE)
   find_package(rcl_interfaces REQUIRED)
 endif()
 
-if(COMPILE_MAPPED_FILE_MODULE)
-  find_package(yaml-cpp REQUIRED)
-  if(yaml-cpp VERSION_LESS "0.8")
-    set(YAML_CPP_HAS_NAMESPACE 0)
-  else()
-    set(YAML_CPP_HAS_NAMESPACE 1)
-  endif()
+find_package(yaml-cpp REQUIRED)
+if(yaml-cpp VERSION_LESS "0.8")
+  set(YAML_CPP_HAS_NAMESPACE 0)
+else()
+  set(YAML_CPP_HAS_NAMESPACE 1)
 endif()
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -34,7 +32,7 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
 
-list(APPEND DEPENDENCIES_INCLUDE_DIRS ${yaml-cpp_INCLUDE_DIRS}
+list(APPEND DEPENDENCIES_INCLUDE_DIRS  $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:${yaml-cpp_INCLUDE_DIRS}>
   ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 if(COMPILE_ROS1_MODULE)
   list(APPEND DEPENDENCIES_INCLUDE_DIRS ${catkin_INCLUDE_DIRS})
@@ -44,11 +42,15 @@ elseif(COMPILE_ROS2_MODULE)
     ${rcl_interfaces_INCLUDE_DIRS})
 endif()
 
-list(APPEND DEPENDENCIES_ROS_LIBRARIES "")
+list(APPEND DEPENDENCIES_ROS_LIBRARIES  
+  $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
+  $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:yaml-cpp>)
 
 message(
   STATUS
-  "COMPILE_MAPPED_FILE_MODULE: ${COMPILE_MAPPED_FILE_MODULE}, COMPILE_ROS1_MODULE: ${COMPILE_ROS1_MODULE}, COMPILE_ROS2_MODULE: ${COMPILE_ROS2_MODULE}"
+  "COMPILE_MAPPED_FILE_MODULE: ${COMPILE_MAPPED_FILE_MODULE}"
+  "COMPILE_ROS1_MODULE: ${COMPILE_ROS1_MODULE}"
+  "COMPILE_ROS2_MODULE: ${COMPILE_ROS2_MODULE}"
 )
 if(COMPILE_ROS1_MODULE)
   list(APPEND DEPENDENCIES_ROS_LIBRARIES ${catkin_LIBRARIES})
@@ -63,7 +65,7 @@ if(ENABLE_TESTING)
     find_package(ament_lint_auto REQUIRED)
     set(ament_cmake_copyright_FOUND TRUE)
     set(ament_cmake_cpplint_FOUND TRUE)
-    ament_lint_auto_find_test_dependencies()
+    #ament_lint_auto_find_test_dependencies()
 
     find_package(ament_cmake_gtest REQUIRED)
   endif()

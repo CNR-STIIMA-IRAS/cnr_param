@@ -21,18 +21,9 @@ public:
 
 private:
   rclcpp::TimerBase::SharedPtr timer_;
-  int count_ = 0;
   void timer_callback()
   {
-    if(count_++==0)
-    {
-      RCLCPP_INFO(this->get_logger(), "Dump parameters");
-      auto vv = this->list_parameters({}, 1000);
-      for (const auto& v : vv.names)
-      {
-        RCLCPP_INFO(this->get_logger(), "- %s", v.c_str());
-      }
-    }
+
   }
 };
 

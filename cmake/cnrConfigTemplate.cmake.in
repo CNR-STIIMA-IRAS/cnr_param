@@ -15,6 +15,6 @@ find_dependency(yaml-cpp REQUIRED)
 find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
-set(cnr_param_LIBRARIES cnr_param_utilities)
+set(cnr_param_LIBRARIES cnr_param_core)
 
 set(cnr_param_EXECUTABLE cnr_param_server)

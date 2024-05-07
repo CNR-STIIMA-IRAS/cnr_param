@@ -5,12 +5,13 @@
 #include <vector>
 #include <map>
 #include <Eigen/Core>
+#include <yaml-cpp/yaml.h>
 
 #include <rclcpp/node.hpp>
 #include <rclcpp/parameter.hpp>
 #include <rclcpp/parameter_client.hpp>
 
-#include <cnr_param/utils/type_traits.h>
+#include <cnr_param/core/type_traits.h>
 
 namespace cnr
 {
@@ -99,6 +100,8 @@ private:
   ParamValue param_;
 };
 
+bool to_yaml(const ParamDictionary& tree, YAML::Node& node, std::string& what);
+
 
 /**
  * @brief
@@ -150,6 +153,18 @@ public:
   ParamDictionary& node_params(const std::string& node_name);
   const ParamDictionary& node_params(const std::string& node_name) const;
 
+  /**
+   * @brief
+   *
+   * @param node_name
+   * @param keys
+   * @param parameter_names
+   * @param what
+   * @return true
+   * @return false
+   */
+  bool list_parameters(const std::string& node_name, const std::vector<std::string>& keys,
+                       std::vector<std::string>& parameter_names, std::string& what);
 private:
   rclcpp::Node::SharedPtr& node_;
   std::map<std::string, rclcpp::AsyncParametersClient::SharedPtr> parameters_client_;
@@ -164,18 +179,6 @@ private:
    */
   bool init_async_params_client(const std::string& node_name);
 
-  /**
-   * @brief
-   *
-   * @param node_name
-   * @param keys
-   * @param parameter_names
-   * @param what
-   * @return true
-   * @return false
-   */
-  bool list_parameters(const std::string& node_name, const std::vector<std::string>& keys,
-                       std::vector<std::string>& parameter_names, std::string& what);
 
   /**
    * @brief Get the parameters for a vector of keys that have already been checked

@@ -324,7 +324,7 @@ bool ParamRetriever::list_parameters(const std::string& node_name, const std::ve
     if (list.wait_for(span) != std::future_status::ready)
     {
       printf("set_parameters service call failed. Exiting example.\n");
-      return -1;
+      return false;
     }
     parameter_names = list.get().names;
   }
@@ -533,6 +533,47 @@ const ParamDictionary* find(const ParamDictionary& tree, const std::string key, 
   }
 
   return nullptr;
+}
+
+bool _to_yaml(const ParamDictionary& tree, YAML::Node& node, std::string& what)
+{
+  if (std::holds_alternative<ParamDictionary::EmptyParam>(tree.value()))
+  {
+    what = "The param is empty";
+    return false;
+  }
+  else if (std::holds_alternative<rclcpp::Parameter>(tree.value()))
+  {
+    auto & rclcpp_par = std::get<rclcpp::Parameter>(tree.value());
+    std::string json_str = rclcpp::_to_json_dict_entry( rclcpp_par );
+    YAML::Node yaml_node = YAML::Load(json_str);
+    node[tree.name()] = YAML::Load(yaml_node[rclcpp_par.get_name()]["value"].as<std::string>());
+  }
+  else
+  {
+    auto & nested = std::get<ParamDictionary::NestedParams>(tree.value());
+    for (const auto& p : nested)
+    {
+      if (!_to_yaml(p.second, node, what))
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
+bool to_yaml(const ParamDictionary& tree, YAML::Node& node, std::string& what)
+{
+  YAML::Node yaml_node;
+  if(!_to_yaml(tree, yaml_node, what))
+  {
+    return false;
+  }
+
+  node[tree.name()] = yaml_node;
+  return true;
 }
 
 }  // namespace ros2

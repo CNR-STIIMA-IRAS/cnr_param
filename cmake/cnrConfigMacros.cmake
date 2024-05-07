@@ -259,3 +259,38 @@ macro(
     install(DIRECTORY ${TEST_CONFIG_DIR} DESTINATION share/${PROJECT_NAME})
   endif()
 endmacro()
+
+
+macro(cnr_configure_gtest trg deps build_include_dirs install_include_dirs)
+
+  target_include_directories(
+    ${trg}
+    PUBLIC "$<BUILD_INTERFACE:${build_include_dirs}>"
+         "$<INSTALL_INTERFACE:${install_include_dirs}>")
+
+  if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
+    target_link_libraries(
+      ${trg}
+      ${deps}
+      Threads::Threads
+      GTest::Main
+      Boost::program_options
+      Boost::system
+      Boost::filesystem
+      Boost::iostreams
+      Boost::regex)
+  else()
+    target_link_libraries(${trg}
+      ${dep} GTest::Main)
+    if(THREADS_HAVE_PTHREAD_ARG)
+      target_compile_options(${trg} PUBLIC "-pthread")
+    endif()
+    if(CMAKE_THREAD_LIBS_INIT)
+      target_link_libraries(${trg}
+                            "${CMAKE_THREAD_LIBS_INIT}")
+    endif()
+  endif()
+
+  set_target_properties(
+    ${trg} PROPERTIES LINK_FLAGS "-Wl,-rpath,${CNR_INSTALL_LIB_DIR}")
+endmacro()

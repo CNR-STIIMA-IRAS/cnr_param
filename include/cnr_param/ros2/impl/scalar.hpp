@@ -3,7 +3,7 @@
 
 #include "rclcpp/parameter_value.hpp"
 
-#include <cnr_param/utils/type_traits.h>
+#include <cnr_param/core/type_traits.h>
 #include <cnr_param/ros2/param_retriever.h>
 
 namespace cnr

@@ -28,6 +28,12 @@ void CNR_PARAM_INIT_RO2_MODULE(std::shared_ptr<rclcpp::Node>& node)
   param_retriever().reset(new cnr::param::ros2::ParamRetriever (background_node()) );
 }
 
+void CNR_PARAM_CLEANUP_RO2_MODULE()
+{
+  background_node() = nullptr;
+  param_retriever().reset( );
+}
+
 bool has(const std::string& key, std::string& what)
 {
   std::string resolved_node_name, resolved_key;

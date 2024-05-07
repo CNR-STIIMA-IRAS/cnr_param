@@ -1,6 +1,13 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__MAP__HPP
 #define CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__MAP__HPP
 
+#include <yaml-cpp/yaml.h>
+#include <string>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <cnr_param/core/param.h>
+
+#include <cnr_param/ros2/yaml_formatter.h>
 #include <cnr_param/ros2/param_retriever.h>
 
 namespace cnr
@@ -21,14 +28,17 @@ namespace ros2
  * @return false 
  */
 template<typename T>
-inline bool get_map(const ParamDictionary& node, T& ret, std::string& what)
+inline bool get_map(const ParamDictionary& param, T& ret, std::string& what)
 {
-  UNUSED(ret);
-  what = "The type ' "
-        + boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() 
-          + "' is not supported. You must specilized your own 'get_map' template function"+ "' Node: \n" 
-              + std::to_string(node) ;
-  return false;
+  
+    YAML::Node node;
+    if(!cnr::param::ros2::to_yaml(param, node, what))
+    {
+      return false;
+    }
+    YAML::Node uncrustified_node = cnr::param::ros2::ros2_yaml_decoder(node);
+    
+    return cnr::param::core::get_map(uncrustified_node, ret, what);
 }
 
 
