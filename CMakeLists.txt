@@ -82,7 +82,10 @@ else()
 endif()
 
 ################################################################################
-configure_file(config.h.in config.h @ONLY)
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
+  "${CNR_INSTALL_INCLUDE_DIR}/config.h" 
+  @ONLY)
 ################################################################################
 
 add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
