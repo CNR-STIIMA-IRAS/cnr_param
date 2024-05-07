@@ -184,8 +184,9 @@ struct is_sequence
 
 // =======================================================================================================
 template<typename F, typename T>
-inline typename std::enable_if<std::is_same<F, T>::value || std::is_convertible<F, T>::value,
-  T>::type implicit_cast(const F & rhs)
+inline 
+typename std::enable_if<std::is_same<F, T>::value || std::is_convertible<F, T>::value,  T>::type
+implicit_cast(const F & rhs)
 {
   return rhs;
 }
@@ -194,7 +195,8 @@ template<typename F, typename T>
 inline typename std::enable_if<is_matrix_expression<T>::value && is_double_std_v<F>::value, T>::type
 implicit_cast(const F & rhs)
 {
-  return Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(rhs.data(), rhs.size());
+  auto _rhs = rhs;
+  return Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_rhs.data(), _rhs.size());
 }
 
 template<typename F, typename T>

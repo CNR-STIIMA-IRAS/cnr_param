@@ -163,7 +163,7 @@ inline bool get(const std::string& key, T& ret, std::string& what)
 template<typename T>
 bool set(const std::string&, const T&, std::string&)
 {
-  return true;
+  return false;
 }
 
 /**

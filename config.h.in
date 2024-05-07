@@ -1,0 +1,6 @@
+// config.h.in
+
+#define ROS2_MODULE @ROS2_MODULE@
+#define ROS1_MODULE @ROS1_MODULE@
+#define MAPPED_FILE_MODULE @MAPPED_FILE_MODULE@
+

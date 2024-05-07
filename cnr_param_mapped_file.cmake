@@ -34,7 +34,9 @@ target_link_libraries(
   PUBLIC Boost::filesystem
   PUBLIC Eigen3::Eigen)
 
+set_target_properties(cnr_param_mapped_file PROPERTIES LINK_FLAGS "-Wl,-rpath,${CNR_INSTALL_LIB_DIR}")
 add_library(cnr_param::cnr_param_mapped_file ALIAS cnr_param_mapped_file)
+
 list(APPEND TARGETS_LIST cnr_param_mapped_file)
 ### cnr_param_mapped_file END #################################################
 

@@ -47,21 +47,21 @@ macro(cnr_set_flags)
     set(CMAKE_C_STANDARD 99)
   endif()
 
-  set(LOCAL_CXX_STANDARD 17)
+  set(LOCAL_CXX_STANDARD 20)
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
     add_compile_options(-Wall -Wextra -Wpedantic -D_TIME_BITS=64
                         -D_FILE_OFFSET_BITS=64)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION GREATER 12)
-      set(LOCAL_CXX_STANDARD 17)
+      set(LOCAL_CXX_STANDARD 20)
     elseif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION GREATER 10)
-      set(LOCAL_CXX_STANDARD 17)
+      set(LOCAL_CXX_STANDARD 20)
     endif()
 
   endif()
 
-  # Default to C++14
+  # Default to C++20
   if(NOT CMAKE_CXX_STANDARD)
     message(STATUS "CMAKE CXX STANDARD: ${LOCAL_CXX_STANDARD}")
     set(CMAKE_CXX_STANDARD ${LOCAL_CXX_STANDARD})
@@ -291,6 +291,7 @@ macro(cnr_configure_gtest trg deps build_include_dirs install_include_dirs)
     endif()
   endif()
 
+  target_link_directories(${trg} PUBLIC ${CNR_INSTALL_LIB_DIR})
   set_target_properties(
     ${trg} PROPERTIES LINK_FLAGS "-Wl,-rpath,${CNR_INSTALL_LIB_DIR}")
 endmacro()

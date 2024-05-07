@@ -57,15 +57,66 @@ cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1 USE_ROS2)
 # ##############################################################################
 # Build       ##
 # ##############################################################################
+
+
 include(cnr_param_core.cmake)
+
+if(COMPILE_ROS1_MODULE)
+  set(ROS1_MODULE 1)
+else()
+  set(ROS1_MODULE 0)
+endif()
 
 if(COMPILE_ROS2_MODULE)
   include(cnr_param_ros2.cmake)
+  set(ROS2_MODULE 1)
+else()
+  set(ROS2_MODULE 0)
 endif()
 
 if(COMPILE_MAPPED_FILE_MODULE)
   include(cnr_param_mapped_file.cmake)
+  set(MAPPED_FILE_MODULE 1)
+else()
+  set(MAPPED_FILE_MODULE 0)
 endif()
+
+################################################################################
+configure_file(config.h.in config.h @ONLY)
+################################################################################
+
+add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
+target_include_directories(cnr_param PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+
+if(COMPILE_ROS2_MODULE)
+  target_compile_definitions(cnr_param PRIVATE ROS2_MODULE)
+  target_link_libraries(cnr_param PUBLIC cnr_param::cnr_param_ros2)
+endif()
+
+if(COMPILE_MAPPED_FILE_MODULE)
+  target_compile_definitions(cnr_param PRIVATE MAPPED_FILE_MODULE)
+  target_link_libraries(cnr_param PUBLIC cnr_param::cnr_param_mapped_file cnr_param::cnr_param_server_utilities)
+endif()
+
+add_library(cnr_param::cnr_param ALIAS cnr_param)
+# #############################################################################
+# Testing  ##
+# #############################################################################
+if(ENABLE_TESTING)
+
+  ### EXECUTABLE
+  add_executable(test_cnr_param
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param_mapped_file.cpp)
+  gtest_discover_tests(test_cnr_param)
+
+  cnr_configure_gtest(test_cnr_param 
+    cnr_param::cnr_param
+    ${CMAKE_CURRENT_SOURCE_DIR}/include include)
+  
+  target_compile_definitions(test_cnr_param PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
+endif()
+
+
 # ##############################################################################
 # END - Build ##
 # ##############################################################################
