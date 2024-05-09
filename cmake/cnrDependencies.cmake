@@ -1,4 +1,5 @@
-find_package(Eigen3 REQUIRED NO_MODULE)
+#find_package(Eigen3 REQUIRED Core Dense)
+find_package(Eigen3 REQUIRED COMPONENTS Core Dense  Geometry)
 
 if(COMPILE_ROS1_MODULE)
   find_package(catkin REQUIRED COMPONENTS roscpp)
@@ -23,9 +24,13 @@ endif()
 find_package(yaml-cpp REQUIRED)
 if(yaml-cpp VERSION_LESS "0.8")
   set(YAML_CPP_HAS_NAMESPACE 0)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(yaml-cpp_pkg_config REQUIRED yaml-cpp IMPORTED_TARGET)
+
 else()
   set(YAML_CPP_HAS_NAMESPACE 1)
 endif()
+
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
