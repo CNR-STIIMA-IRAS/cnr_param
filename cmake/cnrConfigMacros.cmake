@@ -29,6 +29,14 @@ macro(get_project_name filename extracted_name extracted_version)
     cmake_policy(SET CMP0048 NEW)
   endif()
 
+  if($ENV{ROS_VERSION} STREQUAL "1")
+    set(USER_BUILD_TOOL "CATKIN")
+  elseif($ENV{ROS_VERSION} STREQUAL "2")
+    set(USER_BUILD_TOOL "AMENT")
+  else()
+    set(USER_BUILD_TOOL "CMAKE")
+  endif()
+
 endmacro()
 
 #
@@ -106,8 +114,8 @@ endmacro()
 #
 # cnr_enable_testing
 #
-macro(cnr_enable_testing ENABLE_TESTING ENABLE_COVERAGE USE_ROS1)
-  if(${ENABLE_TESTING})
+macro(cnr_enable_testing)
+  if(ENABLE_TESTING)
     message(STATUS "Enable testing")
     if(${USE_ROS1})
       find_package(rostest REQUIRED)
@@ -118,7 +126,7 @@ macro(cnr_enable_testing ENABLE_TESTING ENABLE_COVERAGE USE_ROS1)
       find_package(GTest REQUIRED)
     endif()
 
-    if(${ENABLE_COVERAGE_TESTING} AND NOT WIN32)
+    if(ENABLE_COVERAGE_TESTING AND NOT WIN32)
       message(STATUS "Enable Coverage")
       if(${USE_ROS1})
         find_package(code_coverage REQUIRED)
@@ -136,9 +144,10 @@ endmacro()
 #
 # cnr_install_directories
 #
-macro(cnr_install_directories AMENT_BUILDTOOL CNR_INSTALL_INCLUDE_DIR
+macro(cnr_install_directories CNR_INSTALL_INCLUDE_DIR
       CNR_INSTALL_LIB_DIR CNR_INSTALL_BIN_DIR CNR_INSTALL_SHARE_DIR)
-  if(AMENT_BUILDTOOL)
+  
+  if(${USER_BUILD_TOOL} STREQUAL "CATKIN" OR ${USER_BUILD_TOOL} STREQUAL "AMENT")
     set(${CNR_INSTALL_INCLUDE_DIR}
         ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
     set(${CNR_INSTALL_LIB_DIR} ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME})

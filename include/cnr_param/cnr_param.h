@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-//#include "config.h"
+#include "config.h"
 
 #if ROS1_MODULE==1
 #include <cnr_param/ros1/param.h>
