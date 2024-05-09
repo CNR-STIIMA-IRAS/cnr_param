@@ -133,7 +133,7 @@ cnr::param::ros2::CNR_PARAM_INIT_RO2_MODULE(my_node);
 
 Once the `my_node` is configured, the module can look at the node parameters, and it implements the service to ask the parameters of the other nodes under the network.
 
-### ROS 2 yaml formatter
+### Formatting the ROS 2 YAML files
 
 As well know, ROS 2 does not support all the yaml types. Specifically, it does not allow to have a sequence of sequences or dictionaries. 
 To turn yaml file into a ROS 2 yaml file, the package just provides a formatter.
