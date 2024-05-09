@@ -23,7 +23,9 @@ target_include_directories(
 
 target_link_libraries(
   cnr_param_core
-  PUBLIC ${yaml-cpp_LIBRARIES}
+  #PUBLIC ${yaml-cpp_LIBRARIES}
+  PUBLIC $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
+  PUBLIC $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:PkgConfig::yaml-cpp_pkg_config>
   PUBLIC Boost::system
   PUBLIC Boost::filesystem
   PUBLIC Eigen3::Eigen)
