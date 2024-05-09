@@ -92,16 +92,24 @@ add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
 target_include_directories(cnr_param PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/")
 
 if(COMPILE_ROS2_MODULE)
-  target_compile_definitions(cnr_param PRIVATE ROS2_MODULE)
   target_link_libraries(cnr_param PUBLIC cnr_param::cnr_param_ros2)
 endif()
 
 if(COMPILE_MAPPED_FILE_MODULE)
-  target_compile_definitions(cnr_param PRIVATE MAPPED_FILE_MODULE)
   target_link_libraries(cnr_param PUBLIC cnr_param::cnr_param_mapped_file cnr_param::cnr_param_server_utilities)
 endif()
 
 add_library(cnr_param::cnr_param ALIAS cnr_param)
+
+target_compile_definitions(cnr_param
+  PUBLIC
+  $<$<BOOL:${ROS1_MODULE}>:ROS1_MODULE=1>
+  $<$<BOOL:${ROS2_MODULE}>:ROS2_MODULE=1>
+  $<$<BOOL:${MAPPED_FILE_MODULE}>:MAPPED_FILE_MODULE=1>
+  $<$<NOT:${ROS1_MODULE}>:ROS1_MODULE=0>
+  $<$<NOT:${ROS2_MODULE}>:ROS2_MODULE=0>
+  $<$<NOT:${MAPPED_FILE_MODULE}>:MAPPED_FILE_MODULE=0>
+  )
 # #############################################################################
 # Testing  ##
 # #############################################################################
