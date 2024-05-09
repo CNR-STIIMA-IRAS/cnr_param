@@ -84,12 +84,12 @@ endif()
 ################################################################################
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
-  "${CNR_INSTALL_INCLUDE_DIR}/config.h" 
+  "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/config.h" 
   @ONLY)
 ################################################################################
 
 add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
-target_include_directories(cnr_param PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(cnr_param PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/")
 
 if(COMPILE_ROS2_MODULE)
   target_compile_definitions(cnr_param PRIVATE ROS2_MODULE)
@@ -137,6 +137,7 @@ endif()
 # ##############################################################################
 # INSTALL         ##
 # ##############################################################################
+list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param" )
 if(USE_ROS1)
   cnr_install_catkin_policy()
 else()
@@ -147,7 +148,7 @@ else()
     ${CNR_INSTALL_BIN_DIR}
     ${extracted_version}
     "${TARGETS_LIST}"
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${HEADERS_DIRS}
     test/launch
     test/config)
 endif()
