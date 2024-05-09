@@ -30,11 +30,15 @@ The `key` is the name of the parameter that follows both the `ROS1` and `ROS2` c
 ```cpp
 std::string what;
 AnyType value;
-bool ok = cnr::param::get("/[namespaces / if present]/node_name/a/b/c/d", value, what )
-if(!ok)
-{
-    std::cout << "The parameter is not available: " << what << std::endl;
-}
+bool ok
+// ROS 1 nesting
+ok = cnr::param::get("/[namespaces / if present]/node_name/a/b/c/d", value, what )
+...
+// ROS 2 nesting
+ok = cnr::param::get("/[namespaces / if present].node_name.a.b.c.d", value, what )
+...
+// or mixed
+ok = cnr::param::get("/[namespaces / if present].node_name.a/b.c.d", value, what )
 ```
 
 The already supported supported types are:
