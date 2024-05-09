@@ -22,11 +22,6 @@ namespace cnr
 {
 namespace param
 {
-
-const bool& is_ros1_avaliable();
-const bool& is_ros2_avaliable();
-const bool& is_mapped_file_avaliable();
-
 enum class ModulesID : uint8_t
 {
   ROS1 = 0b001, ROS2=0b010, MAPPED_FILE=0b100
@@ -94,6 +89,13 @@ namespace cnr
 {
 namespace param
 {
+
+
+
+const bool& is_ros1_avaliable();
+const bool& is_ros2_avaliable();
+const bool& is_mapped_file_avaliable();
+
 
 #if !defined(UNUSED)
 #define UNUSED(expr) do { (void)(expr); } while (0)
