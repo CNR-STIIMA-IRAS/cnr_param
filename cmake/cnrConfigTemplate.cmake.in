@@ -6,8 +6,6 @@
 
 set(cnr_param_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 
-# Our library dependencies (contains definitions for IMPORTED targets)
-include("${cnr_param_DIR}/export_cnr_param.cmake")
 
 include(CMakeFindDependencyMacro)
 find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
@@ -19,4 +17,5 @@ set(cnr_param_LIBRARIES cnr_param_core)
 
 set(cnr_param_EXECUTABLE cnr_param_server)
 
+# Our library dependencies (contains definitions for IMPORTED targets)
 include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramTargets.cmake")

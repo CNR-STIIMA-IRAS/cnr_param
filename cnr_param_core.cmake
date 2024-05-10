@@ -1,12 +1,10 @@
 # ##############################################################################
 # UTILS Build                   ##
 # ##############################################################################
-list(APPEND UTILS_DEPENDENCIES_INCLUDE_DIRS ${yaml-cpp_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 list(APPEND UTILS_BUILD_INTERFACE_INCLUDE_DIRS
-  ${UTILS_DEPENDENCIES_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 list(APPEND UTILS_INSTALL_INTERFACE_INCLUDE_DIRS
-  ${UTILS_DEPENDENCIES_INCLUDE_DIRS} include)
+  include)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/core)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/core)
@@ -23,7 +21,6 @@ target_include_directories(
 
 target_link_libraries(
   cnr_param_core
-  #PUBLIC ${yaml-cpp_LIBRARIES}
   PUBLIC $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
   PUBLIC $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:PkgConfig::yaml-cpp_pkg_config>
   PUBLIC Boost::system

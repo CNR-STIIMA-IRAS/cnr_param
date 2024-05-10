@@ -2,6 +2,12 @@
 # YAML MAPPED FILE MODULE Build ##
 # ##############################################################################
 
+### DIRECTORIES: include and src
+list(APPEND MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS
+      ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS
+      include)
+
 
 ### SOURCES
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/mapped_file)

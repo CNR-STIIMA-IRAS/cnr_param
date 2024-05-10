@@ -116,6 +116,7 @@ if(COMPILE_MAPPED_FILE_MODULE)
 endif()
 
 add_library(cnr_param::cnr_param ALIAS cnr_param)
+list(APPEND TARGETS_LIST cnr_param)
 # #############################################################################
 # Testing  ##
 # #############################################################################
@@ -158,6 +159,8 @@ list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include "${CMAKE_CURRENT_BI
 if(USE_ROS1)
   cnr_install_catkin_policy()
 else()
+
+  message("TARGETS:"  "${TARGETS_LIST}")
   set(PROJECT_VERSION 1.0.0)
   cnr_install_cmake_policy(
     ${CNR_INSTALL_INCLUDE_DIR}
