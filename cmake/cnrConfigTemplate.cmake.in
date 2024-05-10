@@ -12,6 +12,12 @@ find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iost
 find_dependency(yaml-cpp REQUIRED)
 find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
 
+find_dependency(yaml-cpp REQUIRED)
+if(yaml-cpp VERSION_LESS "0.8")
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(yaml-cpp_pkg_config REQUIRED yaml-cpp IMPORTED_TARGET)
+endif()
+
 # These are IMPORTED targets created by cnr_paramTargets.cmake
 set(cnr_param_LIBRARIES cnr_param_core)
 

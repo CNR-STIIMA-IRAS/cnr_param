@@ -211,12 +211,6 @@ macro(cnr_install_cmake_policy_gt_3_0_0 INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
   install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
           DESTINATION "${CONFIG_INSTALL_DIR}")
 
-  # Install cmake targets files
-#  install(
-#    EXPORT "${TARGETS_EXPORT_NAME}"
-#    NAMESPACE "${CONFIG_NAMESPACE}"
-#    DESTINATION "${CONFIG_INSTALL_DIR}")
-
   install(
     TARGETS ${TARGETS_LIST}
     EXPORT ${TARGETS_EXPORT_NAME}

@@ -160,7 +160,6 @@ if(USE_ROS1)
   cnr_install_catkin_policy()
 else()
 
-  message("TARGETS:"  "${TARGETS_LIST}")
   set(PROJECT_VERSION 1.0.0)
   cnr_install_cmake_policy(
     ${CNR_INSTALL_INCLUDE_DIR}
