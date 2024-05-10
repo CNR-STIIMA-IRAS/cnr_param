@@ -21,6 +21,12 @@ if(COMPILE_ROS2_MODULE)
   find_package(rcl_interfaces REQUIRED)
 endif()
 
+if (ENABLE_TESTING)
+  find_package(GTest REQUIRED)
+  include(GoogleTest)
+  include(CTest)
+endif()
+
 find_package(yaml-cpp REQUIRED)
 if(yaml-cpp VERSION_LESS "0.8")
   set(YAML_CPP_HAS_NAMESPACE 0)

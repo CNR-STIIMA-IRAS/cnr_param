@@ -2,15 +2,6 @@
 # YAML MAPPED FILE MODULE Build ##
 # ##############################################################################
 
-### DIRECTORIES: include and src
-list(APPEND MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS 
-      ${yaml-cpp_INCLUDE_DIRS}
-      ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
-list(APPEND MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS
-      ${MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS}
-      ${CMAKE_CURRENT_SOURCE_DIR}/include)
-list(APPEND MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS
-      ${MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS} include)
 
 ### SOURCES
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/mapped_file)
@@ -54,7 +45,7 @@ target_include_directories(
 target_link_libraries(
   cnr_param_server_utilities
   PUBLIC cnr_param::cnr_param_mapped_file cnr_param::cnr_param_core Boost::program_options Boost::iostreams
-         Boost::regex ${DEPENDENCIES_ROS_LIBRARIES})
+         Boost::regex)
 add_library(cnr_param::cnr_param_server_utilities ALIAS cnr_param_server_utilities)
 list(APPEND TARGETS_LIST cnr_param_server_utilities)
 ### cnr_param_server_utilities END ############################################
@@ -78,13 +69,20 @@ list(APPEND TARGETS_LIST cnr_param_server)
 # #############################################################################
 if(ENABLE_TESTING)
 
-#  ### EXECUTABLE
-#  add_executable(cnr_param_mapped_file_test
-#    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_yaml_server.cpp)
-#  gtest_discover_tests(cnr_param_mapped_file_test)
+  ### EXECUTABLE
+  add_executable(cnr_param_mapped_file_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_yaml_server.cpp)
 
-#  cnr_configure_gtest(cnr_param_mapped_file_test cnr_param_server_utilities ${CMAKE_CURRENT_SOURCE_DIR}/include include)
-  
-#  target_compile_definitions(cnr_param_mapped_file_test
-#                             PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
+  target_compile_definitions(cnr_param_mapped_file_test
+                             PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
+
+
+   target_link_libraries(cnr_param_mapped_file_test
+     PUBLIC
+     cnr_param::cnr_param_server_utilities
+     GTest::gtest_main
+   )
+   gtest_discover_tests(cnr_param_mapped_file_test)
+   add_test(NAME cnr_param_mapped_file_test
+            COMMAND cnr_param_mapped_file_test)
 endif()

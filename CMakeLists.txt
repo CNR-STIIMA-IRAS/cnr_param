@@ -105,11 +105,6 @@ target_compile_definitions(cnr_param
   $<$<NOT:${ROS2_MODULE}>:ROS2_MODULE=0>
   $<$<NOT:${MAPPED_FILE_MODULE}>:MAPPED_FILE_MODULE=0>
   )
-#define ROS2_MODULE @ROS2_MODULE@
-#define ROS1_MODULE @ROS1_MODULE@
-#define MAPPED_FILE_MODULE @MAPPED_FILE_MODULE@
-
-
 
 if(COMPILE_ROS2_MODULE)
   target_compile_definitions(cnr_param PRIVATE ROS2_MODULE)
@@ -127,21 +122,6 @@ add_library(cnr_param::cnr_param ALIAS cnr_param)
 # #############################################################################
 if(ENABLE_TESTING)
 
-  ### EXECUTABLE
-  #add_executable(test_cnr_param
-  #  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param_mapped_file.cpp)
-  #gtest_discover_tests(test_cnr_param)
-  #  cnr_configure_gtest(test_cnr_param
-  #    cnr_param::cnr_param
-  #    ${CMAKE_CURRENT_SOURCE_DIR}/include include)
-
-  #  target_compile_definitions(test_cnr_param PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
-
-
-  find_package(GTest REQUIRED)
-  include(GoogleTest)
-  include(CTest)
-
   add_executable(test_cnr_param test/test_cnr_param_mapped_file.cpp)
   target_link_libraries(test_cnr_param
     PUBLIC
@@ -150,7 +130,7 @@ if(ENABLE_TESTING)
   )
   target_compile_definitions(test_cnr_param PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
   target_compile_options(test_cnr_param PUBLIC $<$<CONFIG:Release>:-Ofast >)
-#  gtest_discover_tests(test_cnr_param)  # bug related to linking...
+  gtest_discover_tests(test_cnr_param)  # bug related to linking...
   add_test(NAME test_cnr_param
     COMMAND test_cnr_param)
 
