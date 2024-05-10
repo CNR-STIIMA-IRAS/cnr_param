@@ -165,6 +165,7 @@ else()
     ${CNR_INSTALL_BIN_DIR}
     ${extracted_version}
     "${TARGETS_LIST}"
+    ${PROJECT_NAME}
     ${HEADERS_DIRS}
     test/launch
     test/config)
