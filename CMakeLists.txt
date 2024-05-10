@@ -59,8 +59,6 @@ cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1 USE_ROS2)
 # ##############################################################################
 # Build       ##
 # ##############################################################################
-
-
 include(cnr_param_core.cmake)
 
 if(COMPILE_ROS1_MODULE)
@@ -83,17 +81,17 @@ else()
   set(MAPPED_FILE_MODULE 0)
 endif()
 
-################################################################################
-#configure_file(
-#  "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
-#  "${CNR_INSTALL_INCLUDE_DIR}/config.h"
-#  @ONLY)
-################################################################################
+## To track the compilation options
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/config.h" 
+  @ONLY)
 
 add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
 target_include_directories(cnr_param
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/>
   $<INSTALL_INTERFACE:include>
 )
 target_compile_definitions(cnr_param
@@ -105,6 +103,7 @@ target_compile_definitions(cnr_param
   $<$<NOT:${ROS2_MODULE}>:ROS2_MODULE=0>
   $<$<NOT:${MAPPED_FILE_MODULE}>:MAPPED_FILE_MODULE=0>
   )
+
 
 if(COMPILE_ROS2_MODULE)
   target_compile_definitions(cnr_param PRIVATE ROS2_MODULE)
@@ -155,6 +154,7 @@ endif()
 # ##############################################################################
 # INSTALL         ##
 # ##############################################################################
+list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param" )
 if(USE_ROS1)
   cnr_install_catkin_policy()
 else()
@@ -165,7 +165,7 @@ else()
     ${CNR_INSTALL_BIN_DIR}
     ${extracted_version}
     "${TARGETS_LIST}"
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${HEADERS_DIRS}
     test/launch
     test/config)
 endif()

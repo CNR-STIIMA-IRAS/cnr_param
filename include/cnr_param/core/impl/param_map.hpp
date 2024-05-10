@@ -32,6 +32,14 @@ inline bool get_map(const YAML::Node& node, T& ret, std::string& what)
           + "' is not supported. You must specilized your own 'get_map' template function\n Input Node: " + _node.str();
   return false;
 }
+
+template<>
+inline bool get_map(const YAML::Node& node, YAML::Node& ret, std::string& what)
+{
+  UNUSED(what);
+  ret = node;
+  return true;
+}
 // =============================================================================================
 // END MAP
 // =============================================================================================

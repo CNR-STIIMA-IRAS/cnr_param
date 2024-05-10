@@ -13,8 +13,8 @@ add_library(cnr_param_mapped_file SHARED ${cnr_param_mapped_file_SRC})
 target_include_directories(
   cnr_param_mapped_file
   PUBLIC
-    "$<BUILD_INTERFACE:${MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS}>"
-    "$<INSTALL_INTERFACE:${MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include> )
 
 target_link_libraries(
   cnr_param_mapped_file
