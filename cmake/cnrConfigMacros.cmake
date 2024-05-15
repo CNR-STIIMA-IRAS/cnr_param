@@ -29,9 +29,9 @@ macro(get_project_name filename extracted_name extracted_version)
     cmake_policy(SET CMP0048 NEW)
   endif()
 
-  if($ENV{ROS_VERSION} STREQUAL "1")
+  if("$ENV{ROS_VERSION}" STREQUAL "1")
     set(USER_BUILD_TOOL "CATKIN")
-  elseif($ENV{ROS_VERSION} STREQUAL "2")
+  elseif("$ENV{ROS_VERSION}" STREQUAL "2")
     set(USER_BUILD_TOOL "AMENT")
   else()
     set(USER_BUILD_TOOL "CMAKE")
@@ -221,10 +221,13 @@ macro(cnr_install_cmake_policy_gt_3_0_0 INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
           DESTINATION "${CONFIG_INSTALL_DIR}")
 
   # Install cmake targets files
+ message(STATUS "TARGET FILE:" ${PROJECT_NAME}Targets.cmake)
   install(
     EXPORT "${TARGETS_EXPORT_NAME}"
     NAMESPACE "${CONFIG_NAMESPACE}"
-    DESTINATION "${CONFIG_INSTALL_DIR}")
+    DESTINATION "${CONFIG_INSTALL_DIR}"
+    FILE ${PROJECT_NAME}Targets.cmake
+  )
 
   install(
     TARGETS ${TARGETS_LIST}

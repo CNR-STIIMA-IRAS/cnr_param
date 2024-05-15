@@ -3,14 +3,11 @@
 # ##############################################################################
 
 ### DIRECTORIES: include and src
-list(APPEND MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS 
-      ${yaml-cpp_INCLUDE_DIRS}
-      ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 list(APPEND MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS
-      ${MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(APPEND MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS
-      ${MAPPED_FILE_DEPENDENCIES_INCLUDE_DIRS} include)
+      include)
+
 
 ### SOURCES
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/mapped_file)
@@ -19,18 +16,17 @@ list(APPEND cnr_param_mapped_file_SRC ${SRC_DIR}/interprocess.cpp)
 ### LIBRARY ###################################################################
 ### cnr_param_mapped_file
 add_library(cnr_param_mapped_file SHARED ${cnr_param_mapped_file_SRC})
-
 target_include_directories(
   cnr_param_mapped_file
   PUBLIC
-    "$<BUILD_INTERFACE:${MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS}>"
-    "$<INSTALL_INTERFACE:${MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include> )
 
 target_link_libraries(
   cnr_param_mapped_file
   PUBLIC cnr_param::cnr_param_core
   PUBLIC $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
-  PUBLIC $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:yaml-cpp>
+  PUBLIC $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:PkgConfig::yaml-cpp_pkg_config>
   PUBLIC Boost::system
   PUBLIC Boost::filesystem
   PUBLIC Eigen3::Eigen)
@@ -57,8 +53,7 @@ target_include_directories(
 target_link_libraries(
   cnr_param_server_utilities
   PUBLIC cnr_param::cnr_param_mapped_file cnr_param::cnr_param_core Boost::program_options Boost::iostreams
-         Boost::regex ${DEPENDENCIES_ROS_LIBRARIES})
-
+         Boost::regex)
 add_library(cnr_param::cnr_param_server_utilities ALIAS cnr_param_server_utilities)
 
 list(APPEND TARGETS_LIST cnr_param_server_utilities)
@@ -74,8 +69,7 @@ target_include_directories(
     "$<BUILD_INTERFACE:${MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:${MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
-target_link_libraries(cnr_param_server PUBLIC cnr_param_server_utilities)
-
+target_link_libraries(cnr_param_server PUBLIC cnr_param::cnr_param_server_utilities)
 list(APPEND TARGETS_LIST cnr_param_server)
 ### cnr_param_server END #######################################################
 
@@ -86,7 +80,7 @@ list(APPEND TARGETS_LIST cnr_param_server)
 if(ENABLE_TESTING)
 
   ### EXECUTABLE
-  add_executable(cnr_param_mapped_file_test 
+  add_executable(cnr_param_mapped_file_test
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_yaml_server.cpp)
   gtest_discover_tests(cnr_param_mapped_file_test)
 

@@ -51,9 +51,9 @@ list(APPEND DEPENDENCIES_ROS_LIBRARIES
 
 message(
   STATUS
-  "MAPPED_FILE_MODULE: ${MAPPED_FILE_MODULE}"
-  "ROS1_MODULE: ${ROS1_MODULE}"
-  "ROS2_MODULE: ${ROS2_MODULE}"
+  "MODULES: MAPPED_FILE_MODULE=${MAPPED_FILE_MODULE} | "
+  "ROS1_MODULE=${ROS1_MODULE} | "
+  "ROS2_MODULE=${ROS2_MODULE}"
 )
 if(ROS1_MODULE)
   list(APPEND DEPENDENCIES_ROS_LIBRARIES ${catkin_LIBRARIES})
@@ -71,5 +71,9 @@ if(ENABLE_TESTING)
     #ament_lint_auto_find_test_dependencies()
 
     find_package(ament_cmake_gtest REQUIRED)
+  else()
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
+    include(CTest)
   endif()
 endif()
