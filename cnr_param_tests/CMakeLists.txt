@@ -153,4 +153,8 @@ install(
 # ##############################################################################
 
 
-ament_package()
+if("$ENV{ROS_VERSION}" STREQUAL "1")
+  find_package(catkin REQUIRED)
+elseif("$ENV{ROS_VERSION}" STREQUAL "2")
+  ament_package()
+endif()
