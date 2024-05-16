@@ -87,13 +87,6 @@ bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what)
 namespace std
 {
 
-std::string to_string(const YAML::Node& n)
-{
-  std::stringstream ss;
-  ss << n;
-  return ss.str();
-}
-
 std::string to_string(const ComplexType& n)
 {
   return "Name: " + n.name + ", Value: " + std::to_string(n.value);
@@ -106,14 +99,6 @@ std::string to_string(const std::vector<ComplexType>& vv)
   for (auto const & v : vv) ret += std::to_string(v) + " ";
   ret += "]";
   return ret;
-}
-
-template<typename Derived>
-std::string to_string(const Eigen::MatrixBase<Derived>& n)
-{
-  std::stringstream ss;
-  ss << n;
-  return ss.str();
 }
 
 }  // namespace std

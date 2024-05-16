@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <cnr_param/core/type_traits.h>
+#include <cnr_param/core/yaml.h>
+#include <cnr_param/core/eigen.h>
 
 namespace cnr 
 {
@@ -76,6 +78,28 @@ inline std::string to_string(const std::vector<std::vector<T>>& vv)
   ret += "]";
   return ret;
 }
+
+inline std::string to_string(const std::string& s)
+{
+  return s;
+}
+
+inline std::string to_string(const YAML::Node& n)
+{
+  std::stringstream ss;
+  ss << n;
+  return ss.str();
+}
+
+
+template<typename Derived>
+inline std::string to_string(const Eigen::MatrixBase<Derived>& n)
+{
+  return cnr::param::core::to_string(n);
+}
+
+
+
 
 }  // namespace std
 
