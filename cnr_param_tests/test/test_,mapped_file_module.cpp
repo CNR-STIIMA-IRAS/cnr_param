@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 
+#if MAPPED_FILE_MODULE
+
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
 #include <cnr_param/core/yaml.h>
@@ -371,3 +373,11 @@ int main(int argc, char** argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+
+#else
+int main(int, char**)
+{
+  std::cerr << "This test is the yaml server test, availalbe for the MAPPED_FILE_MODULE, but the MAPPED_FILE_MODULE is not defined.\n" << std::endl;
+  return 0;
+}
+#endif

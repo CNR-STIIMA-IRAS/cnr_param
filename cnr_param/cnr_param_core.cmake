@@ -34,4 +34,4 @@ target_link_libraries(
 # ##############################################################################
 
 add_library(cnr_param::cnr_param_core ALIAS cnr_param_core)
-list(APPEND TARGETS_LIST cnr_param_core)
+list(APPEND LIBRARY_TARGETS_LIST cnr_param_core)

@@ -35,7 +35,7 @@ set_target_properties(cnr_param_mapped_file PROPERTIES LINK_FLAGS "-Wl,-rpath,${
 
 add_library(cnr_param::cnr_param_mapped_file ALIAS cnr_param_mapped_file)
 
-list(APPEND TARGETS_LIST cnr_param_mapped_file)
+list(APPEND LIBRARY_TARGETS_LIST cnr_param_mapped_file)
 ### cnr_param_mapped_file END #################################################
 
 ### LIBRARY ###################################################################
@@ -56,7 +56,7 @@ target_link_libraries(
          Boost::regex)
 add_library(cnr_param::cnr_param_server_utilities ALIAS cnr_param_server_utilities)
 
-list(APPEND TARGETS_LIST cnr_param_server_utilities)
+list(APPEND LIBRARY_TARGETS_LIST cnr_param_server_utilities)
 ### cnr_param_server_utilities END ############################################
 
 ### EXECUTABLE ################################################################
@@ -70,22 +70,6 @@ target_include_directories(
     "$<INSTALL_INTERFACE:${MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
 target_link_libraries(cnr_param_server PUBLIC cnr_param::cnr_param_server_utilities)
-list(APPEND TARGETS_LIST cnr_param_server)
+list(APPEND EXECUTABLE_TARGETS_LIST cnr_param_server)
 ### cnr_param_server END #######################################################
 
-
-# #############################################################################
-# Testing  ##
-# #############################################################################
-if(ENABLE_TESTING)
-
-  ### EXECUTABLE
-  add_executable(cnr_param_mapped_file_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_yaml_server.cpp)
-  gtest_discover_tests(cnr_param_mapped_file_test)
-
-  cnr_configure_gtest(cnr_param_mapped_file_test cnr_param_server_utilities ${CMAKE_CURRENT_SOURCE_DIR}/include include)
-  
-  target_compile_definitions(cnr_param_mapped_file_test
-                             PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")
-endif()

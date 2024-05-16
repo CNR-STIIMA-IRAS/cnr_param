@@ -5,11 +5,15 @@
 #include <cstdlib>
 #include <ostream>
 #include <iostream>
-#include <string>
 #include <iostream>
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 #include <Eigen/Core>
+#include <gtest/gtest.h>
+
+#if MAPPED_FILE_MODULE
+
+#include <string>
 
 #include <cnr_param/cnr_param.h>
 #include <cnr_param/core/param.h>
@@ -18,7 +22,6 @@
 #include <cnr_param/mapped_file/yaml_parser.h>
 #include <cnr_param/mapped_file/yaml_manager.h>
 
-#include <gtest/gtest.h>
 
 namespace detail
 {
@@ -350,7 +353,6 @@ TEST(CnrParamMappedFileModule, GetComplexType)
   EXPECT_TRUE(ret = cnr::param::get("/n1/n4/test_vector_complex_type", vv, what));
 }
 
-
 /**
  * @brief The main function of the program.
  *
@@ -377,3 +379,11 @@ int main(int argc, char** argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+
+#else
+int main(int, char**)
+{
+  std::cerr << "This test is for the MAPPED_FILE_MODULE, but the MAPPED_FILE_MODULE is not defined.\n" << std::endl;
+  return 0;
+}
+#endif

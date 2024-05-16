@@ -48,7 +48,7 @@ public:
         //============================================================
         // do we have a config file?
 
-        if (vm.count("help"))
+        if (vm.count("help") || vm.empty())
         {
           printUsage(cmdline_options_);
           exit(0);

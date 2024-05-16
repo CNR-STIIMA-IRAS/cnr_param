@@ -1,4 +1,4 @@
-test_ros2_parameters_node:
+/**:
   ros__parameters:
     bool_value: True
     int_value: 5

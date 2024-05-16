@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
 
+#if ROS2_MODULE
+
 // Include the header file for the function being tested
 #include "cnr_param/ros2/yaml_formatter.h"
 
@@ -404,21 +406,7 @@ TEST(Ros2YamlDecoderTest, SequenceOfComplexTypesNode)
 }
 // Add more test cases as needed
 
-// TEST(Ros2YamlEncoderTest, SequenceOfSequenceOfMap)
-// {
-//   // Create a YAML sequence node
-//   YAML::Node v =  YAML::Load("{a: [ {b: 1, s: ciao }, {b: 2, s: bye } ]}");
-//   YAML::Node node;
-//   node["key"].push_back(v);
-//   node["key"].push_back(v);
-
-//   // Call the function being tested
-//   YAML::Node result = cnr::param::ros2::ros2_yaml_encoder(node);
-
-//   std::cout << "ORIGINAL:" << node << std::endl;
-//   std::cout << "FORMATTED:" << result << std::endl;
-  
-// }
+#endif
 
 int main(int argc, char** argv)
 {

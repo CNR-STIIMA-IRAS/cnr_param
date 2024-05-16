@@ -14,7 +14,6 @@ if(ROS1_MODULE)
 endif()
 
 if(ROS2_MODULE)
-  find_package(ament_cmake REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(rmw REQUIRED)
   find_package(rosidl_runtime_c REQUIRED)
@@ -35,8 +34,12 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
 
-list(APPEND DEPENDENCIES_INCLUDE_DIRS  $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:${yaml-cpp_INCLUDE_DIRS}>
-  ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
+list(APPEND DEPENDENCIES_INCLUDE_DIRS  ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
+
+if(NOT BOOL:${YAML_CPP_HAS_NAMESPACE})
+  list(APPEND DEPENDENCIES_INCLUDE_DIRS  ${yaml-cpp_INCLUDE_DIRS})
+endif()
+
 if(ROS1_MODULE)
   list(APPEND DEPENDENCIES_INCLUDE_DIRS ${catkin_INCLUDE_DIRS})
 elseif(ROS2_MODULE)
@@ -45,9 +48,11 @@ elseif(ROS2_MODULE)
     ${rcl_interfaces_INCLUDE_DIRS})
 endif()
 
-list(APPEND DEPENDENCIES_ROS_LIBRARIES  
-  $<${YAML_CPP_HAS_NAMESPACE}:yaml-cpp::yaml-cpp>
-  $<$<NOT:${YAML_CPP_HAS_NAMESPACE}>:yaml-cpp>)
+if(BOOL:${YAML_CPP_HAS_NAMESPACE})
+  list(APPEND DEPENDENCIES_ROS_LIBRARIES yaml-cpp::yaml-cpp)
+else()
+  list(APPEND DEPENDENCIES_ROS_LIBRARIES yaml-cpp)
+endif()
 
 message(
   STATUS
@@ -61,19 +66,4 @@ endif()
 
 if(ROS2_MODULE)
   list(APPEND DEPENDENCIES_ROS_LIBRARIES ${rclcpp_LIBRARIES})
-endif()
-
-if(ENABLE_TESTING)
-  if(ROS2_MODULE)
-    find_package(ament_lint_auto REQUIRED)
-    set(ament_cmake_copyright_FOUND TRUE)
-    set(ament_cmake_cpplint_FOUND TRUE)
-    #ament_lint_auto_find_test_dependencies()
-
-    find_package(ament_cmake_gtest REQUIRED)
-  else()
-    find_package(GTest REQUIRED)
-    include(GoogleTest)
-    include(CTest)
-  endif()
 endif()

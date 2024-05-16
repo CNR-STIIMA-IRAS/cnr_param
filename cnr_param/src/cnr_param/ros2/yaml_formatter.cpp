@@ -22,8 +22,7 @@ std::string to_string(const YAML::NodeType::value& v)
   if (v == YAML::NodeType::Map)
     return "Map";
   if (v == YAML::NodeType::Scalar)
-    return "Scalar";
-  return "Unknown";
+    return "Scalar";return "Unknown";
 };
 
 /**

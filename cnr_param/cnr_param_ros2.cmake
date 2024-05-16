@@ -22,7 +22,6 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/ros2)
 list(APPEND cnr_param_ros2_SRC ${SRC_DIR}/param.cpp
      ${SRC_DIR}/yaml_formatter.cpp ${SRC_DIR}/param_retriever.cpp)
 
-
 ### LIBRARY ###################################################################
 ### cnr_param_ros2
 add_library (cnr_param_ros2 SHARED ${cnr_param_ros2_SRC})
@@ -35,7 +34,7 @@ target_link_libraries(cnr_param_ros2
   PUBLIC cnr_param::cnr_param_core
   PUBLIC ${DEPENDENCIES_ROS_LIBRARIES})
 add_library(cnr_param::cnr_param_ros2 ALIAS cnr_param_ros2)
-list(APPEND TARGETS_LIST cnr_param_ros2)
+list(APPEND LIBRARY_TARGETS_LIST cnr_param_ros2)
 ###############################################################################
 
 #### EXECECUTABLES ############################################################
@@ -58,47 +57,5 @@ target_link_libraries(ros2_yaml_converter
  ${DEPENDENCIES_ROS_LIBRARIES})
 set_target_properties(ros2_yaml_converter
                       PROPERTIES LINK_FLAGS "-Wl,-rpath,${CNR_INSTALL_LIB_DIR}")
-list(APPEND TARGETS_LIST ros2_yaml_converter)
+list(APPEND EXECUTABLE_TARGETS_LIST ros2_yaml_converter)
 ################################################################################
-
-
-# ##############################################################################
-# Testing         ##
-# ##############################################################################
-if(ENABLE_TESTING)
-  find_package(launch_testing_ament_cmake)
-  find_package(ament_cmake_gtest REQUIRED)
-  
-  #### EXECUTABLE ###############################################################
-  ament_add_gtest(test_ros2_yaml_formatter
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_yaml_formatter.cpp)
-  
-  gtest_discover_tests(test_ros2_yaml_formatter)
-  cnr_configure_gtest(test_ros2_yaml_formatter 
-                      cnr_param::cnr_param_ros2
-                      ${ROS2_BUILD_INTERFACE_INCLUDE_DIRS}
-                      ${ROS2_INSTALL_INTERFACE_INCLUDE_DIRS})
-  
-  #### EXECECUTABLE ###########################################################
-  add_executable(test_ros2_parameters_node
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_parameters_node.cpp)
-
-  target_include_directories(test_ros2_parameters_node
-                             PUBLIC ${rclcpp_INCLUDE_DIRS})
-  target_link_libraries(test_ros2_parameters_node ${rclcpp_LIBRARIES})
-
-  #### EXECECUTABLE #############################################################
-  add_executable(
-    test_ros2_parameters_remote
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_parameters_remote.cpp)
-
-  cnr_configure_gtest(test_ros2_parameters_remote cnr_param::cnr_param_ros2 ${CMAKE_CURRENT_SOURCE_DIR}/include include)
-
-  add_launch_test(test/launch/ros2_test.launch.py TIMEOUT 90)
-
-  list(APPEND TARGETS_LIST test_ros2_yaml_formatter test_ros2_parameters_node
-       test_ros2_parameters_remote)
-endif()
-# ##############################################################################
-# END Testing     ##
-# ##############################################################################

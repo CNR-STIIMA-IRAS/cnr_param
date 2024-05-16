@@ -4,8 +4,10 @@
 #  cnr_param_LIBRARIES    - libraries to link against
 #  cnr_param_EXECUTABLE   - the bar executable
 
-set(cnr_param_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
-
+set(cnr_param_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
+set(cnr_param_ROS2_MODULE @ROS2_MODULE_COMPILED@)
+set(cnr_param_ROS1_MODULE @ROS1_MODULE_COMPILED@)
+set(cnr_param_MAPPED_FILE @MAPPED_FILE_MODULE_COMPILED@)
 
 include(CMakeFindDependencyMacro)
 find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
@@ -18,10 +20,17 @@ if(yaml-cpp VERSION_LESS "0.8")
   pkg_check_modules(yaml-cpp_pkg_config REQUIRED yaml-cpp IMPORTED_TARGET)
 endif()
 
-# These are IMPORTED targets created by cnr_paramTargets.cmake
-set(cnr_param_LIBRARIES cnr_param_core)
+if(${cnr_param_ROS2_MODULE} EQUAL 1)
+  message(STATUS "cnr_param: ROS2 module available")
+  find_dependency(rclcpp REQUIRED)
+  find_dependency(rmw REQUIRED)
+  find_dependency(rosidl_runtime_c REQUIRED)
+  find_dependency(rcl_interfaces REQUIRED)
+endif()
 
-set(cnr_param_EXECUTABLE cnr_param_server)
+# These are IMPORTED targets created by cnr_paramTargets.cmake
+set(cnr_param_LIBRARIES @EXPORTED_LIBRARY_TARGETS_LIST@)
+set(cnr_param_EXECUTABLES @EXPORTED_EXECUTABLE_TARGETS_LIST@)
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramTargets.cmake")
