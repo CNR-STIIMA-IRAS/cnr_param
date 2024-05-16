@@ -1,5 +1,5 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__CORE__YAML_H
-#define CNR_PARAM_INCLUDE_CNR_PARAM_UTILS_YAML
+#define CNR_PARAM__INCLUDE__CNR_PARAM__CORE__YAML_H
 
 #include <string>
 #include <vector>
@@ -100,4 +100,4 @@ std::vector<std::pair<std::string, YAML::Node>> toNodeList(const YAML::Node& roo
 }  // namespace param
 }  // namespace cnr
 
-#endif /* CNR_PARAM_INCLUDE_CNR_PARAM_UTILS_YAML */
+#endif // CNR_PARAM__INCLUDE__CNR_PARAM__CORE__YAML_H

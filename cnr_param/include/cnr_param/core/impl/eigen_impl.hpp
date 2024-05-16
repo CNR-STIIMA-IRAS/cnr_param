@@ -796,31 +796,6 @@ inline DivType<AType, BType> div(const AType& a, const BType& b)
 }
 
 
-template<typename T>
-inline std::string to_string(const T& m, bool transpose)
-{
-  UNUSED(transpose);
-  std::ostringstream out;
-  out.precision(4);
-  out << std::fixed << m;
-  return out.str();
-}
-
-template<typename Derived>
-inline std::string to_string(const Eigen::MatrixBase<Derived>& m, bool transpose)
-{
-  Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-  std::stringstream ss;
-  if(transpose)
-    ss << std::fixed << m.transpose().format(CleanFmt);
-  else
-    ss << std::fixed << m.format(CleanFmt);
-  return ss.str();
-}
-
-
-
-
 }
 }
 }

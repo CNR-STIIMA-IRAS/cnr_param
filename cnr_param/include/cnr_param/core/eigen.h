@@ -115,20 +115,12 @@ bool resize(std::vector<T>& m1, const std::vector<T>& m2);
 template<typename T>
 bool resize(T& /*m1*/, const T& /*m2*/);
 
-
-
-//============
-template<typename T>
-std::string to_string(const T& m, bool transpose = true);
-
-template<typename Derived>
-std::string to_string(const Eigen::MatrixBase<Derived>& m, bool transpose = true);
   
 }  // namespace core
 }  // namespace param
 }  // namespace core
 
 
-#include <cnr_param/core/eigen_impl.hpp>
+#include <cnr_param/core/impl/eigen_impl.hpp>
 
 #endif  /* INCLUDE_CNR_PARAM_UTILS_EIGEN */
