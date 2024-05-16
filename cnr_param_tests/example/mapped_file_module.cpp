@@ -124,7 +124,7 @@ bool call(const std::string& key, T& value, O* o = nullptr)
     }
   }
 
-  std::cout << "Key: " << key << ", Value: " << std::to_string(value) << std::endl;
+  std::cout << "Key: " << key << ", Value: " << std::to_string<T>(value) << std::endl;
   return true;
 }
 
