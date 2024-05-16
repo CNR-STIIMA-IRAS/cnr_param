@@ -19,7 +19,12 @@ project(
 # ##############################################################################
 # DEPENDENCIES            ##
 # ##############################################################################
-find_package(ament_cmake REQUIRED)
+if("$ENV{ROS_VERSION}" STREQUAL "1")
+  find_package(catkin REQUIRED)
+elseif("$ENV{ROS_VERSION}" STREQUAL "2")
+  find_package(ament_cmake REQUIRED)
+endif()
+
 find_package(cnr_param REQUIRED)
 
 find_package(GTest REQUIRED)
