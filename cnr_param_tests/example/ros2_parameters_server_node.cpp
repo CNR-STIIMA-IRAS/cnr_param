@@ -1,6 +1,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <iostream>
 
 #if ROS2_MODULE
 
