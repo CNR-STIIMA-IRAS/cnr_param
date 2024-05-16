@@ -2,6 +2,8 @@
 #include <functional>
 #include <memory>
 
+#if ROS2_MODULE
+
 #include <rclcpp/rclcpp.hpp>
 
 using namespace std::chrono_literals;
@@ -20,14 +22,14 @@ public:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
   std::vector<std::string> parameters_name_;
-  
+
   void timer_callback()
   {
-    if(parameters_name_.empty())
+    if (parameters_name_.empty())
     {
       auto list = this->list_parameters({}, 1000);
       parameters_name_ = list.names;
-      for(const auto & p : list.names)
+      for (const auto& p : list.names)
       {
         std::cout << "- " << this->get_fully_qualified_name() << "." << p << std::endl;
       }
@@ -46,3 +48,10 @@ int main(int argc, char** argv)
   return 0;
 }
 
+#else
+int main(int argc, char** argv)
+{
+  std::cerr << "This test is the server to a ROS2 node, but the ROS2_MODULE is not defined.\n" << std::endl;
+  return 0;
+}
+#endif
