@@ -23,7 +23,7 @@ namespace core
  * @return false
  */
 template <typename T>
-inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what);
+inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 /**
  * @brief Get a sequence
@@ -36,7 +36,7 @@ inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what);
  * @return false
  */
 template <typename T>
-inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what);
+inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 /**
  * @brief Get a map object
@@ -49,7 +49,7 @@ inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what);
  * @return false
  */
 template <typename T>
-inline bool get_map(const YAML::Node& node, T& ret, std::string& what);
+inline bool get_map(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 /**
  * @brief
@@ -94,15 +94,9 @@ bool is_map(const YAML::Node& node);
 template <typename T>
 void insert(YAML::Node& node, const std::string& key, const T& value, const std::string& format = "");
 
-/**
- * @brief Get the templated object from the node.
- *
- * @tparam T
- * @param node
- * @return T
- */
-template <typename T>
-T extract(const YAML::Node& node, const std::string& key = "", const std::string& error_heading_msgs = "");
+
+// template <typename T>
+// T extract(const YAML::Node& node, const std::string& key = "", const std::string& error_heading_msgs = "");
 
 }  // namespace core
 }  // namespace param
@@ -112,6 +106,6 @@ T extract(const YAML::Node& node, const std::string& key = "", const std::string
 #include <cnr_param/core/impl/param_sequence.hpp>
 #include <cnr_param/core/impl/param_map.hpp>
 #include <cnr_param/core/impl/param_insert.hpp>
-#include <cnr_param/core/impl/param_extract.hpp>
+//#include <cnr_param/core/impl/param_extract.hpp>
 
 #endif /* CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_H */

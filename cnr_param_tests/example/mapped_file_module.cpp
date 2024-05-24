@@ -42,7 +42,7 @@ namespace param
 namespace core
 {
 template <>
-bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what)
+bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool&)
 {
   try
   {

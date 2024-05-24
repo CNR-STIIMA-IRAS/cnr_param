@@ -22,9 +22,8 @@ namespace core
 // MAP
 // =============================================================================================
 template<typename T>
-inline bool get_map(const YAML::Node& node, T& ret, std::string& what)
+inline bool get_map(const YAML::Node& node, T&, std::string& what, const bool&)
 {
-  UNUSED(ret);
   std::stringstream _node;
   _node << node;
   what = "The type ' "
@@ -34,9 +33,10 @@ inline bool get_map(const YAML::Node& node, T& ret, std::string& what)
 }
 
 template<>
-inline bool get_map(const YAML::Node& node, YAML::Node& ret, std::string& what)
+inline bool get_map(const YAML::Node& node, YAML::Node& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   UNUSED(what);
+  UNUSED(implicit_cast_if_possible);
   ret = node;
   return true;
 }

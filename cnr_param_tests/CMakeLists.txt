@@ -78,7 +78,7 @@ target_compile_definitions(test_ros2_module
 
 # EXECUTABLE #############################################################
 add_executable(test_mapped_file
-               ${CMAKE_CURRENT_SOURCE_DIR}/test/test_,mapped_file_module.cpp)
+               ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mapped_file_module.cpp)
 
 cnr_configure_gtest(test_mapped_file cnr_param::cnr_param cnr_param::cnr_param_server_utilities
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)

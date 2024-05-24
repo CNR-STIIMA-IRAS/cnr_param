@@ -8,6 +8,21 @@
 #include <string>
 #include <iostream>
 
+struct ComplexType
+{
+  std::string name;
+  double value;
+};
+
+namespace std 
+{
+std::string to_string(const ComplexType& c)
+{
+  return c.name + " = " + std::to_string(c.value);
+}
+}
+
+
 #if MAPPED_FILE_MODULE
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
@@ -115,6 +130,19 @@ TEST(MappedFileModule, BasicAssertions)
   EXPECT_EQ(7 * 6, 42);
 }
 
+template<typename T>
+bool call(const std::string& key, T& value)
+{
+  std::string what;
+  if(!cnr::param::get(key, value, what))
+  {
+    std::cerr << "What: " << what << std::endl;
+    return false;
+  }
+  std::cout << key << " => " << std::to_string(value) << std::endl;
+  return true;
+}
+
 // ====================================================================================================================
 // === ServerTest, ServerUsage ========================================================================================
 // ====================================================================================================================
@@ -167,7 +195,7 @@ TEST(MappedFileModule, ClientUsage)
   std::string value;
   auto f1 = [&](const std::string& path, const std::string& expected) {
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::get(path, value, what);)
+    EXECUTION_TIME(ok = call(path, value);)
     return ok && value == expected;
   };
 
@@ -181,12 +209,12 @@ TEST(MappedFileModule, ClientUsage)
 
   int val = 9, before, after;
   EXPECT_TRUE(cnr::param::set("/a", val, what));
-  EXPECT_TRUE(cnr::param::get("/a", before, what));
+  EXPECT_TRUE(call("/a", before));
   EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
-  EXPECT_TRUE(cnr::param::get("/a", after, what));
+  EXPECT_TRUE(call("/a", after));
   EXPECT_TRUE(before - after == 0);
 
-  EXPECT_FALSE(cnr::param::get("a", before, what));
+  EXPECT_FALSE(call("a", before));
 }
 
 // ====================================================================================================================
@@ -199,7 +227,7 @@ TEST(MappedFileModule, ClientNonExistentParam)
     std::string topic;
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::get(path, topic, what);)
+    EXECUTION_TIME(ok = call(path, topic);)
     return ok;
   };
 
@@ -223,7 +251,7 @@ TEST(MappedFileModule, DeveloperFunctions)
     YAML::Node root;
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::get(root_key, root, what);)
+    EXECUTION_TIME(ok = call(root_key, root);)
     if (!ok)
     {
       return false;
@@ -245,14 +273,14 @@ TEST(MappedFileModule, GetVector)
   std::string what;
   std::vector<std::string> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v1", vv, what));
+  EXPECT_TRUE(ret = call("/n1/n3/v1", vv));
 
-  std::vector<double> dd;
-  EXPECT_FALSE(ret = cnr::param::get("/n1/n3/v1", dd, what));
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", dd, what));
+  std::vector<double> double_vector_dd;
+  EXPECT_FALSE(ret = call("/n1/n3/v1", double_vector_dd));
+  EXPECT_TRUE(ret = call("/n1/n3/v10", double_vector_dd));
 
   Eigen::VectorXd ee;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", ee, what));
+  EXPECT_TRUE(ret = call("/n1/n3/v10", ee));
 }
 
 // ====================================================================================================================
@@ -263,15 +291,15 @@ TEST(MappedFileModule, GetMatrix)
   std::string what;
   std::vector<std::vector<std::string>> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv1", vv, what));
+  EXPECT_TRUE(ret = call("/n1/n4/vv1", vv));
 
   std::vector<std::vector<double>> dd;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", dd, what));
+  EXPECT_TRUE(ret = call("/n1/n4/vv10", dd));
 
   Eigen::MatrixXd ee;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", ee, what));
+  EXPECT_TRUE(ret = call("/n1/n4/vv10", ee));
 
-  EXPECT_FALSE(ret = cnr::param::get("/n1/n4/vv1", ee, what));
+  EXPECT_FALSE(ret = call("/n1/n4/vv1", ee));
 }
 
 
@@ -281,11 +309,6 @@ TEST(MappedFileModule, GetMatrix)
 // then we inherit the get_map function to extract the complex type from the YAML node
 // finally, we run the test
 // ====================================================================================================================
-struct ComplexType
-{
-  std::string name;
-  double value;
-};
 
 namespace cnr
 {
@@ -294,7 +317,7 @@ namespace param
 namespace core
 {
 template <>
-bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what)
+bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   try
   {
@@ -341,7 +364,7 @@ TEST(MappedFileModule, GetComplexType)
   std::string what;
   std::vector<ComplexType> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/test_vector_complex_type", vv, what));
+  EXPECT_TRUE(ret = call("/n1/n4/test_vector_complex_type", vv));
 }
 
 

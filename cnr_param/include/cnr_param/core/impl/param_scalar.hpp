@@ -28,7 +28,7 @@ namespace core
 
 template <typename T>
 inline typename std::enable_if<cnr::param::is_scalar<T>::value, bool>::type _get_scalar(const YAML::Node& node, T& ret,
-                                                                                       std::string& what)
+                                                                                       std::string& what, const bool& implicit_cast_if_possible)
 {
   YAML::Node config(node);
   if (!config.IsScalar())
@@ -40,45 +40,36 @@ inline typename std::enable_if<cnr::param::is_scalar<T>::value, bool>::type _get
     return false;
   }
 
-  try
+  bool ok = YAML::convert<T>::decode(node, ret); 
+  if(!ok && implicit_cast_if_possible)
   {
-    if(!YAML::convert<T>::decode(node, ret))
+    if constexpr(is_integer<T>::value) // maybe a double is stored
     {
-      if constexpr(is_integer<T>::value) // maybe a double is stored, and I want 
-      {
-        ret = node.as<double>();
-      }
+      double _ret;
+      ok = YAML::convert<double>::decode(node, _ret); 
+      ret = _ret;
     }
-    return true;
+    if constexpr(std::is_floating_point<T>::value) // maybe an integer is stored
+    {
+      int _ret;
+      ok = YAML::convert<int>::decode(node, _ret); 
+      ret = _ret;
+    }
   }
-  catch (YAML::Exception & e)                                                                                          
+
+  if(!ok)
   {
-    std::stringstream err;
-    err << "YAML Exception, Error in the extraction of an object of type '"                                      
-        << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl                 
-        << "Node: " << std::endl                                                                                 
-        << node << std::endl                                                                                     
-        << "What: " << std::endl                                                                                 
-        << e.what() << std::endl;                                                                             
-    what = err.str();
-  }                                                                                                                    
-  catch (std::exception & e)                                                                                           
-  {
-    std::stringstream err;                                                                                             
-    err << "Exception, Error in the extraction of an object of type '"                                           
-        << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl                 
-        << "Node: " << std::endl                                                                                 
-        << node << std::endl                                                                                     
-        << "What: " << std::endl                                                                                 
-        << e.what() << std::endl;                                                                                
-    what = err.str();
-  };
-  return false;
+    what = "Error in getting the type '"                                      
+        + boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() + "' from the node:\n" 
+        + std::to_string(node);
+  }
+
+  return ok;
 }
 
 template <typename T>
 inline typename std::enable_if<!cnr::param::is_scalar<T>::value, bool>::type _get_scalar(const YAML::Node& node, T& ret,
-                                                                                        std::string& what)
+                                                                                        std::string& what, const bool&)
 {
   UNUSED(node);
   UNUSED(ret);
@@ -90,9 +81,9 @@ inline typename std::enable_if<!cnr::param::is_scalar<T>::value, bool>::type _ge
 }
 
 template <typename T>
-inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what)
+inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
-  return _get_scalar(node,ret,what);
+  return _get_scalar(node,ret,what,implicit_cast_if_possible);
 }
 
 }  // namespace utils

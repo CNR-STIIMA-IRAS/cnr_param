@@ -19,6 +19,7 @@
 
 #include <cnr_param/mapped_file/interprocess.h>
 #include <cnr_param/mapped_file/param.h>
+#include <yaml-cpp/node/node.h>
 
 
 #if !defined(UNUSED)
@@ -141,7 +142,7 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
  * @return false 
  */
 template<typename T>
-inline bool get(const std::string& key, T& ret, std::string& what, const bool&)
+inline bool get(const std::string& key, T& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   if (!has(key, what))
   {
@@ -154,17 +155,43 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool&)
     return false;
   }
 
+  what = "Failed in getting the Node struct from parameter '" + key + "':\n";
   try
   {
-    ret = cnr::param::core::extract<T>(node);
+    if constexpr(std::is_same<T,YAML::Node>::value)
+    {
+      ret = node;
+      return true;
+    }
+    else
+    {
+     
+      if(node.IsScalar())
+      {
+        return cnr::param::core::get_scalar<T>(node, ret, what, implicit_cast_if_possible);
+      }
+      else if(node.IsSequence())
+      {
+        return cnr::param::core::get_sequence<T>(node, ret, what, implicit_cast_if_possible);
+      } 
+      else if(node.IsMap())
+      {
+        return cnr::param::core::get_map<T>(node, ret, what, implicit_cast_if_possible);
+      }
+      
+      std::stringstream _node;
+      _node << node;
+      what += "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
+                + "' but the node type is undefined\n Input Node: \n" + _node.str();
+    
+    }
   }
   catch (std::exception& e)
   {
-    what = "Failed in getting the Node struct from parameter '" + key + "':\n";
     what += e.what();
     return false;
   }
-  return true;
+  return false;
 }
 
 template<typename T>

@@ -22,6 +22,20 @@
 #include <cnr_param/mapped_file/yaml_parser.h>
 #include <cnr_param/mapped_file/yaml_manager.h>
 
+struct ComplexType
+{
+  std::string name;
+  double value;
+};
+
+namespace std 
+{
+std::string to_string(const ComplexType& c)
+{
+  return c.name + " = " + std::to_string(c.value);
+}
+}
+
 
 namespace detail
 {
@@ -100,6 +114,20 @@ std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
     time_taken = double(time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;                                            \
     std::cout << "Elapsed time [us]: " << time_taken * 1e6 << std::endl;                                               \
   }
+
+template<typename T>
+bool call(const std::string& key, T& value)
+{
+  std::string what;
+  if(!cnr::param::get(key, value, what))
+  {
+    std::cerr << "What: " << what << std::endl;
+    return false;
+  }
+  std::cout << "Value: " << std::to_string(value) << std::endl;
+  return true;
+}
+
 
 // ====================================================================================================================
 // === GLOBAL VARIABLES ===============================================================================================
@@ -254,14 +282,14 @@ TEST(CnrParamMappedFileModule, GetVector)
   std::string what;
   std::vector<std::string> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v1", vv, what));
+  EXPECT_TRUE(ret = call("/n1/n3/v1", vv));
 
   std::vector<double> dd;
-  EXPECT_FALSE(ret = cnr::param::get("/n1/n3/v1", dd, what));
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", dd, what));
+  EXPECT_FALSE(ret = call("/n1/n3/v1", dd));
+  EXPECT_TRUE(ret = call("/n1/n3/v10", dd));
 
   Eigen::VectorXd ee;
-  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", ee, what));
+  EXPECT_TRUE(ret = call("/n1/n3/v10", ee));
 }
 
 // ====================================================================================================================
@@ -290,12 +318,6 @@ TEST(CnrParamMappedFileModule, GetMatrix)
 // then we inherit the get_map function to extract the complex type from the YAML node
 // finally, we run the test
 // ====================================================================================================================
-struct ComplexType
-{
-  std::string name;
-  double value;
-};
-
 namespace cnr
 {
 namespace param
@@ -303,7 +325,7 @@ namespace param
 namespace core
 {
 template <>
-bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what)
+bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool&)
 {
   try
   {

@@ -55,19 +55,19 @@ namespace core
 // =============================================================================================
 // ffwd declarations
 template <typename Derived>
-bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const& ret, std::string& what);
+bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 template <typename T, typename A>
-bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what);
+bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 template <typename T, typename A>
-bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::string& what);
+bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 template <typename T, std::size_t N>
-bool _get_sequence(const YAML::Node& node, std::array<T, N>& ret, std::string& what);
+bool _get_sequence(const YAML::Node& node, std::array<T, N>& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 template <typename T, std::size_t N, std::size_t M>
-bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret, std::string& what);
+bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret, std::string& what, const bool& implicit_cast_if_possible);
 
 /**
  * @brief Generic template function
@@ -81,7 +81,7 @@ bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret,
  * @return false
  */
 template <typename T, typename A>
-inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what)
+inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   YAML::Node config(node);
   if (!config.IsSequence())
@@ -104,15 +104,15 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
       T v = T();
       if (node[i].IsScalar())
       {
-        ok = get_scalar<T>(node[i], v, what);
+        ok = get_scalar<T>(node[i], v, what, implicit_cast_if_possible);
       }
       else if (node[i].IsSequence())
       {
-        ok = get_sequence<T>(node[i], v, what);
+        ok = get_sequence<T>(node[i], v, what, implicit_cast_if_possible);
       }
       else if (node[i].IsMap())
       {
-        ok = get_map<T>(node[i], v, what);
+        ok = get_map<T>(node[i], v, what, implicit_cast_if_possible);
       }
 
       if (!ok)
@@ -133,7 +133,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
 }
 
 template <typename T, typename A>
-inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::string& what)
+inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   bool ok = false;
   YAML::Node config(node);
@@ -159,7 +159,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
                   "' but the node is " + std::to_string(config.Type()) + "\n Input Node:\n" + _node.str();
         }
         std::vector<T> v;
-        ok = get_sequence(config[i], v, what);
+        ok = get_sequence(config[i], v, what, implicit_cast_if_possible);
         if (!ok)
         {
           std::stringstream _node;
@@ -178,13 +178,13 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
 }
 
 template <typename T, std::size_t N>
-bool _get_sequence(const YAML::Node& node, std::array<T, N>& ret, std::string& what)
+bool _get_sequence(const YAML::Node& node, std::array<T, N>& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   bool ok = false;
   try
   {
     std::vector<T> tmp;
-    ok = get_sequence(node, tmp, what);
+    ok = get_sequence(node, tmp, what, implicit_cast_if_possible);
     if (!ok || (tmp.size() == N))
     {
       std::stringstream _node;
@@ -204,13 +204,13 @@ bool _get_sequence(const YAML::Node& node, std::array<T, N>& ret, std::string& w
 }
 
 template <typename T, std::size_t N, std::size_t M>
-bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret, std::string& what)
+bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   bool ok = false;
   try
   {
     std::vector<std::vector<T>> tmp;
-    ok = _get_sequence(node, tmp, what);
+    ok = _get_sequence(node, tmp, what, implicit_cast_if_possible);
     if (!ok || (tmp.size() != N) || (tmp.front().size() != M))
     {
       std::stringstream _node;
@@ -233,7 +233,7 @@ bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret,
 }
 
 template <typename Derived>
-inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const& ret, std::string& what)
+inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derived> const& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   bool ok = false;
   Eigen::MatrixBase<Derived>& _ret = const_cast<Eigen::MatrixBase<Derived>&>(ret);
@@ -250,7 +250,7 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
     if (should_be_a_vector)
     {
       std::vector<double> vv;
-      ok = _get_sequence(config, vv, what);
+      ok = _get_sequence(config, vv, what, implicit_cast_if_possible);
       if (!ok)
       {
         what = "Failed in extracting a vector from the Node " + _node.str();
@@ -272,7 +272,7 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
     else  // matrix expected
     {
       std::vector<std::vector<double>> vv;
-      ok = _get_sequence(node, vv, what);
+      ok = _get_sequence(node, vv, what, implicit_cast_if_possible);
       if (!ok)
       {
         what = "Failed in extracting a vector from the Node " + _node.str();
@@ -307,11 +307,11 @@ inline bool _get_sequence_eigen(const YAML::Node& node, Eigen::MatrixBase<Derive
 }
 
 template <typename T>
-inline bool _get_sequence(const YAML::Node& node, T& ret, std::string& what)
+inline bool _get_sequence(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
   if constexpr (is_matrix_expression<T>::value)
   {
-    return _get_sequence_eigen(node, ret, what);
+    return _get_sequence_eigen(node, ret, what, implicit_cast_if_possible);
   }
   UNUSED(node);
   UNUSED(ret);
@@ -335,9 +335,9 @@ inline bool _get_sequence(const YAML::Node& node, T& ret, std::string& what)
  * @return false
  */
 template <typename T>
-inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what)
+inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible)
 {
-  return _get_sequence(node, ret, what);
+  return _get_sequence(node, ret, what, implicit_cast_if_possible);
 }
 // =============================================================================================
 // END SEQUENCE

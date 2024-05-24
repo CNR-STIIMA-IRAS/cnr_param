@@ -8,6 +8,7 @@
 #include <string>
 #include <array>
 #include <variant>
+#include <optional>
 #include <cstdint>
 #include <Eigen/Core>
 

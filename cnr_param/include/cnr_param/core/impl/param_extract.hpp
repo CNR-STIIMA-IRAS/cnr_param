@@ -1,6 +1,7 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__CORE__IMPL__PARAM_EXTRACT_HPP
 #define CNR_PARAM__INCLUDE__CNR_PARAM__CORE__IMPL__PARAM_EXTRACT_HPP
 
+#if 0
 #include <string>
 #include <boost/type_index.hpp>
 #include <yaml-cpp/yaml.h>
@@ -52,6 +53,8 @@ inline T extract(const YAML::Node& node, const std::string& key, const std::stri
     ok = true;
   }
 
+  std::cout << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": " << node << std::endl;
+
   if(ok)
   {
     if(leaf.IsScalar())
@@ -100,4 +103,6 @@ inline YAML::Node extract(const YAML::Node& node, const std::string& key, const 
 }
 }
 }
+#endif
+
 #endif  // CNR_PARAM__INCLUDE__CNR_PARAM__CORE__IMPL__PARAM_EXTRACT_HPP
