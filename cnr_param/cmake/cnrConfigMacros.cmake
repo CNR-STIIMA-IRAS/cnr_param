@@ -160,6 +160,7 @@ macro(cnr_install_cmake_policy_gt_3_0_0 INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
       BIN_INSTALL_DIR PROJECT_VERSION LIBRARY_TARGETS_LIST EXECUTABLE_TARGETS_LIST)
 
   set(CONFIG_INSTALL_DIR "share/${PROJECT_NAME}/cmake")
+  set(CONFIG_INSTALL_DIR_2 "share/${PROJECT_NAME}/cmake_alternative")
   set(CONFIG_NAMESPACE "${PROJECT_NAME}::")
   set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
   set(VERSION_CONFIG "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
@@ -198,6 +199,9 @@ macro(cnr_install_cmake_policy_gt_3_0_0 INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
   # Install cmake config files
   install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
           DESTINATION "${CONFIG_INSTALL_DIR}")
+
+  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
+          DESTINATION "${CONFIG_INSTALL_DIR_2}")
 
   # Install cmake targets files
  message(STATUS "TARGETS FILE:" ${PROJECT_NAME}Targets.cmake)

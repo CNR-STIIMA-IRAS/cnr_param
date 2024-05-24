@@ -56,7 +56,7 @@ inline T extract(const YAML::Node& node, const std::string& key, const std::stri
   {
     if(leaf.IsScalar())
     {
-      ok = cnr::param::core::get_scalar<T>(leaf, ret, what);
+      ok = get_scalar<T>(leaf, ret, what);
     }
     else if(leaf.IsSequence())
     {

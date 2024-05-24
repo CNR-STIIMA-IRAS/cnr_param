@@ -39,6 +39,52 @@ macro(get_project_name filename extracted_name extracted_version)
 
 endmacro()
 
+
+# cnr_set_flags
+#
+macro(cnr_set_flags)
+  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W3" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  endif()
+
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+  endif()
+
+  if(NOT CMAKE_C_STANDARD)
+    set(CMAKE_C_STANDARD 99)
+  endif()
+
+  set(LOCAL_CXX_STANDARD 20)
+  if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
+    add_compile_options(-Wall -Wextra -Wpedantic -D_TIME_BITS=64
+                        -D_FILE_OFFSET_BITS=64)
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION GREATER 12)
+      set(LOCAL_CXX_STANDARD 20)
+    elseif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION GREATER 10)
+      set(LOCAL_CXX_STANDARD 20)
+    endif()
+
+  endif()
+
+  # Default to C++20
+  if(NOT CMAKE_CXX_STANDARD)
+    message(STATUS "CMAKE CXX STANDARD: ${LOCAL_CXX_STANDARD}")
+    set(CMAKE_CXX_STANDARD ${LOCAL_CXX_STANDARD})
+  endif()
+
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
+
+  if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+  endif()
+
+endmacro()
+
+
 #
 # cnr_target_compile_options
 #

@@ -7,11 +7,10 @@ namespace cnr
 {
 namespace param
 {
-namespace ros2
-{
+
 
 template <typename T>
-inline T implicit_cast(const AllowedParamType& rhs)
+inline T get_from_variant<AllowedParamType,T>(const AllowedParamType& rhs, const bool& implicit_cast_if_possible)
 {
   if (std::holds_alternative<bool>(rhs))
   {
@@ -58,8 +57,45 @@ inline T implicit_cast(const AllowedParamType& rhs)
   return T();
 }
 
+template <>
+inline bool getNodeNames(const std::shared_ptr<rclcpp::Node>& n, std::vector<std::string>& names, std::string& what)
+{
+  names = n->get_node_graph_interface()->get_node_names() ;
+  return true;
+}
 
-}  // namespace ros2
+template <>
+inline bool resolveParamName(const std::shared_ptr<rclcpp::Node>&, const std::string& name, std::string& resolved_name, std::string&)
+{
+  name = resolved_name;
+  return true;
+}
+
+template<>
+inline bool resolveNodeName(const std::shared_ptr<rclcpp::Node>& n, std::string& resolved_name, std::string& what)
+{
+  if(!n)
+  {
+    what = "The node handle is not valid";
+    return false;
+  }
+
+  resolved_name = n->getNamespace();
+  return true;
+}
+
+template <>
+inline std::string lintParamKey(const std::shared_ptr<rclcpp::Node>&, const std::string& param_key)
+{
+  std::string ret = param_key;
+  if (ret.front() == '/')
+  {
+    ret.erase(0, 1);
+  }
+  std::replace(ret.begin(), ret.end(), '/', '.');
+  return ret;
+}
+
 }  // namespace param
 }  // namespace cnr
 

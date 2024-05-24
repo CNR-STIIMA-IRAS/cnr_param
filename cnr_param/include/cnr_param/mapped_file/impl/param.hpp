@@ -141,7 +141,7 @@ inline bool recover(const std::string& key, YAML::Node& node, std::string& what)
  * @return false 
  */
 template<typename T>
-inline bool get(const std::string& key, T& ret, std::string& what)
+inline bool get(const std::string& key, T& ret, std::string& what, const bool&)
 {
   if (!has(key, what))
   {
@@ -193,52 +193,6 @@ bool set(const std::string& key, const T& ret, std::string& what)
   }
   std::memcpy(region->get_address(), str.c_str(), str.size() );
   
-  return true;
-}
-
-/**
- * @brief 
- * 
- * @tparam T 
- * @param key 
- * @param ret 
- * @param what 
- * @param default_val 
- * @return true 
- * @return false 
- */
-template<typename T>
-inline bool get(const std::string& key, T& ret, std::string& what, const T& default_val)
-{
-  if (!has(key, what))
-  {
-    what = (what.size() ? (what + "\n") : std::string("") ) + "Try to superimpose default value...";
-    if (!core::resize(ret, default_val))
-    {
-      what += " Error!";
-      return false;
-    }
-    what += " OK!";
-    ret = default_val;
-    return true;
-  }
-
-  YAML::Node node;
-  if (!recover(key, node, what))
-  {
-    return false;
-  }
-
-  try
-  {
-    ret = cnr::param::core::extract<T>(node);
-  }
-  catch (std::exception& e)
-  {
-    what = "Failed in getting the Node struct from parameter '" + key + "':\n";
-    what += e.what();
-    return false;
-  }
   return true;
 }
 

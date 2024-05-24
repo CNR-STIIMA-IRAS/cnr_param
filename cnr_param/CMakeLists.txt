@@ -94,6 +94,7 @@ endif()
 
 add_library(cnr_param SHARED src/cnr_param/cnr_param.cpp)
 
+message(STATUS "Include dirs: ${CMAKE_SOURCE_DIR}/include")
 target_include_directories(
   cnr_param
   PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include
@@ -102,7 +103,8 @@ target_include_directories(
 
 target_link_libraries(
   cnr_param
-  PUBLIC $<$<BOOL:${ROS2_MODULE}>:cnr_param::cnr_param_ros2>
+  PUBLIC $<$<BOOL:${ROS1_MODULE}>:cnr_param::cnr_param_ros>
+         $<$<BOOL:${ROS2_MODULE}>:cnr_param::cnr_param_ros2>
          $<$<BOOL:${MAPPED_FILE_MODULE}>:cnr_param::cnr_param_mapped_file>
          $<$<BOOL:${MAPPED_FILE_MODULE}>:cnr_param::cnr_param_server_utilities>)
 

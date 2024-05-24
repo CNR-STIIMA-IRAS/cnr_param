@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <boost/type_index.hpp>
 #include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/convert.h>
 
 #include <cnr_param/core/string.h>
 #include <cnr_param/core/type_traits.h>
@@ -41,7 +42,13 @@ inline typename std::enable_if<cnr::param::is_scalar<T>::value, bool>::type _get
 
   try
   {
-    ret = node.as<T>();
+    if(!YAML::convert<T>::decode(node, ret))
+    {
+      if constexpr(is_integer<T>::value) // maybe a double is stored, and I want 
+      {
+        ret = node.as<double>();
+      }
+    }
     return true;
   }
   catch (YAML::Exception & e)                                                                                          
@@ -52,7 +59,7 @@ inline typename std::enable_if<cnr::param::is_scalar<T>::value, bool>::type _get
         << "Node: " << std::endl                                                                                 
         << node << std::endl                                                                                     
         << "What: " << std::endl                                                                                 
-        << e.what() << std::endl;                                                                                
+        << e.what() << std::endl;                                                                             
     what = err.str();
   }                                                                                                                    
   catch (std::exception & e)                                                                                           

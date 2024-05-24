@@ -6,12 +6,26 @@
 #include <cnr_param/core/type_traits.h>
 #include <cnr_param/core/yaml.h>
 #include <cnr_param/core/eigen.h>
+#include <yaml-cpp/node/node.h>
 
 namespace std
 {
 inline std::string to_string(const std::string& v)
 {
   return v;
+}
+
+inline std::string to_string(const YAML::NodeType::value& v)
+{
+  switch(v)
+  {
+    case YAML::NodeType::Null: return "Null";
+    case YAML::NodeType::Scalar: return "Scalar";
+    case YAML::NodeType::Sequence: return "Sequence";
+    case YAML::NodeType::Map: return "Map";
+    case YAML::NodeType::Undefined: return "Undefined";
+    default: return "Unknown";
+  }
 }
 }  // namespace std
 

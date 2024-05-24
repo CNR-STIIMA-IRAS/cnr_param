@@ -17,8 +17,7 @@ namespace cnr
 {
 namespace param
 {
-namespace ros2
-{
+
 
 static constexpr const char* PARAMETER_SEPARATOR_CHAR = ".";
 static constexpr const char* PARAMETER_SEPARATOR_STRING = ".";
@@ -64,7 +63,7 @@ AllowedParamType as_generic(const rclcpp::Parameter& param);
  * @return T 
  */
 template <typename T>
-T implicit_cast(const AllowedParamType& rhs);
+T extract(const AllowedParamType& rhs, const bool& implicit_cast_if_possible);
 
 /**
  * @brief The class is a recursive map. This is useful to associate a parameter value to the chain of namespaces
@@ -217,7 +216,7 @@ private:
                            bool updated = false);
 };
 
-}  // namespace ros2
+
 }  // namespace param
 }  // namespace cnr
 

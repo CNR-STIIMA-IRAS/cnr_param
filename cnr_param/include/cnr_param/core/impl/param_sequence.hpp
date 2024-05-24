@@ -86,10 +86,11 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
   YAML::Node config(node);
   if (!config.IsSequence())
   {
-    std::stringstream _node;
-    _node << node;
+    std::stringstream ss_node;
+    ss_node << node;
     what = "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-           "' but the node is not a sequence\n Input Node:\n" + _node.str();
+           "' but the node is " + std::to_string(config.Type()) +
+           "\n>> Input Node:\n" + ss_node.str();
 
     return false;
   }
@@ -103,7 +104,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
       T v = T();
       if (node[i].IsScalar())
       {
-        ok = cnr::param::core::get_scalar<T>(node[i], v, what);
+        ok = get_scalar<T>(node[i], v, what);
       }
       else if (node[i].IsSequence())
       {
@@ -119,8 +120,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::s
         std::stringstream _node;
         _node << node;
         what = "Error in the extraction of the element #" + std::to_string(i)
-               + ". Type of the sequence: " + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-                      "' but the node is not a sequence\n Input Node:\n" + _node.str();
+               + ": " + what + "\nInput Node:" + _node.str();
         break;
       }
       ret.push_back(v);
@@ -142,7 +142,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
     std::stringstream _node;
     _node << node;
     what = "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-           "' but the node is not a sequence\n Input Node:\n" + _node.str();
+           "' but the node is " + std::to_string(config.Type()) + "\n Input Node:\n" + _node.str();
   }
   else
   {
@@ -156,7 +156,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
           std::stringstream _node;
           _node << config;
           what = "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-                 "' but the node is not a sequence\n Input Node:\n" + _node.str();
+                  "' but the node is " + std::to_string(config.Type()) + "\n Input Node:\n" + _node.str();
         }
         std::vector<T> v;
         ok = get_sequence(config[i], v, what);
@@ -166,7 +166,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
           _node << node;
           what = "Error in the extraction of the element #" + std::to_string(i)
                  + ". Type of the sequence: " + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-                        "' but the node is not a sequence\n Input Node:\n" + _node.str();
+                    "' but the node is " + std::to_string(config.Type()) + "\n Input Node:\n" + _node.str();
           break;
         }
         ret.push_back(v);

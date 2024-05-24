@@ -109,7 +109,7 @@ bool call(const std::string& key, T& value, O* o = nullptr)
   std::string what;
   if (o)
   {
-    if (!cnr::param::mapped_file::get(key, value, what, *o))
+    if (!cnr::param::get(key, value, what, *o))
     {
       std::cerr << "Key: " << key << ", What: " << what << std::endl;
       return false;

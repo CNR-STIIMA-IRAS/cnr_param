@@ -21,14 +21,14 @@ std::shared_ptr<cnr::param::ros2::ParamRetriever>& param_retriever()
 }
 
 
-void CNR_PARAM_INIT_RO2_MODULE(std::shared_ptr<rclcpp::Node>& node)
+void CNR_PARAM_INIT_ROS2_MODULE(std::shared_ptr<rclcpp::Node>& node)
 {
   std::cout << "Init the global varible inside the library" << std::endl;
   background_node() = node;
   param_retriever().reset(new cnr::param::ros2::ParamRetriever (background_node()) );
 }
 
-void CNR_PARAM_CLEANUP_RO2_MODULE()
+void CNR_PARAM_CLEANUP_ROS2_MODULE()
 {
   background_node() = nullptr;
   param_retriever().reset( );

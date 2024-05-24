@@ -20,6 +20,11 @@ if(yaml-cpp VERSION_LESS "0.8")
   pkg_check_modules(yaml-cpp_pkg_config REQUIRED yaml-cpp IMPORTED_TARGET)
 endif()
 
+if(${cnr_param_ROS1_MODULE} EQUAL 1)
+  message(STATUS "cnr_param: ROS2 module available")
+  find_dependency(catkin REQUIRED roscpp)
+endif()
+
 if(${cnr_param_ROS2_MODULE} EQUAL 1)
   message(STATUS "cnr_param: ROS2 module available")
   find_dependency(rclcpp REQUIRED)

@@ -12,6 +12,7 @@ project(
   VERSION ${extracted_version}
   LANGUAGES CXX)
 
+cnr_set_flags()
 # ##############################################################################
 # END - PRELIMINARIES     ##
 # ##############################################################################
@@ -21,11 +22,16 @@ project(
 # ##############################################################################
 if("$ENV{ROS_VERSION}" STREQUAL "1")
   find_package(catkin REQUIRED)
+  find_package(cnr_param REQUIRED)
+  include_directories("${cnr_param_INCLUDE_DIRS}")
 elseif("$ENV{ROS_VERSION}" STREQUAL "2")
   find_package(ament_cmake REQUIRED)
+  find_package(cnr_param REQUIRED)
+else()
+  find_package(cnr_param REQUIRED)
 endif()
 
-find_package(cnr_param REQUIRED)
+
 
 find_package(GTest REQUIRED)
 include(GoogleTest)
@@ -48,6 +54,16 @@ add_executable(test_ros2_yaml_formatter
 
 cnr_configure_gtest(
   test_ros2_yaml_formatter cnr_param::cnr_param)
+
+# EXECUTABLE #############################################################
+add_executable(test_ros_module
+               ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros_module.cpp)
+
+cnr_configure_gtest(test_ros_module cnr_param::cnr_param
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include include)
+
+target_compile_definitions(test_ros_module
+                    PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 # EXECUTABLE #############################################################
 add_executable(test_ros2_module
@@ -83,8 +99,9 @@ target_compile_definitions(test_cnr_param
 list(APPEND TARGETS_LIST 
   test_ros2_yaml_formatter
   test_ros2_module
-  test_mapped_file 
-  test_cnr_param)
+  test_mapped_file
+  # test_cnr_param
+)
 
 # ##############################################################################
 # GOOGLE TESTS

@@ -1,3 +1,5 @@
+#if ROS2_MODULE
+
 #include <string>
 #include <chrono>
 
@@ -14,8 +16,6 @@ namespace param
 {
 namespace ros2
 {
-
-
 AllowedParamType as_generic(const rclcpp::Parameter& param)
 {
   AllowedParamType ret;
@@ -54,7 +54,8 @@ AllowedParamType as_generic(const rclcpp::Parameter& param)
   return ret;
 }
 
-std::string filter_param_key(const std::string& param_key)
+template<>
+inline std::string linParamKey(const std::shared_ptr<rclcpp::Node>&, const std::string& param_key)
 {
   std::string ret = param_key;
   if (ret.front() == '/')
@@ -256,7 +257,10 @@ bool ParamRetriever::resolve_names(const std::string& ns, std::string& resolved_
 
   if (ns.front() == '/')  // remote
   {
-    auto names = node_->get_node_graph_interface()->get_node_names();
+    if(!getNodeNames(node_, names, what)
+    {
+      return false;
+    }
     std::string _ns;
     for (const auto& n : names)
     {
@@ -264,7 +268,7 @@ bool ParamRetriever::resolve_names(const std::string& ns, std::string& resolved_
       {
         _ns = ns;
         _ns.erase(0, n.size());
-        resolved_ns = filter_param_key(_ns);
+        resolved_ns = lintParamKey(_ns);
         resolved_node_name = n;
         return true;
       }
@@ -280,7 +284,7 @@ bool ParamRetriever::resolve_names(const std::string& ns, std::string& resolved_
   else  // local
   {
     resolved_node_name = std::string(node_->get_effective_namespace()) + node_->get_name();
-    resolved_ns = filter_param_key(ns);
+    resolved_ns = lintParamKey(ns);
   }
   return true;
 }
@@ -576,6 +580,28 @@ bool to_yaml(const ParamDictionary& tree, YAML::Node& node, std::string& what)
   return true;
 }
 
+template<>
+inline bool getNodeNames(const std::sahred_ptr<rclcpp::Node> node&, std::vector<std::string>& names, std::string& what)
+{
+  auto names = node->get_node_graph_interface()->get_node_names();
+  return true;
+}
+
+
+
+template<>
+inline bool resolveParamName(const std::sahred_ptr<rclcpp::Node> node, const std::string& name, std::string& resolved_name, std::string& what)
+{
+  resolved_name = name;
+  return true;
+}
+
+}  // namespace ros2
+}  // namespace param
+}  // namespace cnr
+}
+
+
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr
@@ -600,3 +626,5 @@ std::string to_string(const cnr::param::ros2::ParamDictionary& val)
   return val.to_string("");
 }
 }  // namespace std
+
+#endif

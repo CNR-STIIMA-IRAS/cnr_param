@@ -72,9 +72,9 @@ class ParamRetriever;
  * 
  * @param node 
  */
-void CNR_PARAM_INIT_RO2_MODULE(std::shared_ptr<rclcpp::Node>& node);
+void CNR_PARAM_INIT_ROS2_MODULE(std::shared_ptr<rclcpp::Node>& node);
 
-void CNR_PARAM_CLEANUP_RO2_MODULE();
+void CNR_PARAM_CLEANUP_ROZS2_MODULE();
 
 /**
  * @brief 

@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <array>
+#include <variant>
 #include <cstdint>
 #include <Eigen/Core>
 
@@ -30,7 +31,7 @@ namespace param
 template<typename C>
 struct is_vector : std::false_type
 {
-  using base = C;
+  using base = C; 
 };
 template<typename C, typename A>
 struct is_vector<std::vector<C, A>>: std::true_type
@@ -115,6 +116,7 @@ struct is_double_std_v
   static constexpr bool value = is_vector<T>::value && is_double<B>::value;
 };
 
+
 // int -------------------------------------------------------------------------
 template<typename T>
 struct is_integer
@@ -144,6 +146,31 @@ struct is_unsigned_integer_v
   static constexpr bool value = is_vector<T>::value && is_unsigned_integer<B>::value;
 };
 
+// char -------------------------------------------------------------------------
+template<typename T>
+struct is_char
+{
+  static constexpr bool value = std::is_same<T, char>::value;
+};
+template<class T>
+struct is_char_v
+{
+  using B = typename is_vector<T>::base;
+  static constexpr bool value = is_vector<T>::value && is_char<B>::value;
+};
+
+// char -------------------------------------------------------------------------
+template<typename T>
+struct is_unsigned_char
+{
+  static constexpr bool value = std::is_same<T, unsigned char>::value;
+};
+template<class T>
+struct is_unsigned_char_v
+{
+  using B = typename is_vector<T>::base;
+  static constexpr bool value = is_vector<T>::value && is_unsigned_char<B>::value;
+};
 // string -------------------------------------------------------------------------
 template<typename T>
 struct is_string : std::false_type
@@ -170,22 +197,91 @@ struct is_string_v
 template<typename T>
 struct is_scalar
 {
+  using type = T;
   static constexpr bool value = is_bool<T>::value || is_byte<T>::value ||
     is_double<T>::value || is_string<T>::value || is_integer<T>::value || is_unsigned_integer<T>::value;
 };
 
-// scalar -------------------------------------------------------------------------
+// sequence -------------------------------------------------------------------------
 template<typename T>
 struct is_sequence
 {
   static constexpr bool value = is_vector<T>::value || is_matrix_expression<T>::value;
 };
 
+// map
+template<typename T, typename U = void>
+  struct is_map : std::false_type { };
+
+template<typename T>
+struct is_map<T, std::void_t< typename T::key_type,
+                              typename T::mapped_type,
+                              decltype(std::declval<T&>()[std::declval<const typename T::key_type&>()])>>
+  : std::true_type 
+{ 
+  using key_type = typename T::key_type;
+  using mapped_type = typename T::mapped_type;
+};
+
+
+// map
+template<typename T, typename = void>
+struct is_string_to_scalar_map
+{
+  static constexpr bool value = false;
+};
+// map
+template<typename T>
+struct is_string_to_scalar_map<T, 
+    typename std::enable_if< is_map<T>::value, bool>::type 
+  >
+{
+  static constexpr bool value = is_string<typename is_map<T>::key_type>::value &&
+    is_scalar<typename is_map<T>::mapped_type>::value;
+};
+
+// ============================================
+template<class...Ts>
+inline std::type_info const& variant_held_type(std::variant<Ts...> const& v, std::optional<std::size_t> idx={})
+{
+  if (!idx) idx=v.index();
+  if(*idx==std::variant_npos) return typeid(void);
+  const std::array<std::type_info const*, sizeof...(Ts)> infos[]={ &typeid(Ts)... };
+  return *(infos[*idx]);
+}
+
+
+// Main lookup logic of looking up a type in a list.
+template<typename T, typename... ALL_T>
+struct is_one_of : public std::false_type {};
+
+template<typename T, typename FRONT_T, typename... REST_T>
+struct is_one_of<T, FRONT_T, REST_T...> : public 
+  std::conditional<
+    std::is_same<T, FRONT_T>::value,
+    std::true_type,
+    is_one_of<T, REST_T...>
+  >::type {};
+
+// Convenience wrapper for std::variant<>.
+template<typename T, typename VARIANT_T>
+struct is_variant_member : public std::false_type {};
+
+template<typename T, typename... ALL_T>
+struct is_variant_member<T, std::variant<ALL_T...>> : public is_one_of<T, ALL_T...> {};
+
+
+// helper type for the visitor #4
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+// explicit deduction guide (not needed as of C++20)
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
 
 // =======================================================================================================
 template<typename F, typename T>
 inline 
-typename std::enable_if<std::is_same<F, T>::value || std::is_convertible<F, T>::value,  T>::type
+typename std::enable_if<(std::is_same<F, T>::value || std::is_convertible<F, T>::value) && !is_matrix_expression<T>::value,  T>::type
 implicit_cast(const F & rhs)
 {
   return rhs;

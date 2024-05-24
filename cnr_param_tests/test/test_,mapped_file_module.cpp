@@ -12,9 +12,7 @@
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
-#include <cnr_param/core/yaml.h>
-#include <cnr_param/core/param.h>
-#include <cnr_param/mapped_file/param.h>
+#include <cnr_param/cnr_param.h>
 
 #include <cnr_param/mapped_file/args_parser.h>
 #include <cnr_param/mapped_file/yaml_parser.h>
@@ -169,26 +167,26 @@ TEST(MappedFileModule, ClientUsage)
   std::string value;
   auto f1 = [&](const std::string& path, const std::string& expected) {
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::mapped_file::get(path, value, what);)
+    EXECUTION_TIME(ok = cnr::param::get(path, value, what);)
     return ok && value == expected;
   };
 
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic", "/joint_states"));
   value = value + "_CIAO";
-  EXPECT_TRUE(cnr::param::mapped_file::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic", "/joint_states_CIAO"));
 
-  EXPECT_TRUE(cnr::param::mapped_file::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", "/joint_states_CIAO"));
 
   int val = 9, before, after;
-  EXPECT_TRUE(cnr::param::mapped_file::set("/a", val, what));
-  EXPECT_TRUE(cnr::param::mapped_file::get("/a", before, what));
-  EXPECT_TRUE(cnr::param::mapped_file::set("/a", "0x0009", what));
-  EXPECT_TRUE(cnr::param::mapped_file::get("/a", after, what));
+  EXPECT_TRUE(cnr::param::set("/a", val, what));
+  EXPECT_TRUE(cnr::param::get("/a", before, what));
+  EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
+  EXPECT_TRUE(cnr::param::get("/a", after, what));
   EXPECT_TRUE(before - after == 0);
 
-  EXPECT_FALSE(cnr::param::mapped_file::get("a", before, what));
+  EXPECT_FALSE(cnr::param::get("a", before, what));
 }
 
 // ====================================================================================================================
@@ -201,14 +199,14 @@ TEST(MappedFileModule, ClientNonExistentParam)
     std::string topic;
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::mapped_file::get(path, topic, what);)
+    EXECUTION_TIME(ok = cnr::param::get(path, topic, what);)
     return ok;
   };
 
   auto f2 = [](const std::string& path, const std::string& defval) {
     std::string topic;
     std::string what;
-    bool ok = cnr::param::mapped_file::get(path, topic, what, defval);
+    bool ok = cnr::param::get(path, topic, what, defval);
     return ok;
   };
   EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST"));
@@ -225,7 +223,7 @@ TEST(MappedFileModule, DeveloperFunctions)
     YAML::Node root;
     std::string what;
     bool ok = false;
-    EXECUTION_TIME(ok = cnr::param::mapped_file::get(root_key, root, what);)
+    EXECUTION_TIME(ok = cnr::param::get(root_key, root, what);)
     if (!ok)
     {
       return false;
@@ -247,14 +245,14 @@ TEST(MappedFileModule, GetVector)
   std::string what;
   std::vector<std::string> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n3/v1", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v1", vv, what));
 
   std::vector<double> dd;
-  EXPECT_FALSE(ret = cnr::param::mapped_file::get("/n1/n3/v1", dd, what));
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n3/v10", dd, what));
+  EXPECT_FALSE(ret = cnr::param::get("/n1/n3/v1", dd, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", dd, what));
 
   Eigen::VectorXd ee;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n3/v10", ee, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n3/v10", ee, what));
 }
 
 // ====================================================================================================================
@@ -265,15 +263,15 @@ TEST(MappedFileModule, GetMatrix)
   std::string what;
   std::vector<std::vector<std::string>> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n4/vv1", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv1", vv, what));
 
   std::vector<std::vector<double>> dd;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n4/vv10", dd, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", dd, what));
 
   Eigen::MatrixXd ee;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n4/vv10", ee, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/vv10", ee, what));
 
-  EXPECT_FALSE(ret = cnr::param::mapped_file::get("/n1/n4/vv1", ee, what));
+  EXPECT_FALSE(ret = cnr::param::get("/n1/n4/vv1", ee, what));
 }
 
 
@@ -343,7 +341,7 @@ TEST(MappedFileModule, GetComplexType)
   std::string what;
   std::vector<ComplexType> vv;
   bool ret = true;
-  EXPECT_TRUE(ret = cnr::param::mapped_file::get("/n1/n4/test_vector_complex_type", vv, what));
+  EXPECT_TRUE(ret = cnr::param::get("/n1/n4/test_vector_complex_type", vv, what));
 }
 
 
