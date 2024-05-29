@@ -11,8 +11,8 @@ namespace param
 namespace ros2 
 {
 
-YAML::Node ros2_yaml_encoder(const YAML::Node& node);
-YAML::Node ros2_yaml_decoder(const YAML::Node& node);
+bool ros2_yaml_encoder(const YAML::Node& node, YAML::Node& ret, std::string& what);
+bool ros2_yaml_decoder(const YAML::Node& node, YAML::Node& ret, std::string& what);
 
 }
 }

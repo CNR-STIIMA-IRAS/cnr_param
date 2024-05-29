@@ -119,14 +119,15 @@ TEST(ROS2Module, BasicAssertions)
 
 TEST(ROS2Module, Initialization)
 {
-  EXPECT_TRUE(does_not_throw([&] { cnr::param::ros2::CNR_PARAM_INIT_RO2_MODULE(parameters_client_node); }));
+  EXPECT_TRUE(does_not_throw([&] { cnr::param::ros2::CNR_PARAM_INIT_ROS2_MODULE(parameters_client_node); }));
 };
 
 template<typename T>
 bool call(const std::string& key, T& value)
 {
   std::string what;
-  if(!cnr::param::ros2::get("/"+server_node_name+"/"+key, value, what))
+  bool implicit_cast = true;
+  if(!cnr::param::ros2::get("/"+server_node_name+"/"+key, value, what, implicit_cast))
   {
     std::cerr << "What: " << what << std::endl;
     return false;
@@ -300,11 +301,11 @@ int main(int argc, char** argv)
   
   std::this_thread::sleep_for(1s);
 
-  cnr::param::ros2::CNR_PARAM_INIT_RO2_MODULE(parameters_client_node);
+  cnr::param::ros2::CNR_PARAM_INIT_ROS2_MODULE(parameters_client_node);
   
   auto ret = RUN_ALL_TESTS();
 
-  cnr::param::ros2::CNR_PARAM_CLEANUP_RO2_MODULE();
+  cnr::param::ros2::CNR_PARAM_CLEANUP_ROS2_MODULE();
 
   executor.cancel();
   executor_thread.join();

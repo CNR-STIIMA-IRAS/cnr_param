@@ -1,5 +1,5 @@
 #include <cnr_param/ros2/impl/param.hpp>
-#include <cnr_param/ros2/param_retriever.h>
+#include <cnr_param/ros2/impl/param_retriever.hpp>
 
 namespace cnr 
 {
@@ -16,7 +16,7 @@ std::shared_ptr<rclcpp::Node>& background_node()
 
 std::shared_ptr<cnr::param::ros2::ParamRetriever>& param_retriever()
 {
-  static std::shared_ptr<cnr::param::ros2::ParamRetriever> __pr = nullptr;
+  static std::shared_ptr<ParamRetriever> __pr = nullptr;
   return __pr;
 }
 
@@ -25,7 +25,7 @@ void CNR_PARAM_INIT_ROS2_MODULE(std::shared_ptr<rclcpp::Node>& node)
 {
   std::cout << "Init the global varible inside the library" << std::endl;
   background_node() = node;
-  param_retriever().reset(new cnr::param::ros2::ParamRetriever (background_node()) );
+  param_retriever().reset(new ParamRetriever (background_node(), ".") );
 }
 
 void CNR_PARAM_CLEANUP_ROS2_MODULE()

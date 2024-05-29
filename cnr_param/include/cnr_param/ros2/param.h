@@ -3,8 +3,13 @@
 
 #include <string>
 #include <Eigen/Core>
-#include <rclcpp/node.hpp>
 #include <memory>
+
+#include <rclcpp/node.hpp>
+#include <rclcpp/parameter.hpp>
+
+#include <cnr_param/core/param.h>
+#include <cnr_param/ros2/param_retriever.h>
 
 namespace cnr 
 {
@@ -35,7 +40,7 @@ bool has(const std::string& key, std::string& what);
  * @return false 
  */
 template<typename T>
-inline bool get(const std::string& key, T& ret, std::string& what);
+inline bool get(const std::string& key, T& ret, std::string& what, const bool &implicit_cast_if_possible);
 
 /**
  * @brief 
@@ -50,45 +55,49 @@ bool set(const std::string&, const T&, std::string&);
 /**
  * @brief 
  * 
- * @tparam T 
- * @param key 
- * @param ret 
- * @param what 
- * @param default_val 
- * @return true 
- * @return false 
- */
-template<typename T>
-bool get(const std::string& key, T& ret, std::string& what, const T& default_val);
-
-/**
- * @brief 
- * 
- */
-class ParamRetriever;
-
-/**
- * @brief 
- * 
  * @param node 
  */
 void CNR_PARAM_INIT_ROS2_MODULE(std::shared_ptr<rclcpp::Node>& node);
 
-void CNR_PARAM_CLEANUP_ROZS2_MODULE();
+void CNR_PARAM_CLEANUP_ROS2_MODULE();
 
-/**
- * @brief 
- * 
- * @return std::shared_ptr<rclcpp::Node> 
- */
-std::shared_ptr<rclcpp::Node> node();
+std::shared_ptr<rclcpp::Node>& background_node();
+std::shared_ptr<ParamRetriever>& param_retriever();
 
-/**
- * @brief 
- * 
- * @return std::shared_ptr<cnr::param::ros2::ParamRetriever> 
- */
-std::shared_ptr<ParamRetriever> pr();
+
+template<typename T>
+struct is_supported_param_type
+{
+  static constexpr bool value =  
+    cnr::param::is_scalar<T>::value               || 
+    cnr::param::is_double_std_v<T>::value         ||
+    cnr::param::is_integer_v<T>::value            ||
+    cnr::param::is_bool_v<T>::value               ||
+    cnr::param::is_string_v<T>::value             ||
+    std::is_same<rclcpp::Parameter, T>::value;
+};
+
+template<typename T>
+struct is_scalar_supported_param_type
+{
+  static constexpr bool value =  
+    cnr::param::is_scalar<T>::value               || 
+    std::is_same<rclcpp::Parameter, T>::value;
+};
+
+template<typename T>
+struct is_ros_vector_supported_param_type
+{
+  static constexpr bool value =  
+    cnr::param::is_double_std_v<T>::value          ||
+    cnr::param::is_integer_v<T>::value             ||
+    cnr::param::is_unsigned_integer_v<T>::value    ||
+    cnr::param::is_char_v<T>::value                ||
+    cnr::param::is_unsigned_char_v<T>::value       ||
+    cnr::param::is_bool_v<T>::value                ||
+    cnr::param::is_string_v<T>::value;
+};
+
 
 }  // namespace ros2
 }  // namespace param

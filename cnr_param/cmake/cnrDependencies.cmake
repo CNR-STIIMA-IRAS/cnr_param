@@ -15,6 +15,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
 
 if(ROS1_MODULE)
+  message(STATUS "Loading the catkin dependencies...")
   find_package(catkin REQUIRED COMPONENTS roscpp)
   # catkin_package(
   #   CATKIN_DEPENDS roscpp

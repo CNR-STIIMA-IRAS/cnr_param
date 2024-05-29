@@ -1,7 +1,6 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__UTILS__IMPL__PARAM_SCALAR__HPP
 #define CNR_PARAM__INCLUDE__CNR_PARAM__UTILS__IMPL__PARAM_SCALAR__HPP
 
-#include <iostream>
 #include <type_traits>
 #include <boost/type_index.hpp>
 #include <yaml-cpp/yaml.h>

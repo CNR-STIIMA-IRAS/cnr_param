@@ -292,6 +292,17 @@ bool has(const YAML::Node& node, const std::string& key)
   return bool(node[key]);
 }
 
+/**
+ * @brief 
+ * 
+ * @param node 
+ * @return true 
+ * @return false 
+ */
+bool is_scalar(const YAML::Node& node)
+{
+  return node.IsScalar();
+}
 
 /**
  * @brief 

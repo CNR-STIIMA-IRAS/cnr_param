@@ -2,7 +2,6 @@
 #define CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_H
 
 #include <string>
-#include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace cnr
@@ -68,6 +67,15 @@ bool has(const YAML::Node& node, const std::string& key);
  * @return true
  * @return false
  */
+bool is_scalar(const YAML::Node& node);
+
+/**
+ * @brief
+ *
+ * @param node
+ * @return true
+ * @return false
+ */
 bool is_sequence(const YAML::Node& node);
 
 /**
@@ -106,6 +114,5 @@ void insert(YAML::Node& node, const std::string& key, const T& value, const std:
 #include <cnr_param/core/impl/param_sequence.hpp>
 #include <cnr_param/core/impl/param_map.hpp>
 #include <cnr_param/core/impl/param_insert.hpp>
-//#include <cnr_param/core/impl/param_extract.hpp>
 
-#endif /* CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_H */
+#endif // CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_H

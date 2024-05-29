@@ -19,8 +19,8 @@ list(APPEND ROS2_INSTALL_INTERFACE_INCLUDE_DIRS
 
 ### SOURCES
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/ros2)
-list(APPEND cnr_param_ros2_SRC ${SRC_DIR}/param.cpp
-     ${SRC_DIR}/yaml_formatter.cpp ${SRC_DIR}/param_retriever.cpp)
+list(APPEND cnr_param_ros2_SRC  ${SRC_DIR}/param_dictionary.cpp ${SRC_DIR}/param.cpp ${SRC_DIR}/param_retriever.cpp ${SRC_DIR}/yaml_formatter.cpp
+     )
 
 ### LIBRARY ###################################################################
 ### cnr_param_ros2

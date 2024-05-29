@@ -74,7 +74,7 @@ int main(int argc, char** argv)
   std::this_thread::sleep_for(1s);
 
   // Initialize the module
-  cnr::param::ros2::CNR_PARAM_INIT_RO2_MODULE(parameters_client_node);
+  cnr::param::ros2::CNR_PARAM_INIT_ROS2_MODULE(parameters_client_node);
 
   // Get the data
   std::string what;
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
   std::vector<std::vector<std::string>> vv_string;
   call("/ros2_parameters_server_node/n1/n4/vv1", vv_string);
   
-  cnr::param::ros2::CNR_PARAM_CLEANUP_RO2_MODULE();
+  cnr::param::ros2::CNR_PARAM_CLEANUP_ROS2_MODULE();
 
   executor.cancel();
   executor_thread.join();

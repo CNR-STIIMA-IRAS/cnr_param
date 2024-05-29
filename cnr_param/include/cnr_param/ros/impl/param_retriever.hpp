@@ -88,7 +88,7 @@ using RosAllowedParamType = std::variant<double_param::c_type, int_param::c_type
  * @param val 
  * @return YAML::Node 
  */
-inline YAML::Node to_yaml(const std::string& key, const XmlRpc::XmlRpcValue& val)
+inline YAML::Node _to_yaml(const std::string& key, const XmlRpc::XmlRpcValue& val)
 {
   YAML::Node n;
   std::string what;
@@ -117,7 +117,7 @@ inline YAML::Node to_yaml(const std::string& key, const XmlRpc::XmlRpcValue& val
         YAML::Node nn(YAML::NodeType::Sequence);
         for(int i = 0; i < val.size(); i++)
         {
-          YAML::Node element = to_yaml("not_used", val[i]);
+          YAML::Node element = _to_yaml("not_used", val[i]);
           nn.push_back(element["not_used"]);
         }
         n[key] = nn;
@@ -128,7 +128,7 @@ inline YAML::Node to_yaml(const std::string& key, const XmlRpc::XmlRpcValue& val
         YAML::Node nn(YAML::NodeType::Map);
         for(auto it = val.begin(); it != val.end(); it++)
         {
-          nn.push_back(to_yaml(it->first, it->second));
+          nn.push_back(_to_yaml(it->first, it->second));
         }
         n[key] = nn;
       }
@@ -221,15 +221,6 @@ inline std::string ParamDictionary<XmlRpc::XmlRpcValue>::to_string(const std::st
   return ret;
 }
 
-template<>
-inline bool ParamRetriever<::ros::NodeHandle,XmlRpc::XmlRpcValue>::list_parameters(const std::string& , const std::vector<std::string>& ,
-                                     std::vector<std::string>& , std::string& what)
-{
-  what = __PRETTY_FUNCTION__ + (":"  + std::to_string(__LINE__) + ": ") + "Not implemented yet";
-  return false;
-}
-
-
 template <>
 inline bool ParamRetriever<::ros::NodeHandle,XmlRpc::XmlRpcValue>::retrieve_parameters(const std::string& resolved_node_name,
                                                       const std::string& resolved_key, std::string& what, bool updated)
@@ -317,7 +308,7 @@ template<>
 inline bool to_yaml(const ParamDictionary<XmlRpc::XmlRpcValue>& tree, YAML::Node& node, std::string& )
 {
   auto & par = std::get<XmlRpc::XmlRpcValue>(tree.value());
-  node[tree.name()] = to_yaml("", par);
+  node[tree.name()] = _to_yaml("", par);
   return true;
 }
 
