@@ -215,7 +215,7 @@ bool set(const std::string& key, const T& ret, std::string& what)
   auto region = createFileMapping(ap.string(),fsz);
   if(!region)
   {
-    what = "IMpossible to create the file mapping '" + ap.string() +"'";
+    what = "Impossible to create the file mapping '" + ap.string() +"'";
     return false;
   }
   std::memcpy(region->get_address(), str.c_str(), str.size() );
