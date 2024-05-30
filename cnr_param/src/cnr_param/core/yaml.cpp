@@ -83,7 +83,7 @@ YAML::Node init_tree(const std::vector<std::string> seq, const YAML::Node& node)
   }
 }
 
-YAML::iterator get(const std::string& key, YAML::iterator& node_begin, YAML::iterator& node_end)
+YAML::iterator get_node(const std::string& key, YAML::iterator& node_begin, YAML::iterator& node_end)
 {
   YAML::iterator it = node_begin;
   for (it = node_begin; it != node_end; ++it)

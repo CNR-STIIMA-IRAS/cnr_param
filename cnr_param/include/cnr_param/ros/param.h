@@ -36,7 +36,7 @@ bool has(const std::string& key, std::string& what);
  * @return false 
  */
 template<typename T>
-inline bool get(const std::string& key, T& ret, std::string& what, const bool& implicit_cast_if_possible = true);
+bool get(const std::string& key, T& ret, std::string& what, const bool& implicit_cast_if_possible = true);
 
 /**
  * @brief 
@@ -47,12 +47,6 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
  */
 template<typename T>
 bool set(const std::string&, const T&, std::string&);
-
-/**
- * @brief 
- * 
- */
-class ParamRetriever;
 
 /**
  * @brief 

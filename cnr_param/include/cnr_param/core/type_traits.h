@@ -86,6 +86,18 @@ template<>
 struct is_byte<uint8_t>: std::true_type
 {
 };
+template<>
+struct is_byte<uint16_t>: std::true_type
+{
+};
+template<>
+struct is_byte<uint32_t>: std::true_type
+{
+};
+template<>
+struct is_byte<uint64_t>: std::true_type
+{
+};
 template<class T>
 struct is_byte_v
 {

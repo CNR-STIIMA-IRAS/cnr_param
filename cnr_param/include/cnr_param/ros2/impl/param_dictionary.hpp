@@ -225,45 +225,6 @@ inline std::string ParamDictionary<rclcpp::Parameter>::to_string(const std::stri
   return ret;
 }
 
-
-// inline bool _to_yaml(const ParamDictionary<rclcpp::Parameter>& tree, YAML::Node& node, std::string& what)
-// {
-//   std::cout << "================================================ " << std::endl;
-//   std::cout << ">>> INPUT: " << tree.to_string("--") << std::endl;
-//   std::cout << ">>> INPUT: " << std::to_string(node.Type()) << std::endl;
-//   if (std::holds_alternative<ParamDictionary<rclcpp::Parameter>::EmptyParam>(tree.value()))
-//   {
-//     what = "The param is empty";
-//     return false;
-//   }
-//   else if (std::holds_alternative<rclcpp::Parameter>(tree.value()))
-//   {
-//     auto& rclcpp_par = std::get<rclcpp::Parameter>(tree.value());
-//     std::string json_str = rclcpp::_to_json_dict_entry(rclcpp_par);
-//     YAML::Node yaml_node = YAML::Load(json_str);
-//     node[tree.name()] = YAML::Load(yaml_node[rclcpp_par.get_name()]["value"].as<std::string>());
-//   }
-//   else
-//   {
-//     auto& nested = std::get<ParamDictionary<rclcpp::Parameter>::NestedParams>(tree.value());
-//     YAML::Node nested_node(YAML::NodeType::Map);
-//     for (const auto& p : nested)
-//     {
-//       YAML::Node leaf;
-//       if (!_to_yaml(p.second, leaf, what))
-//       {
-//         return false;
-//       }
-//       nested_node[p.second.name()] = leaf[p.second.name()];
-//     }
-//     node[tree.name()] = nested_node;
-//   }
-//   std::cout << "<<< OUTPUT: " << std::to_string(node.Type()) << std::endl;
-//   std::cout << "<<< OUTPUT: " << node << std::endl;
-//   std::cout << "<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>" << std::endl;
-//   return true;
-// }
-
 template <>
 inline bool to_yaml(const ParamDictionary<rclcpp::Parameter>& tree, YAML::Node& node, std::string& what)
 {

@@ -10,6 +10,7 @@
 #include <cnr_param/core/eigen.h>
 
 #include <cnr_param/core/yaml.h>
+#include <cnr_param/core/impl/param.hpp>
 
 #if !defined(UNUSED)
 #define UNUSED(expr)                                                                                                   \
@@ -81,51 +82,32 @@ bool _get_sequence(const YAML::Node& node, std::array<std::array<T, M>, N>& ret,
  * @return false
  */
 template <typename T, typename A>
-inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what, const bool& implicit_cast_if_possible)
+inline bool _get_sequence(const YAML::Node& node, std::vector<T, A>& ret, std::string& what, const bool& )
 {
-  YAML::Node config(node);
-  if (!config.IsSequence())
+  if (!node.IsSequence())
   {
-    std::stringstream ss_node;
-    ss_node << node;
     what = "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() +
-           "' but the node is " + std::to_string(config.Type()) +
-           "\n>> Input Node:\n" + ss_node.str();
+           "' but the node is " + std::to_string(node.Type()) +
+           "\n>> Input Node:\n" + std::to_string(node);
 
     return false;
   }
 
   try
   {
-    bool ok = false;
     ret.clear();
     for (std::size_t i = 0; i < node.size(); i++)
     {
       T v = T();
-      if (node[i].IsScalar())
+      if (!decode<T, std::variant_size<typename type_variant_holder<T>::variant>::value>(node[i], v, what))
       {
-        ok = get_scalar<T>(node[i], v, what, implicit_cast_if_possible);
-      }
-      else if (node[i].IsSequence())
-      {
-        ok = get_sequence<T>(node[i], v, what, implicit_cast_if_possible);
-      }
-      else if (node[i].IsMap())
-      {
-        ok = get_map<T>(node[i], v, what, implicit_cast_if_possible);
-      }
-
-      if (!ok)
-      {
-        std::stringstream _node;
-        _node << node;
         what = "Error in the extraction of the element #" + std::to_string(i)
-               + ": " + what + "\nInput Node:" + _node.str();
-        break;
+               + ": " + what + "\nInput Node:" + std::to_string(node);
+        return false;
       }
       ret.push_back(v);
     }
-    return ok;
+    return true;
   }
   CATCH(ret);
 
@@ -159,7 +141,7 @@ inline bool _get_sequence(const YAML::Node& node, std::vector<std::vector<T, A>>
                   "' but the node is " + std::to_string(config.Type()) + "\n Input Node:\n" + _node.str();
         }
         std::vector<T> v;
-        ok = get_sequence(config[i], v, what, implicit_cast_if_possible);
+        ok = _get_sequence(config[i], v, what, implicit_cast_if_possible);
         if (!ok)
         {
           std::stringstream _node;

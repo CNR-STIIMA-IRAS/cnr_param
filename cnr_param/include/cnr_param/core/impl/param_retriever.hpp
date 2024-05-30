@@ -163,20 +163,37 @@ template <typename N, typename P>
 inline bool ParamRetriever<N, P>::get_parameter(const std::string& resolved_node_name, const std::string& resolved_key,
                                                 ParamDictionary<P>& param, std::string& what, bool updated)
 {
-  if (!retrieve_parameters(resolved_node_name, resolved_key, what, updated))
+  std::size_t ll = __LINE__;
+  try
   {
-    return false;
-  }
+    ll = __LINE__;
+    if (!retrieve_parameters(resolved_node_name, resolved_key, what, updated))
+    {
+      return false;
+    }
 
-  auto it = find(node_params(resolved_node_name), resolved_key, parameter_separator_string_, what);
-  if (!it)
+    ll = __LINE__;
+    auto it = find(node_params(resolved_node_name), resolved_key, parameter_separator_string_, what);
+    if (!it)
+    {
+      what = "Extraction failed (resolved node name: '" + resolved_node_name + "', resolved key: '" + resolved_key +
+            "'): " + what;
+      return false;
+    }
+    ll = __LINE__;
+    param = *it;
+    return true;
+  }
+  catch(std::exception& e)
   {
-    what = "Extraction failed (resolved node name: '" + resolved_node_name + "', resolved key: '" + resolved_key +
-           "'): " + what;
+    what = std::string(e.what()) + " at line " + std::to_string(ll) + " in " + __FILE__;
     return false;
   }
-  param = *it;
-  return true;
+  catch(...)
+  {
+    what = "Unknown exception at line " + std::to_string(ll) + " in " + __FILE__;
+    return false;
+  }
 }
 
 

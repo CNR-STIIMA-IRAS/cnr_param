@@ -79,4 +79,4 @@ inline std::string to_string(const cnr::param::ros2::ParamDictionary& val);
 
 #include <cnr_param/ros2/impl/param_dictionary.hpp>
 
-#endif  // CNR_PARAM__INCLUDE__CNR_PARAM__ros2::_IMPL__PARAM_DICTIONARY__HPP
+#endif  // CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__PARAM_DICTIONARY__H

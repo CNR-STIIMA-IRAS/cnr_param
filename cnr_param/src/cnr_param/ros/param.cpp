@@ -25,16 +25,16 @@ std::shared_ptr<::ros::NodeHandle>& background_node(std::shared_ptr<::ros::NodeH
   return __node;
 }
 
-std::shared_ptr<::cnr::param::ParamRetriever<::ros::NodeHandle, XmlRpc::XmlRpcValue>>& param_retriever()
+std::shared_ptr<ParamRetriever>& param_retriever()
 {
-  static std::shared_ptr<::cnr::param::ParamRetriever<::ros::NodeHandle, XmlRpc::XmlRpcValue>> __pr = nullptr;
+  static std::shared_ptr<ParamRetriever> __pr = nullptr;
   return __pr;
 }
 
 void CNR_PARAM_INIT_ROS_MODULE(std::shared_ptr<::ros::NodeHandle> node)
 {
   background_node() = node;
-  param_retriever().reset(new ::cnr::param::ParamRetriever<::ros::NodeHandle, XmlRpc::XmlRpcValue> (background_node()) );
+  param_retriever().reset(new ParamRetriever(background_node(), "/") );
 }
 
 void CNR_PARAM_CLEANUP_ROS_MODULE()

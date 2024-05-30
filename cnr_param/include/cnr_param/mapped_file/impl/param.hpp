@@ -155,43 +155,7 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
     return false;
   }
 
-  what = "Failed in getting the Node struct from parameter '" + key + "':\n";
-  try
-  {
-    if constexpr(std::is_same<T,YAML::Node>::value)
-    {
-      ret = node;
-      return true;
-    }
-    else
-    {
-     
-      if(node.IsScalar())
-      {
-        return cnr::param::core::get_scalar<T>(node, ret, what, implicit_cast_if_possible);
-      }
-      else if(node.IsSequence())
-      {
-        return cnr::param::core::get_sequence<T>(node, ret, what, implicit_cast_if_possible);
-      } 
-      else if(node.IsMap())
-      {
-        return cnr::param::core::get_map<T>(node, ret, what, implicit_cast_if_possible);
-      }
-      
-      std::stringstream _node;
-      _node << node;
-      what += "Tried to extract a '" + boost::typeindex::type_id_with_cvr<decltype(T())>().pretty_name() 
-                + "' but the node type is undefined\n Input Node: \n" + _node.str();
-    
-    }
-  }
-  catch (std::exception& e)
-  {
-    what += e.what();
-    return false;
-  }
-  return false;
+  return cnr::param::core::get(node, ret, what, implicit_cast_if_possible);
 }
 
 template<typename T>
@@ -240,7 +204,7 @@ inline bool is_sequence(const std::string& key)
   {
     return false;
   }
-  return cnr::param::core::is_sequence(node);
+  return node.IsSequence();
 }
 
 }  // namespace mapped_file

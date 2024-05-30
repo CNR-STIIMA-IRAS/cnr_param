@@ -1,9 +1,8 @@
-#ifndef CNR_PARAM__INCLUDE__CNR_PARAM__ROS__PARAM_RETRIEVER__H
-#define CNR_PARAM__INCLUDE__CNR_PARAM__ROS__PARAM_RETRIEVER__H
+#ifndef CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__PARAM_RETRIEVER__HPP
+#define CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__PARAM_RETRIEVER__HPP
 
 #include <string>
 #include <vector>
-#include <Eigen/Core>
 #include "cnr_param/core/impl/param_retriever.hpp"
 #include <yaml-cpp/yaml.h>
 
@@ -47,8 +46,8 @@ inline bool getNodeNames<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node
 }
 
 template <>
-inline bool resolveParamName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, const std::string& ns, std::string& node_name, std::string& resolved_key,
-                             std::string& what)
+inline bool resolveParamName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, const std::string& ns, 
+  std::string& node_name, std::string& resolved_key, std::string& what)
 {
   std::string _nn = node->get_fully_qualified_name();
   resolved_key = ns;
@@ -224,29 +223,9 @@ namespace param
 {
 namespace ros2
 {
-// inline bool getNodeNames(const std::shared_ptr<rclcpp::Node>& node, std::vector<std::string>& names, std::string& what)
-// {
-//   return ::cnr::param::core::getNodeNames(node, names, what);
-// }
-
-// inline bool resolveParamName(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-//                              std::string& resolved_name, std::string& what)
-// {
-//   return ::cnr::param::core::resolveParamName(node, name, resolved_name, what);
-// }
-
-// inline bool resolveNodeName(const std::shared_ptr<rclcpp::Node>& node, std::string& resolved_name, std::string& what)
-// {
-//   return ::cnr::param::core::resolveNodeName(node, resolved_name, what);
-// }
-
-// inline std::string lintParamKey(const std::shared_ptr<rclcpp::Node>& node, const std::string& param_key)
-// {
-//   return ::cnr::param::core::lintParamKey(node, param_key);
-// }
 
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr
 
-#endif  // CNR_PARAM__INCLUDE__CNR_PARAM__ROS__PARAM_RETRIEVER__H
+#endif  // CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__IMPL__PARAM_RETRIEVER__HPP

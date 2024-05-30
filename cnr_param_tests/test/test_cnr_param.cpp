@@ -318,6 +318,32 @@ TEST(CnrParamMappedFileModule, GetMatrix)
 // then we inherit the get_map function to extract the complex type from the YAML node
 // finally, we run the test
 // ====================================================================================================================
+namespace YAML
+{
+template <>
+struct convert<ComplexType>
+{
+  static Node encode(const ComplexType& rhs)
+  {
+    Node node;
+    node["name"] = rhs.name;
+    node["value"] = rhs.value;
+    return node;
+  }
+
+  static bool decode(const Node& node, ComplexType& rhs)
+  {
+    if (!node.IsMap() || !node["name"] || !node["value"])
+    {
+      return false;
+    }
+    rhs.name = node["name"].as<std::string>();
+    rhs.value = node["value"].as<double>();
+    return true;
+  }
+};
+}  // namespace YAML
+
 namespace cnr
 {
 namespace param

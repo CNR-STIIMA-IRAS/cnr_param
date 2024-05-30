@@ -11,6 +11,7 @@ namespace param
 namespace core
 {
 
+
 /**
  * @brief Get the scalar object
  *
@@ -22,72 +23,9 @@ namespace core
  * @return false
  */
 template <typename T>
-inline bool get_scalar(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
-
-/**
- * @brief Get a sequence
- *
- * @tparam T
- * @param node
- * @param ret
- * @param what
- * @return true
- * @return false
- */
-template <typename T>
-inline bool get_sequence(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
-
-/**
- * @brief Get a map object
- *
- * @tparam T
- * @param node
- * @param ret
- * @param what
- * @return true
- * @return false
- */
-template <typename T>
-inline bool get_map(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
-
-/**
- * @brief
- *
- * @param node
- * @param key
- * @return true
- * @return false
- */
-bool has(const YAML::Node& node, const std::string& key);
-
-/**
- * @brief
- *
- * @param node
- * @return true
- * @return false
- */
-bool is_scalar(const YAML::Node& node);
-
-/**
- * @brief
- *
- * @param node
- * @return true
- * @return false
- */
-bool is_sequence(const YAML::Node& node);
-
-/**
- * @brief
- *
- * @param node
- * @return true
- * @return false
- */
-bool is_map(const YAML::Node& node);
-
+inline bool get(const YAML::Node& node, T& ret, std::string& what, const bool& implicit_cast_if_possible);
 // =============================================================================================
+
 
 /**
  * @brief
@@ -110,9 +48,6 @@ void insert(YAML::Node& node, const std::string& key, const T& value, const std:
 }  // namespace param
 }  // namespace cnr
 
-#include <cnr_param/core/impl/param_scalar.hpp>
-#include <cnr_param/core/impl/param_sequence.hpp>
-#include <cnr_param/core/impl/param_map.hpp>
-#include <cnr_param/core/impl/param_insert.hpp>
+#include <cnr_param/core/impl/param.hpp>
 
 #endif // CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_H

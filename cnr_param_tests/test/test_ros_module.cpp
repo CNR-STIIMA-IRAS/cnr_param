@@ -173,7 +173,7 @@ TEST(ROS1Module, ClientUsageBasicTypes)
   EXPECT_TRUE(call("bool_value", val_bool));
   EXPECT_TRUE(val_bool);
 
-  std::vector<uint8_t> v_bytes;
+  std::vector<uint16_t> v_bytes;
   EXPECT_TRUE(call("bytes_array", v_bytes));
   EXPECT_TRUE(v_bytes.size() == 3 && v_bytes[0] == 0x01 && v_bytes[1] == 0xF1 && v_bytes[2] == 0xA2);
 

@@ -38,7 +38,7 @@ YAML::Node init_tree(const std::vector<std::string> seq, const YAML::Node& node)
  * @param node_end
  * @return YAML::iterator
  */
-YAML::iterator get(const std::string& key, YAML::iterator& node_begin, YAML::iterator& node_end);
+YAML::iterator get_node(const std::string& key, YAML::iterator& node_begin, YAML::iterator& node_end);
 
 /**
  * @brief Get the leaf object

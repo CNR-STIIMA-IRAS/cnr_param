@@ -47,6 +47,14 @@ A as_generic(const P& param);
  */
 template<int ParamType, typename T> struct is_forward_implicit_conversion_allowed : std::false_type {};
 
+template<typename c_type> 
+struct type_variant_holder
+{
+  using base = c_type;
+  using variant = std::variant<c_type>;
+};
+
+
 template<typename ParamType, ParamType p, typename T> 
 struct type_holder
 {
