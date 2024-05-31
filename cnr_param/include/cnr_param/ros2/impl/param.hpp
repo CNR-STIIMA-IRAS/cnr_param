@@ -128,26 +128,7 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool &i
   // ========================================================================
   
   YAML::Node uncrustified_value = uncrustified_node.begin()->second;
-  bool ok = false;
-  switch(uncrustified_value.Type())
-  {
-    case YAML::NodeType::Scalar:
-      ok = cnr::param::core::get_scalar(uncrustified_value, ret, what, implicit_cast_if_possible);
-      break;
-    case YAML::NodeType::Sequence:
-      ok = cnr::param::core::get_sequence(uncrustified_value, ret, what, implicit_cast_if_possible);
-      break;
-    case YAML::NodeType::Map:
-      ok = cnr::param::core::get_map(uncrustified_value, ret, what, implicit_cast_if_possible);  
-      break;
-    default:
-      what = "Failure in getting '"+key+"' (Resolved Node Name: '"+resolved_node_name+"', resolved key: '"+resolved_key+"'). Required type: '"
-            + boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() 
-                + "'. Extracted param: '" + std::to_string(param) + "'";
-      ok = false;
-      break;
-  }
-  return ok;
+  return cnr::param::core::get(uncrustified_value, ret, what, implicit_cast_if_possible);
 }
 
 template<typename T>
