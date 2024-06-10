@@ -46,8 +46,8 @@ namespace core
 std::vector<std::string> tokenize(const std::string& str, const std::string& delim);
 
 template <typename T, typename std::enable_if<
-                          !std::is_same<T, std::string>::value && !cnr::param::is_vector<T>::value &&
-                              !cnr::param::is_matrix_expression<T>::value && !std::is_same<T, YAML::Node>::value,
+                          !std::is_same<T, std::string>::value && !cnr::param::is_std_vector<T>::value &&
+                              !cnr::param::is_eigen_matrix<T>::value && !std::is_same<T, YAML::Node>::value,
                           bool>::type = true>
 inline void to_string(const T& v, std::string& ret)
 {
@@ -69,7 +69,7 @@ inline void to_string(const T& v, std::string& ret)
 }
 
 
-template <typename D, typename std::enable_if<cnr::param::is_matrix_expression<D>::value, bool>::type = true>
+template <typename D, typename std::enable_if<cnr::param::is_eigen_matrix<D>::value, bool>::type = true>
 inline void to_string(const Eigen::MatrixBase<D>& m, std::string& ret)
 {
   Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
@@ -78,7 +78,7 @@ inline void to_string(const Eigen::MatrixBase<D>& m, std::string& ret)
   ret = ss.str();
 }
 
-template <typename T, typename std::enable_if<cnr::param::is_vector<T>::value, bool>::type = true>
+template <typename T, typename std::enable_if<cnr::param::is_std_vector<T>::value, bool>::type = true>
 inline void to_string(const T& v, std::string& ret)
 {
   ret = "[ ";

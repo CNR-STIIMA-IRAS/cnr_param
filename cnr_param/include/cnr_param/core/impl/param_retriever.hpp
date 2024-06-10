@@ -196,6 +196,15 @@ inline bool ParamRetriever<N, P>::get_parameter(const std::string& resolved_node
   }
 }
 
+template <typename N, typename P>
+inline bool ParamRetriever<N, P>::set_parameter(const std::string&, const std::string&, const P&, std::string&)
+{
+  std::string err = __PRETTY_FUNCTION__ + std::string(":") + std::to_string(__LINE__) + ": " +
+                    "To be specialized to your specific case";
+  throw std::runtime_error(err.c_str());
+  return false;
+}
+
 
 template <typename N>
 inline bool getNodeNames(const std::shared_ptr<N>&, std::vector<std::string>&, std::string&)

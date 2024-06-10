@@ -135,6 +135,19 @@ bool call(const std::string& key, T& value)
   return true;
 }
 
+template<typename T>
+bool send(const std::string& key, T& value)
+{
+  std::string what;
+  if(!cnr::param::ros2::set("/"+server_node_name+"/"+key, value, what))
+  {
+    std::cerr << "What: " << what << std::endl;
+    return false;
+  }
+  return true;
+}
+
+
 TEST(ROS2Module, ClientUsageBasicTypes)
 {
   std::string what;
@@ -197,6 +210,76 @@ TEST(ROS2Module, ClientUsageBasicTypes)
   EXPECT_TRUE(
       call("nested_param/nested_param.another_int2", val_int));
   EXPECT_TRUE(val_int == 7);
+}
+
+TEST(ROS2Module, ClientUsageSetBasicTypes)
+{
+  std::string what;
+  std::vector<double> v_double{7.5, 400.4};
+  EXPECT_TRUE(send("darray", v_double));
+  EXPECT_TRUE(call("darray", v_double));
+  EXPECT_TRUE(v_double.size() == 2 && v_double[0] == 7.5 && v_double[1] == 400.4);
+
+  double val = 3.14;
+  EXPECT_TRUE(send("dvalue", val));
+  EXPECT_TRUE(call("dvalue", val));
+  EXPECT_TRUE(val == 3.14);
+
+  std::vector<int> v_int{10, 11, 12, 13};
+  EXPECT_TRUE(send("iarray", v_int));
+  EXPECT_TRUE(call("iarray", v_int));
+  EXPECT_TRUE(v_int.size() == 4 && v_int[0] == 10 && v_int[1] == 11 && v_int[2] == 12 && v_int[3] == 13);
+
+  int val_int = 5;
+  EXPECT_TRUE(send("ivalue", val_int));
+  EXPECT_TRUE(call("ivalue", val_int));
+  EXPECT_TRUE(val_int == 5);
+
+  std::vector<std::string> v_string{"Nice", "more", "params"};
+  EXPECT_TRUE(send("sarray", v_string));
+  EXPECT_TRUE(call("sarray", v_string));
+  EXPECT_TRUE(v_string.size() == 3 && v_string[0] == "Nice" && v_string[1] == "more" && v_string[2] == "params");
+
+  std::string val_string = "Hello Universe";
+  EXPECT_TRUE(send("svalue", val_string));
+  EXPECT_TRUE(send("svalue", val_string));
+  EXPECT_TRUE(val_string == "Hello Universe");
+
+  std::vector<bool> v_bool{true,false,true};
+  EXPECT_TRUE(send("barray", v_bool));
+  EXPECT_TRUE(v_bool.size() == 3 && v_bool[0] && !v_bool[1] && v_bool[2]);
+
+  bool val_bool = true;
+  EXPECT_TRUE(send("bvalue", val_bool));
+  EXPECT_TRUE(send("bvalue", val_bool));
+  EXPECT_TRUE(val_bool);
+
+  std::vector<uint8_t> v_bytes{0x01, 0xF, 0x1A};
+  EXPECT_TRUE(send("by_array", v_bytes));
+  EXPECT_TRUE(call("by_array", v_bytes));
+  EXPECT_TRUE(v_bytes.size() == 3 && v_bytes[0] == 0x01 && v_bytes[1] == 0xF && v_bytes[2] == 0x1A);
+
+  EXPECT_TRUE(send("n_param/another_int", val_int));
+  EXPECT_TRUE(call("n_param/another_int", val_int));
+  EXPECT_TRUE(send("n_param.another_int", val_int));
+  EXPECT_TRUE(call("n_param.another_int", val_int));
+  EXPECT_TRUE(val_int == 5);
+
+  EXPECT_TRUE(send("n_param/another_int2", val_int));
+  EXPECT_TRUE(call("n_param/another_int2", val_int));
+  EXPECT_TRUE(call("n_param.another_int2", val_int));
+  EXPECT_TRUE(send("n_param.another_int2", val_int));
+  EXPECT_TRUE(val_int == 5);
+
+  EXPECT_TRUE(
+      send("n_param/nested_param/another_int2", val_int));
+  EXPECT_TRUE(
+      send("n_param.nested_param.another_int2", val_int));
+  EXPECT_TRUE(
+      send("n_param.nested_param/another_int2", val_int));
+  EXPECT_TRUE(
+      send("n_param/nested_param.another_int2", val_int));
+  EXPECT_TRUE(val_int == 5);
 }
 
 TEST(ROS2Module, ClientUsageSequenceOf)

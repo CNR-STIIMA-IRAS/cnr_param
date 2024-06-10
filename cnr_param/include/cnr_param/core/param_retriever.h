@@ -36,9 +36,10 @@ public:
    * @return true
    * @return false
    */
-  bool get_parameter(const std::string& key, const std::string& resolved_key, ParamDictionary<P>& param,
+  bool get_parameter(const std::string& resolved_node_name, const std::string& resolved_key, ParamDictionary<P>& param,
                      std::string& what, bool updated = false);
 
+  bool set_parameter(const std::string& resolved_node_name, const std::string& resolved_key, const P& param, std::string& what);
   /**
    * @brief
    *

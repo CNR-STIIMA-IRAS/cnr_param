@@ -35,10 +35,9 @@ inline bool get(const YAML::Node& node, T& ret, std::string& what, const bool& i
  * @param key
  * @param value
  * @param format : by now only format for int is supported. Specify if it is 'dec' or 'hex'
-
  */
 template <typename T>
-void insert(YAML::Node& node, const std::string& key, const T& value, const std::string& format = "");
+inline bool set(const T& value, YAML::Node& ret, std::string& what);
 
 
 // template <typename T>

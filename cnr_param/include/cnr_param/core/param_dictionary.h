@@ -1,14 +1,100 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_DICTIONARY__H
 #define CNR_PARAM__INCLUDE__CNR_PARAM__CORE__PARAM_DICTIONARY__H
 
+#include <cstddef>
 #include <string>
-#include <vector>
 #include <map>
 #include <variant>
 #include <Eigen/Core>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/node/type.h>
 #include <yaml-cpp/yaml.h>
 
 #include <cnr_param/core/type_traits.h>
+
+#include <optional>
+
+namespace YAML
+{
+
+template <typename T>
+struct as_if<T, std::optional<T>>
+{
+  explicit as_if(const Node& node) : node(node)
+  {
+  }
+  const Node& node;
+
+  std::optional<T> operator()() const
+  {
+    std::optional<T> val;
+    T decoded;
+    if ((node.m_pNode != nullptr) && convert<T>::decode(node, decoded))
+    {
+      val = std::move(decoded);
+    }
+
+    return val;
+  }
+};
+
+// There is already a string partial specialisation, so we need a full specialisation here
+template <>
+struct as_if<std::string, std::optional<std::string>>
+{
+  explicit as_if(const Node& node) : node(node)
+  {
+  }
+  const Node& node;
+
+  std::optional<std::string> operator()() const
+  {
+    std::optional<std::string> val;
+    std::string decoded;
+    if ((node.m_pNode != nullptr) && convert<std::string>::decode(node, decoded))
+    {
+      val = std::move(decoded);
+    }
+
+    return val;
+  }
+};
+
+template <typename T, typename A>
+struct as_if<std::vector<T,A>, std::optional<std::vector<T,A>>>
+{
+  explicit as_if(const Node& node) : node(node)
+  {
+  }
+  const Node& node;
+
+  std::optional<std::vector<T,A>> operator()() const
+  {
+    std::optional<std::vector<T,A>> val;
+    std::vector<T,A> decoded;
+    if ((node.m_pNode != nullptr) && node.IsSequence())
+    {
+      for(std::size_t i=0;i<node.size(); i++)
+      {
+        T element;
+        if (convert<T>::decode(node[i], element))
+        {
+          decoded.push_back(std::move(element));
+        }
+        else
+        {
+          return std::nullopt;
+        }
+      }
+      val = std::move(decoded);
+    }
+
+    return val;
+  }
+};
+
+}  // namespace YAML
+// ========================================
 
 namespace cnr
 {
@@ -48,11 +134,20 @@ A as_generic(const P& param);
 template<int ParamType, typename T> struct is_forward_implicit_conversion_allowed : std::false_type {};
 
 template<typename c_type> 
-struct type_variant_holder
+struct encoding_type_variant_holder
+{
+  using const_type = std::decay_t<const c_type&>;
+  using base = c_type;
+  using variant = std::variant<const_type>;
+};
+
+template<typename c_type> 
+struct decoding_type_variant_holder
 {
   using base = c_type;
   using variant = std::variant<c_type>;
 };
+
 
 
 template<typename ParamType, ParamType p, typename T> 
@@ -122,6 +217,7 @@ public:
   const std::string& name() const;
   const AllowedParam& value() const;
   ParamDictionary& operator=(const P& value);
+  ParamDictionary& operator=(const NestedParams& value);
   ParamDictionary& operator[](const std::string& key);
 
   const ParamDictionary& operator[](const std::string& key) const;
@@ -138,9 +234,6 @@ private:
 
 template<typename P>
 bool to_yaml(const ParamDictionary<P>& tree, YAML::Node& node, std::string& what);
-
-// template<typename P>
-// bool to_yaml(const P& tree, YAML::Node& node, std::string& what);
 
 /**
  * @brief

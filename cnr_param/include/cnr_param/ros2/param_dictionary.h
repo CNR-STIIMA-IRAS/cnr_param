@@ -40,7 +40,7 @@ using AllowedParamType = std::variant<ros2::double_param::c_type, ros2::int_para
                                       ros2::bool_param::c_type, ros2::bytes_param::c_type>;
 
 bool to_yaml(const ::cnr::param::core::ParamDictionary<rclcpp::Parameter>& tree, YAML::Node& node, std::string& what);
-// bool to_yaml(const rclcpp::Parameter& tree, YAML::Node& node, std::string& what);
+bool from_yaml(const YAML::Node& node, rclcpp::ParameterValue& tree, std::string& what);
 
 AllowedParamType as_generic(const rclcpp::Parameter& param);
 

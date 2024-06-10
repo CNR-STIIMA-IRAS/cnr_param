@@ -209,6 +209,41 @@ inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::retrieve_parameters
   return value_found;
 }
 
+
+template<>
+inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::set_parameter(const std::string& resolved_node_name, const std::string& resolved_key, const rclcpp::Parameter& param, std::string& what)
+{
+   if (!cnr::param::ros2::init_async_params_client(resolved_node_name, node_))
+  {
+    what = "there has been a failure in the initialization of the param retriver for node '" + resolved_node_name + "'";
+    return false;
+  }
+
+  if(resolved_node_name + "." + resolved_key != param.get_name() )
+  {
+    std::cerr << "Resovled Node Name: "  << resolved_node_name << std::endl;
+    std::cerr << "Resovled Key      : "  << resolved_key << std::endl;
+    std::cerr << "Param Name        : "  << param.get_name() << std::endl;
+    std::cerr << "Param Value       : "  << param.value_to_string() << std::endl;
+  }
+
+  if (resolved_node_name == node_->get_fully_qualified_name())// The request is for a local parameter
+  {
+    node_->set_parameter(param);
+  }
+  else
+  {
+    auto list = cnr::param::ros2::parameters_client()[resolved_node_name]->set_parameters({param});
+    std::chrono::milliseconds span(5000);
+    if (list.wait_for(span) != std::future_status::ready)
+    {
+      what = "set_parameters service call failed. ";
+      return false;
+    }
+  }
+  return true;
+}
+
 }  // namespace core
 }  // namespace param
 }  // namespace cnr
