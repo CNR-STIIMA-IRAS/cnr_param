@@ -114,16 +114,6 @@ struct ParamType
   static constexpr param_type value = param_type();
 };
 
-/**
- * @brief This abstract template is for the implicit cast of a parameter value to a std::variant<..> that should collect the types that undeline to the pameter type
- * 
- * @tparam P 
- * @tparam A 
- * @param param 
- * @return A 
- */
-template<typename P, typename A>
-A as_generic(const P& param);
 
 /**
  * @brief For each type of parameter, the template if the given type T is equivalent ot not
@@ -131,7 +121,7 @@ A as_generic(const P& param);
  * @tparam ParamType 
  * @tparam T 
  */
-template<int ParamType, typename T> struct is_forward_implicit_conversion_allowed : std::false_type {};
+// template<int ParamType, typename T> struct is_forward_implicit_conversion_allowed : std::false_type {};
 
 template<typename c_type> 
 struct encoding_type_variant_holder
@@ -189,11 +179,6 @@ template<> struct c_type_to_param_type< TYPE_HOLDER_SPECIALIZATION::c_type >\
   using param_type = TYPE_HOLDER_SPECIALIZATION::param_type;\
   constexpr static const param_type value = TYPE_HOLDER_SPECIALIZATION::value;\
 }
-
-
-template<typename T, typename F, typename ...Ts>
-inline bool get_from_variant(T& ret, const std::variant<F, Ts...>& rhs, const bool& implicit_cast_if_possible, std::string& what);
-
 
 /**
  * @brief The class is a recursive map. This is useful to associate a parameter value to the chain of namespaces

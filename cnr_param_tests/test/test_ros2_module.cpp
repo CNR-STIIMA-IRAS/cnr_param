@@ -92,7 +92,7 @@ template <class F>
 
 std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
 
-#define EXECUTION_TIME(...)                                                                                            \
+#define EXECUTION_TIME(hdr, ...)                                                                                            \
   {                                                                                                                    \
     struct timespec start, end;                                                                                        \
     clock_gettime(CLOCK_MONOTONIC, &start);                                                                            \
@@ -101,7 +101,7 @@ std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
     double time_taken;                                                                                                 \
     time_taken = double(end.tv_sec - start.tv_sec) * 1e9;                                                              \
     time_taken = double(time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;                                            \
-    std::cout << "Elapsed time [us]: " << time_taken * 1e6 << std::endl;                                               \
+    std::cout << hdr << ": Elapsed time [us]: " << time_taken * 1e6 << std::endl;                                               \
   }
 
 // ====================================================================================================================
@@ -111,15 +111,9 @@ const std::string server_node_name = "parameters_server_node";
 const std::string client_node_name = "parameters_client_node";
 std::shared_ptr<rclcpp::Node> parameters_client_node;
 
-TEST(ROS2Module, BasicAssertions)
-{
-  EXPECT_STRNE("hello", "world");
-  EXPECT_EQ(7 * 6, 42);
-};
-
 TEST(ROS2Module, Initialization)
 {
-  EXPECT_TRUE(does_not_throw([&] { cnr::param::ros2::CNR_PARAM_INIT_ROS2_MODULE(parameters_client_node); }));
+  EXPECT_TRUE(does_not_throw([&] { EXECUTION_TIME( "Init", cnr::param::ros2::CNR_PARAM_INIT_ROS2_MODULE(parameters_client_node); ) }));
 };
 
 template<typename T>
@@ -127,24 +121,18 @@ bool call(const std::string& key, T& value)
 {
   std::string what;
   bool implicit_cast = true;
-  if(!cnr::param::ros2::get("/"+server_node_name+"/"+key, value, what, implicit_cast))
-  {
-    std::cerr << "What: " << what << std::endl;
-    return false;
-  }
-  return true;
+  bool ok = false;
+  EXECUTION_TIME(key, ok = cnr::param::ros2::get("/"+server_node_name+"/"+key, value, what, implicit_cast); );
+  return ok;
 }
 
 template<typename T>
 bool send(const std::string& key, T& value)
 {
   std::string what;
-  if(!cnr::param::ros2::set("/"+server_node_name+"/"+key, value, what))
-  {
-    std::cerr << "What: " << what << std::endl;
-    return false;
-  }
-  return true;
+  bool ok = false;
+  EXECUTION_TIME(key, ok = cnr::param::ros2::set("/"+server_node_name+"/"+key, value, what))
+  return ok;
 }
 
 

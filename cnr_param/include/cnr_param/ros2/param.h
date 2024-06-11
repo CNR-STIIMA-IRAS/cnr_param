@@ -64,41 +64,6 @@ void CNR_PARAM_CLEANUP_ROS2_MODULE();
 std::shared_ptr<rclcpp::Node>& background_node();
 std::shared_ptr<ParamRetriever>& param_retriever();
 
-
-template<typename T>
-struct is_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_scalar<T>::value               || 
-    cnr::param::is_double_std_v<T>::value         ||
-    cnr::param::is_integer_v<T>::value            ||
-    cnr::param::is_bool_v<T>::value               ||
-    cnr::param::is_string_v<T>::value             ||
-    std::is_same<rclcpp::Parameter, T>::value;
-};
-
-template<typename T>
-struct is_scalar_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_scalar<T>::value               || 
-    std::is_same<rclcpp::Parameter, T>::value;
-};
-
-template<typename T>
-struct is_ros_vector_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_double_std_v<T>::value          ||
-    cnr::param::is_integer_v<T>::value             ||
-    cnr::param::is_unsigned_integer_v<T>::value    ||
-    cnr::param::is_char_v<T>::value                ||
-    cnr::param::is_unsigned_char_v<T>::value       ||
-    cnr::param::is_bool_v<T>::value                ||
-    cnr::param::is_string_v<T>::value;
-};
-
-
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr

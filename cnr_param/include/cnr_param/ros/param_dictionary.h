@@ -39,9 +39,6 @@ using AllowedParamType = std::variant<ros::double_param::c_type, ros::int_param:
 bool to_yaml(const std::string& key, const XmlRpc::XmlRpcValue& tree, YAML::Node& node, std::string& what);
 bool to_yaml(const ::cnr::param::core::ParamDictionary<XmlRpc::XmlRpcValue>& tree, YAML::Node& node, std::string& what);
 
-
-AllowedParamType as_generic(const XmlRpc::XmlRpcValue& param);
-
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr

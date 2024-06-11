@@ -57,43 +57,6 @@ void CNR_PARAM_INIT_ROS_MODULE(std::shared_ptr<::ros::NodeHandle> node);
 
 void CNR_PARAM_CLEANUP_ROS_MODULE();
 
-
-template<typename T>
-struct is_ros_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_scalar<T>::value               || 
-    cnr::param::is_double_std_v<T>::value         ||
-    cnr::param::is_integer_v<T>::value            ||
-    cnr::param::is_bool_v<T>::value               ||
-    cnr::param::is_string_v<T>::value             ||
-    cnr::param::is_string_to_scalar_map<T>::value ||
-    std::is_same<XmlRpc::XmlRpcValue, T>::value;
-};
-
-template<typename T>
-struct is_ros_scalar_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_scalar<T>::value               || 
-    cnr::param::is_string_to_scalar_map<T>::value ||
-    std::is_same<XmlRpc::XmlRpcValue, T>::value;
-};
-
-template<typename T>
-struct is_ros_vector_supported_param_type
-{
-  static constexpr bool value =  
-    cnr::param::is_double_std_v<T>::value          ||
-    cnr::param::is_integer_v<T>::value             ||
-    cnr::param::is_unsigned_integer_v<T>::value    ||
-    cnr::param::is_char_v<T>::value                ||
-    cnr::param::is_unsigned_char_v<T>::value       ||
-    cnr::param::is_bool_v<T>::value                ||
-    cnr::param::is_string_v<T>::value;
-};
-
-
 }  // namespace ros
 }  // namespace param
 }  // namespace cnr

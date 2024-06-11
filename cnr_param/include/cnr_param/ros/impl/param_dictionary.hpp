@@ -39,68 +39,6 @@ SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::bool_param);
 SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::bytes_param);
 
 
-// Alternative type for implicit conversion from XmlRpcValue::TypeDouble
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, double> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, long double> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, float> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, int32_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, int64_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, int16_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeDouble, int8_t> : std::true_type {};
-
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, int32_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, int64_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, int16_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, int8_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, double> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, long double> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeInt, float> : std::true_type {};
-
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeString, std::string> : std::true_type {};
-
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBoolean, bool> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBoolean, uint8_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBoolean, uint16_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBoolean, uint32_t> : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBoolean, uint64_t> : std::true_type {};
-
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBase64, std::vector<char> > : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBase64, std::vector<uint8_t> > : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBase64, std::vector<uint16_t> > : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBase64, std::vector<uint32_t> > : std::true_type {};
-template <> struct is_forward_implicit_conversion_allowed<XmlRpc::XmlRpcValue::TypeBase64, std::vector<uint64_t> > : std::true_type {};
-
-template<>
-inline cnr::param::ros::AllowedParamType as_generic<cnr::param::ros::AllowedParamType, XmlRpc::XmlRpcValue>(const XmlRpc::XmlRpcValue& param)
-{
-  cnr::param::ros::AllowedParamType ret;
-  switch (param.getType())
-  {
-    case XmlRpc::XmlRpcValue::TypeBoolean:
-      ret = (cnr::param::ros::bool_param::c_type)(param);
-      break;
-    case XmlRpc::XmlRpcValue::TypeInt:
-      ret = (cnr::param::ros::int_param::c_type)(int(param));
-      break;
-    case XmlRpc::XmlRpcValue::TypeDouble:
-      ret = (cnr::param::ros::double_param::c_type)(param);
-      break;
-    case XmlRpc::XmlRpcValue::TypeString:
-      ret = (cnr::param::ros::string_param::c_type)(param);
-      break;
-    case XmlRpc::XmlRpcValue::TypeBase64:
-      {
-        cnr::param::ros::bytes_param::c_type vv = param;
-        ret = vv;
-      }
-      break;
-    default:
-      return nullptr;
-  }
-  return ret;
-}
-
-
 template<>
 inline bool ParamDictionary<XmlRpc::XmlRpcValue>::is_scalar() const
 {

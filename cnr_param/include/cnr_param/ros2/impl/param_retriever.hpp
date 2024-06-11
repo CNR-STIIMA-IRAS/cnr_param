@@ -219,13 +219,13 @@ inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::set_parameter(const
     return false;
   }
 
-  if(resolved_node_name + "." + resolved_key != param.get_name() )
-  {
-    std::cerr << "Resovled Node Name: "  << resolved_node_name << std::endl;
-    std::cerr << "Resovled Key      : "  << resolved_key << std::endl;
-    std::cerr << "Param Name        : "  << param.get_name() << std::endl;
-    std::cerr << "Param Value       : "  << param.value_to_string() << std::endl;
-  }
+  // if(resolved_node_name + "." + resolved_key != param.get_name() )
+  // {
+  //   std::cerr << "Resovled Node Name: "  << resolved_node_name << std::endl;
+  //   std::cerr << "Resovled Key      : "  << resolved_key << std::endl;
+  //   std::cerr << "Param Name        : "  << param.get_name() << std::endl;
+  //   std::cerr << "Param Value       : "  << param.value_to_string() << std::endl;
+  // }
 
   if (resolved_node_name == node_->get_fully_qualified_name())// The request is for a local parameter
   {

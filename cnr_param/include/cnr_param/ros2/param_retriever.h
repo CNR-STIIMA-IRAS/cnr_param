@@ -27,14 +27,6 @@ bool init_async_params_client(const std::string& node_name, const std::shared_pt
 
 using ParamRetriever = cnr::param::core::ParamRetriever<rclcpp::Node, rclcpp::Parameter>;
 
-// bool getNodeNames(const std::shared_ptr<rclcpp::Node>& node, std::vector<std::string>& names, std::string& what);
-
-// bool resolveParamName(const std::string& key, std::string& resolved_name, std::string& what);
-
-// bool resolveNodeName(const std::shared_ptr<rclcpp::Node>& node, std::string& resolved_name, std::string& what);
-
-// std::string lintParamKey(const std::shared_ptr<rclcpp::Node>& node, const std::string& param_key);
-
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr
