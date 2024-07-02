@@ -68,7 +68,7 @@ endif()
 # DEPENDENCIES_LIBRARIES
 # ##############################################################
 list(APPEND DEPENDENCIES_INCLUDE_DIRS "${Boost_INCLUDE_DIRS}"
-     "${EIGEN3_INCLUDE_DIRS}")
+     "${EIGEN3_INCLUDE_DIRS}" "${cnr_yaml_INCLUDE_DIRS}")
 
 if(NOT BOOL:${YAML_CPP_HAS_NAMESPACE})
   list(APPEND DEPENDENCIES_INCLUDE_DIRS ${yaml-cpp_INCLUDE_DIRS})
