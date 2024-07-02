@@ -38,9 +38,9 @@ endif()
 
 # cnr_yaml
 # #####################################################################################
-find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
+find_package(cnr_yaml QUIET)
 if(NOT ${cnr_yaml_FOUND})
-  find_package(cnr_yaml REQUIRED)
+  find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
 endif()
 
 # Catkin is a fake dependency. It is used to test the cmake configuration
