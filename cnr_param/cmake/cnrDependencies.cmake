@@ -40,6 +40,7 @@ endif()
 # #####################################################################################
 find_package(cnr_yaml QUIET)
 if(NOT ${cnr_yaml_FOUND})
+  message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
   find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
 endif()
 
