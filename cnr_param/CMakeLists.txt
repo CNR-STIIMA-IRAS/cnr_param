@@ -122,7 +122,7 @@ set_target_properties(cnr_param_static
 
 # Include DIRECTORIES: include and src
 list(APPEND BUILD_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
-     "${CMAKE_CURRENT_SOURCE_DIR}/include")
+     "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include/")
 list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
      include)
 
