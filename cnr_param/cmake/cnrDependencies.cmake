@@ -46,6 +46,7 @@ endif()
 # Catkin is a fake dependency. It is used to test the cmake configuration
 # ######################
 find_package(catkin QUIET)
+message(STATUS "Catkin found: ${catkin_FOUND}")
 if(${catkin_FOUND})
   set(PACKAGE_LIB_DESTINATION "${CATKIN_PACKAGE_LIB_DESTINATION}")
   set(PACKAGE_BIN_DESTINATION "${CATKIN_PACKAGE_BIN_DESTINATION}")
