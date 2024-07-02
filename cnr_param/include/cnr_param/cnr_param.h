@@ -6,7 +6,7 @@
 
 #include <cnr_yaml/eigen.h>
 
-#include "config.h"
+#include <cnr_param/config.h>
 
 #if ROS1_MODULE == 1
 #include <cnr_param/ros/param.h>
