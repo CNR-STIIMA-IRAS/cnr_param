@@ -78,19 +78,19 @@ include(CTest REQUIRED)
 # ##############################################################################
 
 # EXECUTABLE ###############################################################
-get_target_property(cnr_param_static_location cnr_yaml::cnr_yaml_static IMPORTED_LOCATION_NOCONFIG)
-message(STATUS "cnr_param_static_location: ${cnr_param_static_location}")
+get_target_property(cnr_param_location cnr_yaml::cnr_yaml_static IMPORTED_LOCATION_NOCONFIG)
+message(STATUS "cnr_param_location: ${cnr_param_location}")
 add_executable(test_ros2_yaml_formatter
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_yaml_formatter.cpp)
                
 cnr_configure_gtest(
-  test_ros2_yaml_formatter cnr_param::cnr_param_static)
+  test_ros2_yaml_formatter cnr_param::cnr_param)
 
 # EXECUTABLE #############################################################
 add_executable(test_ros_module
                 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros_module.cpp)
 
-cnr_configure_gtest(test_ros_module cnr_param::cnr_param_static
+cnr_configure_gtest(test_ros_module cnr_param::cnr_param
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_ros_module
@@ -100,7 +100,7 @@ target_compile_definitions(test_ros_module
 add_executable(test_ros2_module
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_module.cpp)
 
-cnr_configure_gtest(test_ros2_module cnr_param::cnr_param_static
+cnr_configure_gtest(test_ros2_module cnr_param::cnr_param
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_ros2_module
@@ -111,7 +111,7 @@ target_compile_definitions(test_ros2_module
 add_executable(test_mapped_file
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mapped_file_module.cpp)
 
-cnr_configure_gtest(test_mapped_file cnr_param::cnr_param_static cnr_param::cnr_param_server_utilities
+cnr_configure_gtest(test_mapped_file cnr_param::cnr_param cnr_param::cnr_param_server_utilities
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_mapped_file
@@ -121,7 +121,7 @@ target_compile_definitions(test_mapped_file
 add_executable(test_cnr_param
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param.cpp)
 
-cnr_configure_gtest(test_cnr_param cnr_param::cnr_param_static)
+cnr_configure_gtest(test_cnr_param cnr_param::cnr_param)
 
 target_compile_definitions(test_cnr_param
                            PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
@@ -146,14 +146,14 @@ add_executable(ros2_parameters_server_node
 
 target_include_directories(ros2_parameters_server_node
                            PUBLIC ${rclcpp_INCLUDE_DIRS})
-target_link_libraries(ros2_parameters_server_node cnr_param::cnr_param_static ${rclcpp_LIBRARIES})
+target_link_libraries(ros2_parameters_server_node cnr_param::cnr_param ${rclcpp_LIBRARIES})
 
 # EXECUTABLE ###########################################################
 add_executable(ros2_parameters_client_node
                ${CMAKE_CURRENT_SOURCE_DIR}/example/ros2_parameters_client_node.cpp)
 target_include_directories(ros2_parameters_client_node
                            PUBLIC ${rclcpp_INCLUDE_DIRS})
-target_link_libraries(ros2_parameters_client_node cnr_param::cnr_param_static)
+target_link_libraries(ros2_parameters_client_node cnr_param::cnr_param)
 
 # # EXECUTABLE ###########################################################
 add_executable(mapped_file_module
