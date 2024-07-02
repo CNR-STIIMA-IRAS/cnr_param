@@ -6,48 +6,8 @@
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 
-#include <cnr_param/core/type_traits.h>
+#include <cnr_yaml/type_traits.h>
 #include <cnr_param/core/param_dictionary.h>
-
-namespace cnr
-{
-namespace param
-{
-namespace yaml
-{
-struct Value
-{
-  enum Type : uint8_t
-  {
-    FLOATING,
-    INTEGER,
-    UNSIGNED_INTEGER,
-    CHAR,
-    UNSIGNED_CHAR,
-    STRING,
-    BOOL,
-    BYTES
-  };
-};
-
-using double_param =
-    ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type, ::cnr::param::yaml::Value::Type::FLOATING, double>;
-using int_param =
-    ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type, ::cnr::param::yaml::Value::Type::INTEGER, int>;
-using uint_param = ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type,
-                                                   ::cnr::param::yaml::Value::Type::UNSIGNED_INTEGER, uint64_t>;
-using string_param = ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type,
-                                                     ::cnr::param::yaml::Value::Type::STRING, std::string>;
-using bool_param =
-    ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type, ::cnr::param::yaml::Value::Type::BOOL, bool>;
-using bytes_param = ::cnr::param::core::type_holder<::cnr::param::yaml::Value::Type,
-                                                    ::cnr::param::yaml::Value::Type::BYTES, std::vector<uint8_t>>;
-
-using AllowedParamType = std::variant<double_param::c_type, int_param::c_type, uint_param::c_type, string_param::c_type,
-                                      bool_param::c_type, bytes_param::c_type>;
-}  // namespace yaml
-}  // namespace param
-}  // namespace cnr
 
 namespace cnr
 {
@@ -55,94 +15,6 @@ namespace param
 {
 namespace core
 {
-
-// Alternative type for implicit conversion from XmlRpcValue::TypeDouble
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::double_param::c_type>
-{
-  using base = cnr::param::yaml::double_param::c_type;
-  using variant = std::variant<double, long double, float, int32_t, int64_t, int16_t, int8_t>;
-};
-
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::int_param::c_type>
-{
-  using base = cnr::param::yaml::int_param::c_type;
-  using variant = std::variant<double, long double, float, int32_t, int64_t, int16_t, int8_t>;
-};
-
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::uint_param::c_type>
-{
-  using base = cnr::param::yaml::uint_param::c_type;
-  using variant = std::variant<uint32_t, uint64_t, uint16_t, uint8_t>;
-};
-
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::string_param::c_type>
-{
-  using base = cnr::param::yaml::string_param::c_type;
-  using variant = std::variant<std::string>;
-};
-
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::bool_param::c_type>
-{
-  using base = cnr::param::yaml::bool_param::c_type;
-  using variant = std::variant<bool, uint8_t, uint16_t, uint32_t, uint64_t>;
-};
-
-template <>
-struct decoding_type_variant_holder<cnr::param::yaml::bytes_param::c_type>
-{
-  using base = cnr::param::yaml::bool_param::c_type;
-  using variant = std::variant<std::vector<uint8_t>, std::vector<unsigned char>, std::vector<uint16_t>, std::vector<uint32_t>, std::vector<uint64_t>>;
-};
-
-
-
-// Alternative type for implicit conversion from XmlRpcValue::TypeDouble
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::double_param::c_type>
-{
-  using base = cnr::param::yaml::double_param::c_type;
-  using variant = std::variant<double, long double, float>;
-};
-
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::int_param::c_type>
-{
-  using base = cnr::param::yaml::int_param::c_type;
-  using variant = std::variant<int32_t, int64_t, int16_t, int8_t>;
-};
-
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::uint_param::c_type>
-{
-  using base = cnr::param::yaml::uint_param::c_type;
-  using variant = std::variant<uint32_t, uint64_t, uint16_t, uint8_t>;
-};
-
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::string_param::c_type>
-{
-  using base = cnr::param::yaml::string_param::c_type;
-  using variant = std::variant<std::string>;
-};
-
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::bool_param::c_type>
-{
-  using base = cnr::param::yaml::bool_param::c_type;
-  using variant = std::variant<bool, unsigned char, uint8_t, uint16_t, uint32_t, uint64_t>;
-};
-
-template <>
-struct encoding_type_variant_holder<cnr::param::yaml::bytes_param::c_type>
-{
-  using base = cnr::param::yaml::bool_param::c_type;
-  using variant = std::variant<std::vector<uint16_t>, std::vector<uint32_t>, std::vector<uint64_t>>;
-};
 
 template <typename P>
 inline ParamDictionary<P>::ParamDictionary(const std::string& key) : param_({ key, ParamDictionary<P>::EmptyParam() })

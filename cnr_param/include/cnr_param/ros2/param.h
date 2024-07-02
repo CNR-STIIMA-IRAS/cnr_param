@@ -2,13 +2,12 @@
 #define CNR_PARAM__INCLUDE__CNR_PARAM__ROS2__PARAM__H
 
 #include <string>
-#include <Eigen/Core>
 #include <memory>
+#include <Eigen/Core>
 
 #include <rclcpp/node.hpp>
 #include <rclcpp/parameter.hpp>
 
-#include <cnr_param/core/param.h>
 #include <cnr_param/ros2/param_retriever.h>
 
 namespace cnr 
@@ -62,6 +61,7 @@ void CNR_PARAM_INIT_ROS2_MODULE(std::shared_ptr<rclcpp::Node>& node);
 void CNR_PARAM_CLEANUP_ROS2_MODULE();
 
 std::shared_ptr<rclcpp::Node>& background_node();
+
 std::shared_ptr<ParamRetriever>& param_retriever();
 
 }  // namespace ros2

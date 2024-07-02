@@ -11,6 +11,8 @@
 #include <rclcpp/parameter_value.hpp>
 #include <rclcpp/parameter_client.hpp>
 
+#include <cnr_yaml/string.h>
+
 #include <cnr_param/ros2/param_retriever.h>
 #include <cnr_param/ros2/impl/param_dictionary.hpp>
 
@@ -25,7 +27,7 @@ template <>
 inline std::string lintParamKey<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>&, const std::string& param_key)
 {
   std::string ret = param_key;
-  if(ret.front() == '/' || ret.front() == '.')
+  if (ret.front() == '/' || ret.front() == '.')
   {
     ret.erase(0, 1);
   }
@@ -33,11 +35,11 @@ inline std::string lintParamKey<rclcpp::Node>(const std::shared_ptr<rclcpp::Node
   return ret;
 }
 
-
 template <>
-inline bool getNodeNames<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, std::vector<std::string>& names, std::string&)
+inline bool getNodeNames<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, std::vector<std::string>& names,
+                                       std::string&)
 {
-  if(node)
+  if (node)
   {
     names = node->get_node_graph_interface()->get_node_names();
     return names.size();
@@ -46,28 +48,28 @@ inline bool getNodeNames<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node
 }
 
 template <>
-inline bool resolveParamName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, const std::string& ns, 
-  std::string& node_name, std::string& resolved_key, std::string& what)
+inline bool resolveParamName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& node, const std::string& ns,
+                                           std::string& node_name, std::string& resolved_key, std::string& what)
 {
   std::string _nn = node->get_fully_qualified_name();
   resolved_key = ns;
-  if(resolved_key.find(_nn) == 0)
+  if (resolved_key.find(_nn) == 0)
   {
     node_name = _nn;
     resolved_key.erase(0, _nn.size());
     resolved_key = lintParamKey(node, resolved_key);
     return true;
   }
-  
+
   std::vector<std::string> _nnn;
-  if(!getNodeNames<rclcpp::Node>(node, _nnn, what))
+  if (!getNodeNames<rclcpp::Node>(node, _nnn, what))
   {
     return false;
   }
 
-  for(const auto & nn : _nnn)
+  for (const auto& nn : _nnn)
   {
-    if(resolved_key.find(nn) == 0)
+    if (resolved_key.find(nn) == 0)
     {
       node_name = nn;
       resolved_key.erase(0, nn.size());
@@ -80,7 +82,8 @@ inline bool resolveParamName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& 
 }
 
 template <>
-inline bool resolveNodeName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& n, std::string& resolved_name, std::string&)
+inline bool resolveNodeName<rclcpp::Node>(const std::shared_ptr<rclcpp::Node>& n, std::string& resolved_name,
+                                          std::string&)
 {
   resolved_name = n->get_fully_qualified_name();
   return true;
@@ -98,14 +101,13 @@ inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::list_parameters(con
     return false;
   }
 
-  if (node_name == node_->get_fully_qualified_name())// The request is for a local parameter
+  if (node_name == node_->get_fully_qualified_name())  // The request is for a local parameter
   {
     auto list = node_->list_parameters(keys, 1000);
     parameter_names = list.names;
   }
   else
   {
-
     auto list = cnr::param::ros2::parameters_client()[node_name]->list_parameters(keys, 1000);
     std::chrono::milliseconds span(5000);
     if (list.wait_for(span) != std::future_status::ready)
@@ -209,11 +211,13 @@ inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::retrieve_parameters
   return value_found;
 }
 
-
-template<>
-inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::set_parameter(const std::string& resolved_node_name, const std::string& resolved_key, const rclcpp::Parameter& param, std::string& what)
+template <>
+inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::set_parameter(const std::string& resolved_node_name,
+                                                                           const std::string&,
+                                                                           const rclcpp::Parameter& param,
+                                                                           std::string& what)
 {
-   if (!cnr::param::ros2::init_async_params_client(resolved_node_name, node_))
+  if (!cnr::param::ros2::init_async_params_client(resolved_node_name, node_))
   {
     what = "there has been a failure in the initialization of the param retriver for node '" + resolved_node_name + "'";
     return false;
@@ -227,13 +231,13 @@ inline bool ParamRetriever<rclcpp::Node, rclcpp::Parameter>::set_parameter(const
   //   std::cerr << "Param Value       : "  << param.value_to_string() << std::endl;
   // }
 
-  if (resolved_node_name == node_->get_fully_qualified_name())// The request is for a local parameter
+  if (resolved_node_name == node_->get_fully_qualified_name())  // The request is for a local parameter
   {
     node_->set_parameter(param);
   }
   else
   {
-    auto list = cnr::param::ros2::parameters_client()[resolved_node_name]->set_parameters({param});
+    auto list = cnr::param::ros2::parameters_client()[resolved_node_name]->set_parameters({ param });
     std::chrono::milliseconds span(5000);
     if (list.wait_for(span) != std::future_status::ready)
     {

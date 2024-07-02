@@ -5,6 +5,7 @@ A package to read and write parameters for your C++ application.
 ## The Design
 
 ### User Functions
+
 The package provides a unique interface to get and set parameters that are stored in different databases.
 
 The core is the file [cnr_param.[h](./include/cnr_param/cnr_param.h), which should be the only header file included by the user.
@@ -46,6 +47,7 @@ The already supported types are:
 * Vectors of vectors of all the types of the `rclcpp::Parameter`  (e.g. `std::vector<std::vector<double>>`, `std::vector<std::vector<string>>`  etc. )
 
 * `Eigen` matrixes (both with static and dynamic dimensions). For example: 
+
 ```cpp
 std::string what;
 Eigen::VectorXd value;
@@ -53,6 +55,7 @@ bool ok = cnr::param::get("/[namespaces / if present]/node_name/a/b/c/d", value,
 ```
 
 * `YAML::Node`: This is useful if you want to extract part of your parameters as a whole. For example:
+
 ```cpp
 std::string what;
 YAML::Node value;
@@ -60,6 +63,7 @@ bool ok = cnr::param::get("/[namespaces / if present]/node_name/a/b/c/d", value,
 ```
 
 * complex type, like a dictionary or sequences of dictionaries. To extract properly a complex type, you must specialize your `template`<typename T> get_map(const YAML::Node& node, ComplexType& ret, std::string& what)` ([that is in this file](./include/cnr_param/core/param.h)). Here an example:
+
 ```cpp
 struct ComplexType
 {
@@ -92,6 +96,7 @@ bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what)
 ```
 
 Once you have defined your specialization you can call:
+
 ```cpp
 std::string what;
 ComplexType value;
@@ -135,8 +140,8 @@ Once the `my_node` is configured, the module can look at the node parameters, an
 
 ### Formatting the ROS 2 YAML files
 
-As well know, ROS 2 does not support all the yaml types. Specifically, it does not allow to have a sequence of sequences or dictionaries. 
-To turn yaml file into a ROS 2 yaml file, the package just provides a formatter.
+As well know, ROS 2 does not support all the YAML types. Specifically, it does not allow to have a sequence of sequences or dictionaries.
+To turn a YAML file into a ROS 2 YAML file, the package just provides a formatter.
 
 ```bash
 Usage: ./ros2_yaml_converter [-t [ --to-ros2-format ] str] [-f [ --from-ros2-format ] str] [-o [ --output-filenames ] str] [-v [ --version ] ] [-h [ --help ] ]
@@ -153,6 +158,7 @@ Generic options:
 ```
 
 For example
+
 ```yaml
 n1:
   - ["s11","s12","s13"]
@@ -160,7 +166,7 @@ n1:
   - ["s31","s32","s33"]
 ```
 
-is formatted as 
+is formatted as
 
 ```yaml
 /**:
@@ -198,26 +204,34 @@ The mapping of the file creates a shared memory mapped on the hard drive under a
 ### Adding parameters to the database
 
 The basic way to load parameters is using this command from the terminal:
-```
+
+```bash
 cnr_param_server -p path-to-file
 ```
+
 To get help and see available options, type:
-```
+
+```bash
 cnr_param_server -h
 ```
-By default, the parameters are saved in the 'cnr_param' folder located within the operating system's temporary folder (e.g., '/tmp' on Linux/Unix/Mac, or a designated temp folder on Windows). 
+
+By default, the parameters are saved in the 'cnr_param' folder located within the operating system's temporary folder (e.g., '/tmp' on Linux/Unix/Mac, or a designated temp folder on Windows).
 You can choose another directory for storing your parameters by setting the `CNR_PARAM_ROOT_DIRECTORY` environment variable.
 
-##### Linux/Unix/Mac
+#### Linux/Unix/Mac
+
 Open your terminal and set the `CNR_PARAM_ROOT_DIRECTORY` environment variable by executing:
+
 ```bash
 export CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 ```
+
 Add this line to your .bashrc, .zshrc, or equivalent shell configuration file to make the change permanent.
 
-##### Windows
+#### Windows
+
 Open Command Prompt and set the `CNR_PARAM_ROOT_DIRECTORY` environment variable by executing:
+
 ```bash
 set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 ```
-

@@ -12,9 +12,10 @@
 
 #include <boost/interprocess/detail/os_file_functions.hpp>
 
+#include <cnr_yaml/eigen.h>
+
 #include <cnr_param/cnr_param.h>
 #include <cnr_param/core/string.h>
-#include <cnr_param/core/eigen.h>
 
 #include <cnr_param/mapped_file/args_parser.h>
 #include <cnr_param/mapped_file/yaml_parser.h>
@@ -61,54 +62,54 @@ struct convert<ComplexType>
 };
 }  // namespace YAML
 
-namespace cnr
-{
-namespace param
-{
-namespace core
-{
-template <>
-bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool&)
-{
-  try
-  {
-    if (node["name"] && node["value"])
-    {
-      ret.name = node["name"].as<std::string>();
-      ret.value = node["value"].as<double>();
-      return true;
-    }
-  }
-  catch (YAML::Exception& e)
-  {
-    std::stringstream err;
-    err << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "YAML Exception, Error in the extraction of an object of type '"
-        << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-        << "Node: " << std::endl
-        << node << std::endl
-        << "What: " << std::endl
-        << e.what() << std::endl;
-    what = err.str();
-  }
-  catch (std::exception& e)
-  {
-    std::stringstream err;
-    err << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-        << "Exception, Error in the extraction of an object of type '"
-        << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-        << "Node: " << std::endl
-        << node << std::endl
-        << "What: " << std::endl
-        << e.what() << std::endl;
-    what = err.str();
-  }
-  return false;
-}
+// namespace cnr
+// {
+// namespace param
+// {
+// namespace core
+// {
+// template <>
+// bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool&)
+// {
+//   try
+//   {
+//     if (node["name"] && node["value"])
+//     {
+//       ret.name = node["name"].as<std::string>();
+//       ret.value = node["value"].as<double>();
+//       return true;
+//     }
+//   }
+//   catch (YAML::Exception& e)
+//   {
+//     std::stringstream err;
+//     err << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+//         << "YAML Exception, Error in the extraction of an object of type '"
+//         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+//         << "Node: " << std::endl
+//         << node << std::endl
+//         << "What: " << std::endl
+//         << e.what() << std::endl;
+//     what = err.str();
+//   }
+//   catch (std::exception& e)
+//   {
+//     std::stringstream err;
+//     err << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+//         << "Exception, Error in the extraction of an object of type '"
+//         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+//         << "Node: " << std::endl
+//         << node << std::endl
+//         << "What: " << std::endl
+//         << e.what() << std::endl;
+//     what = err.str();
+//   }
+//   return false;
+// }
 
-}  // namespace core
-}  // namespace param
-}  // namespace cnr
+// }  // namespace core
+// }  // namespace param
+// }  // namespace cnr
 
 namespace std
 {

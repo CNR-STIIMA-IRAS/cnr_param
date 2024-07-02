@@ -10,12 +10,42 @@
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/interprocess/managed_mapped_file.hpp>
 
+#include <cnr_yaml/node_utils.h>
+
 #include <cnr_param/core/string.h>
 #include <cnr_param/core/filesystem.h>
-#include <cnr_param/core/yaml.h>
+
 #include <cnr_param/mapped_file/interprocess.h>
 #include <cnr_param/mapped_file/yaml_manager.h>
 
+
+/**
+ * @brief
+ *
+ * @param root
+ * @return std::map<std::string, std::vector<std::string> >
+ */
+std::map<std::string, std::vector<std::string>> toLeafMap(const YAML::Node& root)
+{
+  std::map<std::string, std::vector<std::string>> tree;  // mapped file names;
+  std::vector<std::string> fns;                          // mapped file names;
+  fns.reserve(1000000);
+  cnr::yaml::get_keys_tree("", root, fns);
+
+  std::sort(fns.begin(), fns.end(), [](std::string a, std::string b) { return a < b; });
+  fns.erase(std::unique(fns.begin(), fns.end()), fns.end());
+  for (const auto& fn : fns)
+  {
+    std::vector<std::string> pp = cnr::param::core::tokenize(fn, "/");
+    boost::filesystem::path path;
+    for (size_t i = 0; i < pp.size() - 1; i++)
+    {
+      path = path / pp.at(i);
+    }
+    tree[path.string()].push_back(pp.back());
+  }
+  return tree;
+}
 
 namespace cnr
 {
@@ -49,7 +79,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
 {
   boost::filesystem::path absolute_root_path(absolute_root_path_string); 
 
-  std::map<std::string, std::vector<std::string> > tree = cnr::param::core::toLeafMap(root_); //mapped file names;
+  std::map<std::string, std::vector<std::string> > tree = toLeafMap(root_); //mapped file names;
 
   for(const auto & leaf : tree)
   {
@@ -66,7 +96,7 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
         l = __LINE__;
         
         auto keys = cnr::param::core::tokenize(rp.string(), "/");
-        auto node = cnr::param::core::get_leaf(keys, root_);
+        auto node = cnr::yaml::get_leaf(keys, root_);
         std::string str = YAML::Dump(node);
 
         l = __LINE__;
@@ -106,7 +136,7 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
 {
   boost::filesystem::path absolute_root_path(absolute_root_path_string); 
 
-  std::vector<std::pair<std::string,YAML::Node>> tree = cnr::param::core::toNodeList(root_); //mapped file names;
+  std::vector<std::pair<std::string,YAML::Node>> tree = cnr::yaml::toNodeList(root_); //mapped file names;
 
   for(const auto & node : tree)
   {

@@ -119,17 +119,6 @@ std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
 std::string param_root_directory;
 const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path();
 
-// ====================================================================================================================
-// === HelloTest, BasicAssertions =====================================================================================
-// ====================================================================================================================
-TEST(MappedFileModule, BasicAssertions)
-{
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
-}
-
 template<typename T>
 bool call(const std::string& key, T& value)
 {
@@ -139,7 +128,7 @@ bool call(const std::string& key, T& value)
     std::cerr << "What: " << what << std::endl;
     return false;
   }
-  std::cout << key << " => " << std::to_string(value) << std::endl;
+  std::cout << key << " => '" << std::to_string(value) << "'" << std::endl;
   return true;
 }
 
@@ -178,6 +167,8 @@ TEST(MappedFileModule, ServerUsage)
   // The tree is build under the 'param_root_directory'
 
   EXPECT_TRUE(does_not_throw([&] { yaml_streamer = new cnr::param::mapped_file::YAMLStreamer(yaml_parser->root(), param_root_directory); }));
+
+  std::cout << "The mapped files are under the directory: " << param_root_directory << std::endl;
 
   EXPECT_TRUE(yaml_parser);
 
@@ -258,7 +249,7 @@ TEST(MappedFileModule, DeveloperFunctions)
     }
 
     YAML::Node leaf;
-    EXECUTION_TIME(ok = cnr::param::core::get_leaf(root, leaf_key, leaf, what);)
+    EXECUTION_TIME(ok = cnr::yaml::get_leaf(root, leaf_key, leaf, what);)
     return ok;
   };
 
@@ -336,54 +327,54 @@ struct convert<ComplexType>
 }  // namespace YAML
 
 
-namespace cnr
-{
-namespace param
-{
-namespace core
-{
-template <>
-bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool& )
-{
-  try
-  {
-    if (node["name"] && node["value"])
-    {
-      ret.name = node["name"].as<std::string>();
-      ret.value = node["value"].as<double>();
-      return true;
-    }
-  }
-  catch (YAML::Exception& e)
-  {
-    std::stringstream err;
-    err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-         << "YAML Exception, Error in the extraction of an object of type '"
-         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-         << "Node: " << std::endl
-         << node << std::endl
-         << "What: " << std::endl
-         << e.what() << std::endl;
-    what = err.str();
-  }
-  catch (std::exception& e)
-  {
-    std::stringstream err;
-    err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-         << "Exception, Error in the extraction of an object of type '"
-         << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-         << "Node: " << std::endl
-         << node << std::endl
-         << "What: " << std::endl
-         << e.what() << std::endl;
-    what = err.str();
-  }
-  return false;
-}
+// namespace cnr
+// {
+// namespace param
+// {
+// namespace core
+// {
+// template <>
+// bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool& )
+// {
+//   try
+//   {
+//     if (node["name"] && node["value"])
+//     {
+//       ret.name = node["name"].as<std::string>();
+//       ret.value = node["value"].as<double>();
+//       return true;
+//     }
+//   }
+//   catch (YAML::Exception& e)
+//   {
+//     std::stringstream err;
+//     err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+//          << "YAML Exception, Error in the extraction of an object of type '"
+//          << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+//          << "Node: " << std::endl
+//          << node << std::endl
+//          << "What: " << std::endl
+//          << e.what() << std::endl;
+//     what = err.str();
+//   }
+//   catch (std::exception& e)
+//   {
+//     std::stringstream err;
+//     err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
+//          << "Exception, Error in the extraction of an object of type '"
+//          << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
+//          << "Node: " << std::endl
+//          << node << std::endl
+//          << "What: " << std::endl
+//          << e.what() << std::endl;
+//     what = err.str();
+//   }
+//   return false;
+// }
 
-}  // namespace core
-}  // namespace param
-}  // namespace cnr
+// }  // namespace core
+// }  // namespace param
+// }  // namespace cnr
 
 TEST(MappedFileModule, GetComplexType)
 {

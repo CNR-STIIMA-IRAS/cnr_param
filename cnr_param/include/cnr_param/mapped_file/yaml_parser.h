@@ -5,11 +5,6 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-#include <cnr_param/core/visibility_control.h>
-
-#include <string>
-
-
 namespace cnr
 {
 namespace param

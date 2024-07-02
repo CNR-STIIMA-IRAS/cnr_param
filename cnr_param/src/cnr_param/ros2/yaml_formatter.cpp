@@ -2,6 +2,7 @@
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/type.h>
 
+#include <cnr_yaml/string.h>
 #include <cnr_param/core/string.h>
 #include <cnr_param/ros2/yaml_formatter.h>
 

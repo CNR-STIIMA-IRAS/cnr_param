@@ -4,20 +4,16 @@
 #  cnr_param_LIBRARIES    - libraries to link against
 #  cnr_param_EXECUTABLE   - the bar executable
 
-set(cnr_param_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 set(cnr_param_ROS2_MODULE @ROS2_MODULE_COMPILED@)
 set(cnr_param_ROS1_MODULE @ROS1_MODULE_COMPILED@)
 set(cnr_param_MAPPED_FILE @MAPPED_FILE_MODULE_COMPILED@)
 
 include(CMakeFindDependencyMacro)
-find_dependency(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
-find_dependency(yaml-cpp REQUIRED)
-find_dependency(Eigen3 REQUIRED COMPONENTS Core Geometry)
 
-find_dependency(yaml-cpp REQUIRED)
-if(yaml-cpp VERSION_LESS "0.8")
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(yaml-cpp_pkg_config REQUIRED yaml-cpp IMPORTED_TARGET)
+# cnr_yaml #####################################################################################
+find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
+if(NOT ${cnr_yaml_FOUND})
+  find_package(cnr_yaml REQUIRED)
 endif()
 
 if(${cnr_param_ROS1_MODULE} EQUAL 1)
@@ -34,8 +30,22 @@ if(${cnr_param_ROS2_MODULE} EQUAL 1)
 endif()
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
-set(cnr_param_LIBRARIES @EXPORTED_LIBRARY_TARGETS_LIST@)
-set(cnr_param_EXECUTABLES @EXPORTED_EXECUTABLE_TARGETS_LIST@)
+set(cnr_param_INCLUDE_DIRS "@PACKAGE_INCLUDE_DESTINATION@")
+set(cnr_param_LIBRARIES    @EXPORTED_LIBRARY_TARGETS_LIST@)
+set(cnr_param_EXECUTABLES  @EXPORTED_EXECUTABLE_TARGETS_LIST@)
+set(cnr_param_RPATH       "@EXPORTED_LIBRARY_TARGET_RPATH@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramTargets.cmake")
+
+set_target_properties(cnr_param::cnr_param PROPERTIES
+  IMPORTED_LOCATION_NOCONFIG "${cnr_param_TARGET_LINK_DIRECTORIES}/libcnr_yaml.so"
+  BUILD_RPATH "${cnr_param_RPATH}"
+  INSTALL_RPATH "${cnr_param_RPATH}"
+)
+
+set_target_properties(cnr_param::cnr_param_static PROPERTIES
+  IMPORTED_LOCATION_NOCONFIG "${cnr_param_TARGET_LINK_DIRECTORIES}/libcnr_yaml.a"
+  BUILD_RPATH "${cnr_param_RPATH}"
+  INSTALL_RPATH "${cnr_param_RPATH}"
+)

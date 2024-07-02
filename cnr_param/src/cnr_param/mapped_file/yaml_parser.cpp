@@ -2,10 +2,10 @@
 #include <map>
 #include <vector>
 
+#include <cnr_yaml/node_utils.h>
 
 #include <cnr_param/mapped_file/yaml_parser.h>
 #include <cnr_param/core/string.h>
-#include <cnr_param/core/yaml.h>
 
 namespace cnr
 {
@@ -33,8 +33,8 @@ YAMLParser::YAMLParser(const std::map<std::string, std::vector<std::string> >& n
       
       for(const auto & node : nodes) 
       {
-        YAML::Node new_node = cnr::param::core::init_tree(ns, node);
-        root_=cnr::param::core::merge_nodes(root_, new_node);
+        YAML::Node new_node = cnr::yaml::init_tree(ns, node);
+        root_=cnr::yaml::merge_nodes(root_, new_node);
       }
     }
   }

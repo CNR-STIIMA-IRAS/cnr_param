@@ -117,12 +117,16 @@ TEST(ROS2Module, Initialization)
 };
 
 template<typename T>
-bool call(const std::string& key, T& value)
+bool call(const std::string& key, T& value, bool implicit_cast = true)
 {
   std::string what;
-  bool implicit_cast = true;
   bool ok = false;
   EXECUTION_TIME(key, ok = cnr::param::ros2::get("/"+server_node_name+"/"+key, value, what, implicit_cast); );
+  if(!ok)
+  {
+    std::cerr << "What: " << what << std::endl;
+    return false;
+  }
   return ok;
 }
 
@@ -135,6 +139,25 @@ bool send(const std::string& key, T& value)
   return ok;
 }
 
+namespace cnr { 
+namespace yaml 
+{
+template <>
+struct decoding_type_variant_holder<int>
+{
+  using base = int;
+  using variant = std::variant<int32_t, int64_t, int16_t, int8_t, double, long double, float>;
+};
+
+template <>
+struct decoding_type_variant_holder<double>
+{
+  using base = int;
+  using variant = std::variant<double, long double, float, int32_t, int64_t, int16_t, int8_t>;
+};
+
+}
+}
 
 TEST(ROS2Module, ClientUsageBasicTypes)
 {
@@ -154,7 +177,8 @@ TEST(ROS2Module, ClientUsageBasicTypes)
   EXPECT_TRUE(call("int_array", v_int));
   EXPECT_TRUE(v_int.size() == 4 && v_int[0] == 10 && v_int[1] == 11 && v_int[2] == 12 && v_int[3] == 13);
 
-  EXPECT_TRUE(call("int_array_2", v_int));
+  EXPECT_FALSE(call("int_array_2", v_int, false));
+  EXPECT_TRUE (call("int_array_2", v_int, true));
   EXPECT_TRUE(v_int.size() == 4 && v_int[0] == 10 && v_int[1] == 11 && v_int[2] == 12 && v_int[3] == 13);
 
   int val_int = 0;
@@ -242,7 +266,7 @@ TEST(ROS2Module, ClientUsageSetBasicTypes)
   EXPECT_TRUE(send("bvalue", val_bool));
   EXPECT_TRUE(val_bool);
 
-  std::vector<uint8_t> v_bytes{0x01, 0xF, 0x1A};
+  std::vector<uint16_t> v_bytes{0x01, 0xF, 0x1A};
   EXPECT_TRUE(send("by_array", v_bytes));
   EXPECT_TRUE(call("by_array", v_bytes));
   EXPECT_TRUE(v_bytes.size() == 3 && v_bytes[0] == 0x01 && v_bytes[1] == 0xF && v_bytes[2] == 0x1A);

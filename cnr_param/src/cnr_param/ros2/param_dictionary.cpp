@@ -2,6 +2,8 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
+#include <cnr_yaml/cnr_yaml.h>
+
 #include <cnr_param/core/string.h>
 #include <cnr_param/core/param_dictionary.h>
 #include <cnr_param/ros2/param_dictionary.h>

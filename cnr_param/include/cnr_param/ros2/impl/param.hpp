@@ -12,17 +12,15 @@
 
 #include <rclcpp/node.hpp>
 
-#include <cnr_param/core/string.h>
-#include <cnr_param/core/eigen.h>
-#include <cnr_param/core/yaml.h>
+#include <cnr_yaml/cnr_yaml.h>
 
+#include <cnr_param/core/string.h>
 #include <cnr_param/ros2/param.h>
 #include <cnr_param/ros2/param_retriever.h>
 #include <cnr_param/ros2/param_retriever.h>
 #include <cnr_param/ros2/yaml_formatter.h>
 
 #include <boost/algorithm/string/classification.hpp>  // Include boost::for is_any_of
-#include "cnr_param/core/impl/param_sequence.hpp"
 #include "cnr_param/ros2/param_dictionary.h"
 #include "rclcpp/parameter_value.hpp"
 
@@ -134,7 +132,7 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
   // ========================================================================
 
   YAML::Node uncrustified_value = uncrustified_node.begin()->second;
-  return cnr::param::core::get(uncrustified_value, ret, what, implicit_cast_if_possible);
+  return cnr::yaml::get(uncrustified_value, ret, what, implicit_cast_if_possible);
 }
 
 template <typename T>
@@ -153,7 +151,7 @@ bool set(const std::string& key, const T& value, std::string& what)
   }
 
   YAML::Node leaf;
-  if (!cnr::param::core::set(value, leaf, what))
+  if (!cnr::yaml::set(value, leaf, what))
   {
     return false;
   }
@@ -172,7 +170,7 @@ bool set(const std::string& key, const T& value, std::string& what)
     ll = __LINE__;
     std::vector<std::pair<std::string, YAML::Node>> param_tree;
     ll = __LINE__;
-    cnr::param::core::get_nodes_tree("/", crusted_node, param_tree);
+    cnr::yaml::get_nodes_tree("/", crusted_node, param_tree);
     ll = __LINE__;
     for (const auto& param : param_tree)
     {

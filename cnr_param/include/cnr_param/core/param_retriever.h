@@ -6,7 +6,7 @@
 #include <Eigen/Core>
 #include <yaml-cpp/yaml.h>
 
-#include <cnr_param/core/type_traits.h>
+#include <cnr_yaml/type_traits.h>
 #include <cnr_param/core/param_dictionary.h>
 
 namespace cnr

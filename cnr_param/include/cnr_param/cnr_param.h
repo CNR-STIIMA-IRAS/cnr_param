@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include <cnr_yaml/eigen.h>
+
 #include "config.h"
 
 #if ROS1_MODULE == 1
@@ -167,7 +169,7 @@ inline bool get(const std::string& key, T& value, std::string& what, const T& de
   if (!get(key, value, what, implicit_cast_if_possible, module))
   {
     what = (what.size() ? (what + "\n") : std::string("") ) + "Try to superimpose default value...";
-    if (!core::resize(value, default_val))
+    if (!cnr::yaml::resize(value, default_val))
     {
       what += " Error!";
       return false;

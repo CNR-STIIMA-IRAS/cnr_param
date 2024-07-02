@@ -11,11 +11,10 @@
 #include <boost/interprocess/managed_mapped_file.hpp>
 #include <boost/type_index.hpp>
 
+#include <cnr_yaml/cnr_yaml.h>
+
 #include <cnr_param/core/string.h>
-#include <cnr_param/core/eigen.h>
 #include <cnr_param/core/filesystem.h>
-#include <cnr_param/core/yaml.h>
-#include <cnr_param/core/param.h>
 
 #include <cnr_param/mapped_file/interprocess.h>
 #include <cnr_param/mapped_file/param.h>
@@ -154,8 +153,7 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
   {
     return false;
   }
-
-  return cnr::param::core::get(node, ret, what, implicit_cast_if_possible);
+  return cnr::yaml::get(node, ret, what, implicit_cast_if_possible);
 }
 
 template<typename T>

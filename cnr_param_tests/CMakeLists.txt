@@ -13,6 +13,18 @@ project(
   LANGUAGES CXX)
 
 cnr_set_flags()
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+ 
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+ 
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 # ##############################################################################
 # END - PRELIMINARIES     ##
 # ##############################################################################
@@ -20,6 +32,12 @@ cnr_set_flags()
 # ##############################################################################
 # DEPENDENCIES            ##
 # ##############################################################################
+find_package(cnr_yaml QUIET)
+if(NOT ${cnr_yaml_FOUND})
+  message("Check alternative path: ${CMAKE_INSTALL_PREFIX}/..")
+  find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)  
+endif()
+
 if("$ENV{ROS_VERSION}" STREQUAL "1")
   find_package(catkin REQUIRED)
   find_package(cnr_param REQUIRED)
@@ -33,13 +51,24 @@ endif()
 
 
 
+## Catkin is a fake dependency. It is used to test the cmake configuration
+if(${catkin_FOUND})
+  set(PACKAGE_LIB_DESTINATION     "${CATKIN_PACKAGE_LIB_DESTINATION}")
+  set(PACKAGE_BIN_DESTINATION     "${CATKIN_PACKAGE_BIN_DESTINATION}")
+  set(PACKAGE_INCLUDE_DESTINATION "${CATKIN_PACKAGE_INCLUDE_DESTINATION}")
+  set(CONFIG_INSTALL_DIR           "share/${PROJECT_NAME}/cmake_alternative")
+else()
+  set(PACKAGE_LIB_DESTINATION      "${CMAKE_INSTALL_PREFIX}/lib")
+  set(PACKAGE_BIN_DESTINATION      "${CMAKE_INSTALL_PREFIX}/bin")
+  set(PACKAGE_INCLUDE_DESTINATION  "${CMAKE_INSTALL_PREFIX}/include")
+  set(CONFIG_INSTALL_DIR           "share/${PROJECT_NAME}/cmake")
+endif()
+
 find_package(GTest REQUIRED)
 include(GoogleTest)
 enable_testing()
 include(CTest REQUIRED)
 
-cnr_install_directories(CNR_INSTALL_INCLUDE_DIR CNR_INSTALL_LIB_DIR
-                        CNR_INSTALL_BIN_DIR CNR_INSTALL_SHARE_DIR)
 # ##############################################################################
 # END DEPENDANCIES        ##
 # ##############################################################################
@@ -49,17 +78,19 @@ cnr_install_directories(CNR_INSTALL_INCLUDE_DIR CNR_INSTALL_LIB_DIR
 # ##############################################################################
 
 # EXECUTABLE ###############################################################
+get_target_property(cnr_param_static_location cnr_yaml::cnr_yaml_static IMPORTED_LOCATION_NOCONFIG)
+message(STATUS "cnr_param_static_location: ${cnr_param_static_location}")
 add_executable(test_ros2_yaml_formatter
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_yaml_formatter.cpp)
-
+               
 cnr_configure_gtest(
-  test_ros2_yaml_formatter cnr_param::cnr_param)
+  test_ros2_yaml_formatter cnr_param::cnr_param_static)
 
 # EXECUTABLE #############################################################
 add_executable(test_ros_module
-               ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros_module.cpp)
+                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros_module.cpp)
 
-cnr_configure_gtest(test_ros_module cnr_param::cnr_param
+cnr_configure_gtest(test_ros_module cnr_param::cnr_param_static
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_ros_module
@@ -69,7 +100,7 @@ target_compile_definitions(test_ros_module
 add_executable(test_ros2_module
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_module.cpp)
 
-cnr_configure_gtest(test_ros2_module cnr_param::cnr_param
+cnr_configure_gtest(test_ros2_module cnr_param::cnr_param_static
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_ros2_module
@@ -80,7 +111,7 @@ target_compile_definitions(test_ros2_module
 add_executable(test_mapped_file
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mapped_file_module.cpp)
 
-cnr_configure_gtest(test_mapped_file cnr_param::cnr_param cnr_param::cnr_param_server_utilities
+cnr_configure_gtest(test_mapped_file cnr_param::cnr_param_static cnr_param::cnr_param_server_utilities
                     ${CMAKE_CURRENT_SOURCE_DIR}/include include)
 
 target_compile_definitions(test_mapped_file
@@ -90,8 +121,7 @@ target_compile_definitions(test_mapped_file
 add_executable(test_cnr_param
                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param.cpp)
 
-cnr_configure_gtest(test_cnr_param cnr_param::cnr_param
-                    ${CMAKE_CURRENT_SOURCE_DIR}/include include)
+cnr_configure_gtest(test_cnr_param cnr_param::cnr_param_static)
 
 target_compile_definitions(test_cnr_param
                            PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
@@ -100,9 +130,8 @@ list(APPEND TARGETS_LIST
   test_ros2_yaml_formatter
   test_ros2_module
   test_mapped_file
-  # test_cnr_param
+  test_cnr_param
 )
-
 # ##############################################################################
 # GOOGLE TESTS
 # ##############################################################################
@@ -117,26 +146,27 @@ add_executable(ros2_parameters_server_node
 
 target_include_directories(ros2_parameters_server_node
                            PUBLIC ${rclcpp_INCLUDE_DIRS})
-target_link_libraries(ros2_parameters_server_node cnr_param::cnr_param ${rclcpp_LIBRARIES})
+target_link_libraries(ros2_parameters_server_node cnr_param::cnr_param_static ${rclcpp_LIBRARIES})
 
 # EXECUTABLE ###########################################################
 add_executable(ros2_parameters_client_node
                ${CMAKE_CURRENT_SOURCE_DIR}/example/ros2_parameters_client_node.cpp)
 target_include_directories(ros2_parameters_client_node
                            PUBLIC ${rclcpp_INCLUDE_DIRS})
-target_link_libraries(ros2_parameters_client_node cnr_param::cnr_param)
+target_link_libraries(ros2_parameters_client_node cnr_param::cnr_param_static)
 
-# EXECUTABLE ###########################################################
+# # EXECUTABLE ###########################################################
 add_executable(mapped_file_module
                ${CMAKE_CURRENT_SOURCE_DIR}/example/mapped_file_module.cpp)
 target_compile_definitions(mapped_file_module
                PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
-target_link_libraries(mapped_file_module cnr_param::cnr_param)
+
+target_link_libraries(mapped_file_module cnr_yaml::cnr_yaml cnr_param::cnr_param)
 
 list(APPEND TARGETS_LIST 
   ros2_parameters_server_node
   ros2_parameters_client_node
-  mapped_file_module)
+   mapped_file_module)
 # ##############################################################################
 # END EXAMPLE
 # ##############################################################################
@@ -145,20 +175,14 @@ list(APPEND TARGETS_LIST
 # INSTALL         ##
 # ##############################################################################
 list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-if(USE_ROS1)
-  cnr_install_catkin_policy()
-else()
-  set(PROJECT_VERSION 1.0.0)
-  cnr_install_cmake_policy(
-    ${CNR_INSTALL_INCLUDE_DIR}
-    ${CNR_INSTALL_LIB_DIR}
-    ${CNR_INSTALL_BIN_DIR}
-    ${extracted_version}
-    "${TARGETS_LIST}"
-    ${HEADERS_DIRS}
-    launch
-    config)
-endif()
+
+cnr_install(
+  ${extracted_version}
+  "${TARGETS_LIST}"
+  ${HEADERS_DIRS}
+  launch
+  config
+)
 
 install(
   PROGRAMS

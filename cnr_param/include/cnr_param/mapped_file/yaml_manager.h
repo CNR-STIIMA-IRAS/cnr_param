@@ -1,13 +1,8 @@
 #ifndef CNR_PARAM__INCLUDE__CNR_PARAM__MAPPED_FILE__YAML_MANAGER_H
 #define CNR_PARAM__INCLUDE__CNR_PARAM__MAPPED_FILE__YAML_MANAGER_H
 
-#include <vector>
 #include <string>
 #include <yaml-cpp/yaml.h>
-
-#include <cnr_param/core/visibility_control.h>
-
-#include <string>
 
 namespace cnr
 {

@@ -11,7 +11,7 @@
 #include <rclcpp/parameter.hpp>
 #include <rclcpp/parameter_client.hpp>
 
-#include <cnr_param/core/type_traits.h>
+#include <cnr_yaml/type_traits.h>
 #include <cnr_param/core/param_retriever.h>
 #include <cnr_param/ros2/param_dictionary.h>
 

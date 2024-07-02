@@ -3,8 +3,7 @@
 
 #include <cstdint>
 #include <string>
-#include <type_traits>
-#include <vector>
+
 #include <variant>
 #include <Eigen/Core>
 
@@ -22,20 +21,8 @@ namespace cnr
 {
 namespace param
 {
-namespace core 
+namespace core
 {
-
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(::cnr::param::ros2::double_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(::cnr::param::ros2::int_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(::cnr::param::ros2::string_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(::cnr::param::ros2::bool_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(::cnr::param::ros2::bytes_param);
-
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(::cnr::param::ros2::double_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(::cnr::param::ros2::int_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(::cnr::param::ros2::string_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(::cnr::param::ros2::bool_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(::cnr::param::ros2::bytes_param);
 
 template <>
 inline bool ParamDictionary<rclcpp::Parameter>::is_scalar() const
@@ -66,7 +53,7 @@ inline bool ParamDictionary<rclcpp::Parameter>::is_sequence() const
   return false;
 }
 
-template<>
+template <>
 inline std::string ParamDictionary<rclcpp::Parameter>::to_string(const std::string& prefix) const
 {
   std::string ret;
@@ -78,8 +65,7 @@ inline std::string ParamDictionary<rclcpp::Parameter>::to_string(const std::stri
   else if (std::holds_alternative<typename ParamDictionary::NestedParams>(param_.second))
   {
     ret += "[type: ParamDictionary<P>::NestedParams(" +
-           std::to_string(std::get<typename ParamDictionary::NestedParams>(param_.second).size()) +
-           ")]\n";
+           std::to_string(std::get<typename ParamDictionary::NestedParams>(param_.second).size()) + ")]\n";
     for (const auto& p : std::get<typename ParamDictionary::NestedParams>(param_.second))
     {
       ret += p.second.to_string(prefix + param_.first + "/");
@@ -94,10 +80,9 @@ inline bool to_yaml(const ParamDictionary<rclcpp::Parameter>& tree, YAML::Node& 
   return cnr::param::ros2::to_yaml(tree, node, what);
 }
 
-}
-}
-}
-
+}  // namespace core
+}  // namespace param
+}  // namespace cnr
 
 namespace cnr
 {
@@ -109,7 +94,6 @@ namespace ros2
 }  // namespace ros2
 }  // namespace param
 }  // namespace cnr
-
 
 namespace std
 {
