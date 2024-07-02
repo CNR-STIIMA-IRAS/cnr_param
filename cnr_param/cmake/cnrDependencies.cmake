@@ -36,14 +36,6 @@ if(ROS2_MODULE)
   find_package(rcl_interfaces REQUIRED)
 endif()
 
-# cnr_yaml
-# #####################################################################################
-find_package(cnr_yaml QUIET)
-if(NOT ${cnr_yaml_FOUND})
-  message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
-  find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
-endif()
-
 # Catkin is a fake dependency. It is used to test the cmake configuration
 # ######################
 find_package(catkin QUIET)
@@ -58,6 +50,18 @@ else()
   set(PACKAGE_BIN_DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
   set(PACKAGE_INCLUDE_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
   set(CONFIG_INSTALL_DIR "share/${PROJECT_NAME}/cmake")
+endif()
+
+# cnr_yaml
+# #####################################################################################
+find_package(cnr_yaml QUIET)
+if(NOT ${cnr_yaml_FOUND})
+  if(${catkin_found})
+    message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+    find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
+  else()
+    find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
+  endif()
 endif()
 
 # Keys: DEPENDENCIES_INCLUDE_DIRS
