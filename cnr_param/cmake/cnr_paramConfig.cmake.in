@@ -30,10 +30,10 @@ if(${cnr_param_ROS2_MODULE} EQUAL 1)
 endif()
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
-set(cnr_param_INCLUDE_DIRS "@PACKAGE_INCLUDE_DESTINATION@")
-set(cnr_param_LIBRARIES    @EXPORTED_LIBRARY_TARGETS_LIST@)
-set(cnr_param_EXECUTABLES  @EXPORTED_EXECUTABLE_TARGETS_LIST@)
-set(cnr_param_RPATH       "@EXPORTED_LIBRARY_TARGET_RPATH@")
+set(cnr_param_INCLUDE_DIRS "@EXPORTED_TARGET_INCLUDE_DIRS@")
+set(cnr_param_LIBRARIES    "@EXPORTED_LIBRARY_TARGETS_LIST@")
+set(cnr_param_EXECUTABLES  "@EXPORTED_EXECUTABLE_TARGETS_LIST@")
+set(cnr_param_RPATH        "@EXPORTED_LIBRARY_TARGET_RPATH@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramTargets.cmake")

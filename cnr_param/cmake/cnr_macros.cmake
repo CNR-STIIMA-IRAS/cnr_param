@@ -114,14 +114,14 @@ macro(
   list(APPEND TARGETS_LIST ${LIBRARY_TARGETS_LIST} ${EXECUTABLE_TARGETS_LIST})
   
   # We create the congfig files for the package
-  set(CONFIG_INSTALL_DIR_ALTERNATIVE "${CONFIG_INSTALL_DIR}/../cmake_alternative")
   set(CONFIG_NAMESPACE               "${PROJECT_NAME}::")
   set(TARGETS_EXPORT_NAME            "${PROJECT_NAME}Targets")
   set(VERSION_CONFIG                 "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
   set(PROJECT_CONFIG_OUTPUT          "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
-  set(PROJECT_CONFIG_INPUT_TEMPLATE  "cmake/cnrConfigTemplate.cmake.in")
+  set(PROJECT_CONFIG_INPUT_TEMPLATE  "cmake/cnr_paramConfig.cmake.in")
 
   # Parameter template in the PROJECT_CONFIG_INPUT_TEMPLATE
+  set(EXPORTED_TARGET_INCLUDE_DIRS      "@")
   set(EXPORTED_LIBRARY_TARGETS_LIST     "${LIBRARY_TARGETS_LIST}")
   set(EXPORTED_EXECUTABLE_TARGETS_LIST  "${EXECUTABLE_TARGETS_LIST}")
   set(EXPORTED_LIBRARY_TARGET_RPATH     "${PACKAGE_LIB_DESTINATION}")
@@ -130,7 +130,6 @@ macro(
   set(MAPPED_FILE_MODULE_COMPILED       "${MAPPED_FILE_MODULE}")
   
   ##
-  message(STATUS "CONFIG_INSTALL_DIR              = ${CONFIG_INSTALL_DIR}"           )
   message(STATUS "CONFIG_NAMESPACE                = ${CONFIG_NAMESPACE}"             )
   message(STATUS "TARGETS_EXPORT_NAME             = ${TARGETS_EXPORT_NAME}"          )
   message(STATUS "VERSION_CONFIG                  = ${VERSION_CONFIG}"               )
@@ -191,9 +190,6 @@ macro(
   # Install cmake config files
   install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
           DESTINATION "${CONFIG_INSTALL_DIR}")
-
-  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
-          DESTINATION "${CONFIG_INSTALL_DIR_ALTERNATIVE}")
 
 endmacro()
 

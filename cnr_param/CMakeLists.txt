@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.0)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrConfigMacros.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnr_macros.cmake)
 
 # ##############################################################################
 # PRELIMINARIES           ##
@@ -61,7 +61,25 @@ endif()
 # ##############################################################################
 # DEPENDENCIES            ##
 # ##############################################################################
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnr_paramDependencies.cmake)
+
+# Catkin and Ament are fake dependencies. They are used to test the building environment and
+# configure CMake environment consequently. I do not call catkin_package() or ament_package()
+# since they introduce also the creation of other files that are not needed in this case.
+message(STATUS "Define the DESTINATION folders")
+if(${catkin_FOUND})
+  set(PACKAGE_LIB_DESTINATION     "${CATKIN_GLOBAL_LIB_DESTINATION}")
+  set(PACKAGE_BIN_DESTINATION     "${CATKIN_GLOBAL_LIBEXEC_DESTINATION}/${PROJECT_NAME}")
+  set(PACKAGE_INCLUDE_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${PROJECT_NAME}")
+  set(CONFIG_INSTALL_DIR          "share/${PROJECT_NAME}/cmake_alternative")
+else()
+  set(PACKAGE_LIB_DESTINATION     "${CMAKE_INSTALL_PREFIX}/lib")
+  set(PACKAGE_BIN_DESTINATION     "${CMAKE_INSTALL_PREFIX}/bin")
+  set(PACKAGE_INCLUDE_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+  set(CONFIG_INSTALL_DIR          "share/${PROJECT_NAME}/cmake")
+endif()
+message(STATUS "CONFIG_INSTALL_DIR              = ${CONFIG_INSTALL_DIR}"           )
+
 # ##############################################################################
 # END DEPENDANCIES        ##
 # ##############################################################################
