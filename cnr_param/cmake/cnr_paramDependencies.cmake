@@ -3,6 +3,8 @@
 ## Ton idea is to have a single file that can be included in the CMakeLists.txt of the package
 ## and in the >package>Config.cmake
 ## https://discourse.cmake.org/t/how-to-conditionally-call-either-find-pacakge-or-find-dependency/8175
+include(CMakeFindDependencyMacro)
+
 if(${PROJECT_NAME} STREQUAL "cnr_param")
   message(STATUS "Loading cnr_paramDependencies.cmake for the project '${PROJECT_NAME}'")
   macro(_find_package)
@@ -17,25 +19,14 @@ else()
   endmacro()
 endif()
 
-
 # ##########################################################################################
-# Ament: if it is found it does mean that I am compiling a ROS2 package in a ROS2 workspace
-# ##########################################################################################
-_find_package(ament_cmake QUIET)
-message(STATUS "ament_cmake FOUND=${ament_cmake_FOUND}")
-if(${ament_cmake_FOUND})
-  find_package(rclcpp REQUIRED)
-  find_package(rmw REQUIRED)
-  find_package(rosidl_runtime_c REQUIRED)
-  find_package(rcl_interfaces REQUIRED)
-endif()
-
-# ##########################################################################################
-# Catkin: if it is found it does mean that I am compiling a ROS1 package in a ROS1 workspace
-# ##########################################################################################
-if(NOT ${ament_cmake_FOUND})
+if(ROS2_MODULE_COMPILED)
   _find_package(catkin QUIET COMPONENTS roscpp)
-  message(STATUS "catkin FOUND=${catkin_FOUND}")
+elseif(ROS1_MODULE_COMPILED)
+  _find_package(rclcpp REQUIRED)
+  _find_package(rmw REQUIRED)
+  _find_package(rosidl_runtime_c REQUIRED)
+  _find_package(rcl_interfaces REQUIRED)
 endif()
 
 
