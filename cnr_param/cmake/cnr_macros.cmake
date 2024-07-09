@@ -188,8 +188,8 @@ macro(
   
   #------------------------------------------------------------------------------
   # Install cmake config files
-  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
-          DESTINATION "${CONFIG_INSTALL_DIR}")
+  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnr_paramDependencies.cmake"
+    DESTINATION "${CONFIG_INSTALL_DIR}")
 
 endmacro()
 
