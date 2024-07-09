@@ -32,12 +32,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # ##############################################################################
 # DEPENDENCIES            ##
 # ##############################################################################
-find_package(cnr_yaml QUIET)
-if(NOT ${cnr_yaml_FOUND})
-  message("Check alternative path: ${CMAKE_INSTALL_PREFIX}/..")
-  find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)  
-endif()
-
 if("$ENV{ROS_VERSION}" STREQUAL "1")
   find_package(catkin REQUIRED)
   find_package(cnr_param REQUIRED)
@@ -46,7 +40,7 @@ elseif("$ENV{ROS_VERSION}" STREQUAL "2")
   find_package(ament_cmake REQUIRED)
   find_package(cnr_param REQUIRED)
 else()
-  find_package(cnr_param REQUIRED)
+  find_package(cnr_param REQUIRED NO_MODULE)
 endif()
 
 
