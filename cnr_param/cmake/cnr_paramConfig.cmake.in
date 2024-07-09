@@ -4,30 +4,11 @@
 #  cnr_param_LIBRARIES    - libraries to link against
 #  cnr_param_EXECUTABLE   - the bar executable
 
-set(cnr_param_ROS2_MODULE @ROS2_MODULE_COMPILED@)
 set(cnr_param_ROS1_MODULE @ROS1_MODULE_COMPILED@)
+set(cnr_param_ROS2_MODULE @ROS2_MODULE_COMPILED@)
 set(cnr_param_MAPPED_FILE @MAPPED_FILE_MODULE_COMPILED@)
 
-include(CMakeFindDependencyMacro)
-
-# cnr_yaml #####################################################################################
-find_package(cnr_yaml REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/.. NO_DEFAULT_PATH)
-if(NOT ${cnr_yaml_FOUND})
-  find_package(cnr_yaml REQUIRED)
-endif()
-
-if(${cnr_param_ROS1_MODULE} EQUAL 1)
-  message(STATUS "cnr_param: ROS2 module available")
-  find_dependency(catkin REQUIRED roscpp)
-endif()
-
-if(${cnr_param_ROS2_MODULE} EQUAL 1)
-  message(STATUS "cnr_param: ROS2 module available")
-  find_dependency(rclcpp REQUIRED)
-  find_dependency(rmw REQUIRED)
-  find_dependency(rosidl_runtime_c REQUIRED)
-  find_dependency(rcl_interfaces REQUIRED)
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramDependencies.cmake")
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
 set(cnr_param_INCLUDE_DIRS "@EXPORTED_TARGET_INCLUDE_DIRS@")
