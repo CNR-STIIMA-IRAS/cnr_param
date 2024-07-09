@@ -12,7 +12,8 @@
 
 #include <ros/node_handle.h>
 
-#include <cnr_param/core/param.h>
+#include <cnr_yaml/cnr_yaml.h>
+
 #include <cnr_param/ros/param.h>
 #include <cnr_param/ros/param_retriever.h>
 
@@ -107,7 +108,7 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
     // ========================================================================
 
     ll = __LINE__;
-    return cnr::param::core::get(node.begin()->second, ret, what, implicit_cast_if_possible);
+    return cnr::yaml::get(node.begin()->second, ret, what, implicit_cast_if_possible);
   }
   catch (std::exception& e)
   {
@@ -121,24 +122,12 @@ inline bool get(const std::string& key, T& ret, std::string& what, const bool& i
   }
 }
 
-template <typename T>
-bool set(const std::string&, const T&, std::string&)
-{
-  return false;
-}
 
-/**
- * @brief
- *
- * @tparam T
- * @param node
- * @param key
- * @param value
- */
 template <typename T>
-void insert(ParamDictionary& node, const std::string& key, const T& value)
+bool set(const std::string& key, const T& value, std::string& what)
 {
-  assert(0);
+
+  return false;
 }
 
 }  // namespace ros

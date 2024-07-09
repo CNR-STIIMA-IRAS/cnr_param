@@ -1,6 +1,8 @@
 #include <string>
 #include <xmlrpcpp/XmlRpc.h>
 #include <yaml-cpp/yaml.h>
+
+#include <cnr_yaml/string.h>
 #include <cnr_param/core/string.h>
 #include <cnr_param/core/param_dictionary.h>
 #include <cnr_param/ros/param_dictionary.h>

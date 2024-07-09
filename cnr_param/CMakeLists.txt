@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.16.0)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnr_macros.cmake)
 
 # ##############################################################################
 # PRELIMINARIES           ##
 # ##############################################################################
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrMacros.cmake)
 get_project_name("package.xml" extracted_name extracted_version)
 
 project(
@@ -61,25 +62,7 @@ endif()
 # ##############################################################################
 # DEPENDENCIES            ##
 # ##############################################################################
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnr_paramDependencies.cmake)
-
-# Catkin and Ament are fake dependencies. They are used to test the building environment and
-# configure CMake environment consequently. I do not call catkin_package() or ament_package()
-# since they introduce also the creation of other files that are not needed in this case.
-message(STATUS "Define the DESTINATION folders")
-if(${catkin_FOUND})
-  set(PACKAGE_LIB_DESTINATION     "${CATKIN_GLOBAL_LIB_DESTINATION}")
-  set(PACKAGE_BIN_DESTINATION     "${CATKIN_GLOBAL_LIBEXEC_DESTINATION}/${PROJECT_NAME}")
-  set(PACKAGE_INCLUDE_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${PROJECT_NAME}")
-  set(CONFIG_INSTALL_DIR          "share/${PROJECT_NAME}/cmake_alternative")
-else()
-  set(PACKAGE_LIB_DESTINATION     "${CMAKE_INSTALL_PREFIX}/lib")
-  set(PACKAGE_BIN_DESTINATION     "${CMAKE_INSTALL_PREFIX}/bin")
-  set(PACKAGE_INCLUDE_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
-  set(CONFIG_INSTALL_DIR          "share/${PROJECT_NAME}/cmake")
-endif()
-message(STATUS "CONFIG_INSTALL_DIR              = ${CONFIG_INSTALL_DIR}"           )
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake)
 # ##############################################################################
 # END DEPENDANCIES        ##
 # ##############################################################################
@@ -134,13 +117,16 @@ add_library(cnr_param_static STATIC ${cnr_param_SRC})
 
 # set PIC
 set_target_properties(cnr_param PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
-                                           INSTALL_RPATH_USE_LINK_PATH TRUE)
+                                           INSTALL_RPATH_USE_LINK_PATH TRUE
+                                           OUTPUT_NAME cnr_param)
 set_target_properties(cnr_param_static
-                      PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
+                      PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
+                      OUTPUT_NAME cnr_param)
 
 # Include DIRECTORIES: include and src
 list(APPEND BUILD_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
      "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include/")
+
 list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
      include)
 
@@ -161,7 +147,7 @@ target_link_libraries(
 
 target_link_libraries(
   cnr_param_static
-  PUBLIC cnr_yaml::cnr_yaml
+  PUBLIC cnr_yaml::cnr_yaml_static
   PUBLIC "${DEPENDENCIES_LIBRARIES}")
 
 # ## definitions
@@ -216,8 +202,10 @@ endif()
 # ##############################################################################
 # INSTALL         ##
 # ##############################################################################
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrInstall.cmake)
+
 list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-     "${CMAKE_CURRENT_BINARY_DIR}/include")
+     ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 cnr_install("${LIBRARY_TARGETS_LIST}" "${EXECUTABLE_TARGETS_LIST}"
             "${HEADERS_DIRS}")

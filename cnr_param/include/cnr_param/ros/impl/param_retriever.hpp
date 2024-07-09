@@ -11,7 +11,7 @@
 #include <ros/param.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 
-#include <cnr_param/core/type_traits.h>
+
 #include <cnr_param/core/param_retriever.h>
 #include <cnr_param/ros/param_retriever.h>
 #include <cnr_param/ros/param_dictionary.h>

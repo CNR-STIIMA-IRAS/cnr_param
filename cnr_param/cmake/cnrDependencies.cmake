@@ -20,9 +20,9 @@ else()
 endif()
 
 # ##########################################################################################
-if(ROS2_MODULE_COMPILED)
+if(ROS1_MODULE)
   _find_package(catkin QUIET COMPONENTS roscpp)
-elseif(ROS1_MODULE_COMPILED)
+elseif(ROS2_MODULE)
   _find_package(rclcpp REQUIRED)
   _find_package(rmw REQUIRED)
   _find_package(rosidl_runtime_c REQUIRED)
@@ -65,6 +65,7 @@ if(${PROJECT_NAME} STREQUAL "cnr_param")
   # ##############################################################
   list(APPEND DEPENDENCIES_TARGETS cnr_yaml::cnr_yaml)
   list(APPEND DEPENDENCIES_INCLUDE_DIRS "${cnr_yaml_INCLUDE_DIRS}")
+  message(STATUS "DEPENDENCIES_INCLUDE_DIRS=${DEPENDENCIES_INCLUDE_DIRS}")
 
   if(ROS1_MODULE)
     list(APPEND DEPENDENCIES_INCLUDE_DIRS "${catkin_INCLUDE_DIRS}")
@@ -74,6 +75,7 @@ if(${PROJECT_NAME} STREQUAL "cnr_param")
         "${rcl_interfaces_INCLUDE_DIRS}")
   endif()
 
+  message(STATUS "DEPENDENCIES_INCLUDE_DIRS=${DEPENDENCIES_INCLUDE_DIRS}")
   list(
     APPEND
     DEPENDENCIES_LIBRARIES

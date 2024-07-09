@@ -2,16 +2,11 @@
 #define CNR_PARAM__INCLUDE__CNR_PARAM__ROS__PARAM_RETRIEVER__H
 
 
-#include <Eigen/Core>
-#include "XmlRpcValue.h"
-#include <yaml-cpp/yaml.h>
 
 #include <ros/node_handle.h>
 #include <xmlrpcpp/XmlRpc.h>
 
-#include <cnr_param/core/type_traits.h>
 #include <cnr_param/core/param_retriever.h>
-#include <cnr_param/ros/param_dictionary.h>
 
 namespace cnr
 {

@@ -15,7 +15,7 @@
 #include <ros/param.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 
-#include <cnr_param/core/type_traits.h>
+
 #include <cnr_param/core/string.h>
 #include <cnr_param/ros/param_dictionary.h>
 
@@ -25,19 +25,6 @@ namespace param
 {
 namespace core
 {
-
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(cnr::param::ros::double_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(cnr::param::ros::int_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(cnr::param::ros::string_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(cnr::param::ros::bool_param);
-SPECILIZE_C_TYPE_TO_PARAM_TYPE(cnr::param::ros::bytes_param);
-
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::double_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::int_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::string_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::bool_param);
-SPECILIZE_PARAM_TYPE_TO_C_TYPE(cnr::param::ros::bytes_param);
-
 
 template<>
 inline bool ParamDictionary<XmlRpc::XmlRpcValue>::is_scalar() const

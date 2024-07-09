@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <ros/node_handle.h>
-#include <cnr_param/core/type_traits.h>
 
 namespace cnr 
 {
