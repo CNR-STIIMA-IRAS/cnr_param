@@ -98,13 +98,13 @@ target_compile_definitions(test_ros2_module
 
 
 # EXECUTABLE #############################################################
-# add_executable(test_mapped_file
-#                ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mapped_file_module.cpp)
+add_executable(test_mapped_file
+               ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mapped_file_module.cpp)
 
-# cnr_configure_gtest(test_mapped_file cnr_param::cnr_param)
+cnr_configure_gtest(test_mapped_file cnr_param::cnr_param)
 
-# target_compile_definitions(test_mapped_file
-#                            PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+target_compile_definitions(test_mapped_file
+                           PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 # EXECUTABLE #############################################################
 add_executable(test_cnr_param
@@ -118,7 +118,7 @@ target_compile_definitions(test_cnr_param
 list(APPEND TARGETS_LIST 
   test_ros2_yaml_formatter
   test_ros2_module
-  #test_mapped_file
+  test_mapped_file
   test_cnr_param
 )
 # ##############################################################################
