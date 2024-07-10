@@ -1,0 +1,67 @@
+name: ros1
+
+on:
+  push:
+    branches: [ no-ament-only-cmake ]
+  pull_request:
+    branches: [ no-ament-only-cmake ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    name: Build on ros ${{ matrix.ros_distro }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        include:
+        - os: ubuntu-22.04
+          ros_distro: 'humble'
+
+
+    steps:   
+    - uses: ros-tooling/setup-ros@v0.2
+      with:
+        required-ros-distributions: ${{ matrix.ros_distro }}
+
+    # - name: Install dependencies
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base python3-catkin-tools
+    #     sudo pip3 uninstall empy --yes
+
+    - name: Setup catkin workspace
+      run: | 
+        source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+        mkdir -p ${{github.workspace}}/colcon_ws/src
+        cd ${{github.workspace}}/colcon_ws/src
+        cd ..
+
+    - uses: actions/checkout@v2
+      with:
+        repository: 'CNR-STIIMA-IRAS/cnr_yaml'
+        path: 'colcon_ws/src/cnr_yaml'
+
+    - uses: actions/checkout@v2
+      with:
+        repository: 'CNR-STIIMA-IRAS/cnr_param'
+        path: 'colcon_ws/src/cnr_param'
+
+    - name: colcon build
+      run: |
+        source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+        cd ${{github.workspace}}/colcon_ws
+        olcon build --symlink-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
+
+    - name: colcon test
+      run: |
+        source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+        cd ${{github.workspace}}/colcon_ws
+        colcon test --packages-select cnr_param
