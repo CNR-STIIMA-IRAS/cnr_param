@@ -181,8 +181,6 @@ install(
 # ##############################################################################
 # END INSTALL     ##
 # ##############################################################################
-
-
 if("$ENV{ROS_VERSION}" STREQUAL "1")
   find_package(catkin REQUIRED)
 elseif("$ENV{ROS_VERSION}" STREQUAL "2")
