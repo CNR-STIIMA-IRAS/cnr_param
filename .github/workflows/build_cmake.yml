@@ -81,6 +81,20 @@ jobs:
           )
         endif()
 
+    - name: Download cnr_yaml
+      id: cnr_yaml
+      shell: cmake -P {0}
+      run: |       
+        message(STATUS "Using host CMake version: ${CMAKE_VERSION}")
+
+        set(cnr_yaml "https://github.com/CNR-STIIMA-IRAS/cnr_yaml")
+        
+        execute_process(COMMAND ${CMAKE_COMMAND} -E git clone ${cnr_yaml})
+
+        execute_process(COMMAND ${CMAKE_COMMAND} -E pwd)
+
+        execute_process(COMMAND ${CMAKE_COMMAND} -E ls)
+
     - name: Configure
       shell: cmake -P {0}
       run: |
