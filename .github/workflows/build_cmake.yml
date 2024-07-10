@@ -2,12 +2,12 @@ name: 'PLAIN CMake CI'
 
 on:
   push:
-    branches: [ master ]
+    branches: [ no-ament-only-cmake ]
     paths-ignore:
     - 'docs/**'
     - 'README.md'
   pull_request:
-    branches: [ master ]
+    branches: [ no-ament-only-cmake ]
 
 jobs:
   build:
