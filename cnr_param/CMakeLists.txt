@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.16.0)
 
-
 # ##############################################################################
 # PRELIMINARIES           ##
 # ##############################################################################
@@ -24,7 +23,9 @@ cnr_set_flags()
 option(COMPILE_ROS1_MODULE "ROS 1 SUPPORT" OFF)
 option(COMPILE_ROS2_MODULE "ROS 2 SUPPORT" OFF)
 option(COMPILE_MAPPED_FILE_MODULE "MAPPED FILE SUPPORT" ON)
-option(COMPILE_EXAMPLE "COMPILE THE EXAMPLE" OFF)
+option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
+option(BUILD_INTEGRATION_TESTS "Build the integration tests" OFF)
+
 
 if(COMPILE_ROS1_MODULE AND "$ENV{ROS_VERSION}" STREQUAL "1")
   message(STATUS "The ROS 1 Module will be compiled")
@@ -71,7 +72,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake)
 # Build       ##
 # ##############################################################################
 configure_file("${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/include/cnr_param/config.h" @ONLY)
+               "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h" @ONLY)
 
 # Core Library
 set(SRC_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/core)
@@ -116,28 +117,28 @@ add_library(cnr_param SHARED ${cnr_param_SRC})
 add_library(cnr_param_static STATIC ${cnr_param_SRC})
 
 # set PIC
-set_target_properties(cnr_param PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
-                                           INSTALL_RPATH_USE_LINK_PATH TRUE
-                                           OUTPUT_NAME cnr_param)
-set_target_properties(cnr_param_static
-                      PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
-                      OUTPUT_NAME cnr_param)
+set_target_properties(
+  cnr_param
+  PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
+             INSTALL_RPATH_USE_LINK_PATH TRUE
+             OUTPUT_NAME cnr_param)
+set_target_properties(
+  cnr_param_static PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON OUTPUT_NAME
+                                                                 cnr_param)
 
 # Include DIRECTORIES: include and src
 list(APPEND BUILD_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
-     "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include/")
-
+     "${CMAKE_CURRENT_SOURCE_DIR}/include")
 list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
      include)
 
 target_include_directories(
   cnr_param PUBLIC "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
                    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
-
 target_include_directories(
-  cnr_param_static
-  PUBLIC "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
-         "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
+  cnr_param_static PUBLIC 
+                    "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+                    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
 # ## link
 target_link_libraries(
@@ -212,3 +213,7 @@ cnr_install("${LIBRARY_TARGETS_LIST}" "${EXECUTABLE_TARGETS_LIST}"
 # ##############################################################################
 # END INSTALL     ##
 # ##############################################################################
+
+if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
+  add_subdirectory(test)
+endif()
