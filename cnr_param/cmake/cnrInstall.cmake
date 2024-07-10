@@ -97,34 +97,42 @@ macro(
     LIBRARY DESTINATION "${PACKAGE_LIB_DESTINATION}"
     RUNTIME DESTINATION "${PACKAGE_BIN_DESTINATION}")
 
-  include(CMakePackageConfigHelpers)
+  if(ROS1_MODULE)
+    catkin_package(
+      INCLUDE_DIRS ${INSTALL_INTERFACE_INCLUDE_DIRS}
+      LIBRARIES ${LIBRARY_TARGETS_LIST}
+      CATKIN_DEPENDS roscpp
+      DEPENDS cnr_yaml)
+  else()
+    include(CMakePackageConfigHelpers)
 
-  #------------------------------------------------------------------------------
-  # Configure <PROJECT_NAME>ConfigVersion.cmake common to build and install tree
-  write_basic_package_version_file(
-    "${VERSION_CONFIG}"
-    VERSION ${extracted_version}
-    COMPATIBILITY SameMajorVersion)
+    #------------------------------------------------------------------------------
+    # Configure <PROJECT_NAME>ConfigVersion.cmake common to build and install tree
+    write_basic_package_version_file(
+      "${VERSION_CONFIG}"
+      VERSION ${extracted_version}
+      COMPATIBILITY SameMajorVersion)
 
-  #------------------------------------------------------------------------------
-  # Create the ${PROJECT_NAME}Config.cmake using the template
-  # ${PROJECT_NAME}Config.cmake.in
-  configure_package_config_file(
-    "${PROJECT_CONFIG_INPUT_TEMPLATE}" "${PROJECT_CONFIG_OUTPUT}"
-    INSTALL_DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
+    #------------------------------------------------------------------------------
+    # Create the ${PROJECT_NAME}Config.cmake using the template
+    # ${PROJECT_NAME}Config.cmake.in
+    configure_package_config_file(
+      "${PROJECT_CONFIG_INPUT_TEMPLATE}" "${PROJECT_CONFIG_OUTPUT}"
+      INSTALL_DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
 
-  #------------------------------------------------------------------------------
-  # Install cmake targets files
-  install(
-    EXPORT "${TARGETS_EXPORT_NAME}"
-    NAMESPACE "${CONFIG_NAMESPACE}"
-    DESTINATION "${PACKAGE_CONFIG_DESTINATION}"
-    FILE ${TARGETS_EXPORT_NAME}.cmake
-  )
-   
-  #------------------------------------------------------------------------------
-  # Install cmake config files
-  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake"
-          DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
+    #------------------------------------------------------------------------------
+    # Install cmake targets files
+    install(
+      EXPORT "${TARGETS_EXPORT_NAME}"
+      NAMESPACE "${CONFIG_NAMESPACE}"
+      DESTINATION "${PACKAGE_CONFIG_DESTINATION}"
+      FILE ${TARGETS_EXPORT_NAME}.cmake
+    )
+    
+    #------------------------------------------------------------------------------
+    # Install cmake config files
+    install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake"
+            DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
+  endif()
 
 endmacro()
