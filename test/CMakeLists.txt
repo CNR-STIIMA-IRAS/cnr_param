@@ -11,6 +11,9 @@ if(ROS1_MODULE)
   find_package(rostest REQUIRED)
 endif()
 
+if(ROS2_MODULE)
+  find_package(ament_cmake_gtest REQUIRED)
+endif()
 #
 # cnr_unit_gtest
 #
@@ -115,18 +118,14 @@ if(BUILD_INTEGRATION_TESTS)
 
   if(ROS2_MODULE)
     # EXECUTABLE #################################################################
-    add_executable(test_ros2_module ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_module.cpp)
-    cnr_integration_gtest(test_ros2_module cnr_param::cnr_param)
+    cnr_integration_gtest(test_ros2_module ${CMAKE_CURRENT_SOURCE_DIR}/test_ros2_module.cpp cnr_param::cnr_param)
 
     target_compile_definitions(test_ros2_module
                 PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
     list(APPEND TARGETS_LIST test_ros2_module)
     # EXECUTABLE #################################################################
 
-    add_executable(test_cnr_param
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param.cpp)
-
-    cnr_integration_gtest(test_cnr_param cnr_param::cnr_param)
+    cnr_integration_gtest(test_cnr_param ${CMAKE_CURRENT_SOURCE_DIR}/test_cnr_param.cpp cnr_param::cnr_param)
 
     target_compile_definitions(test_cnr_param
                 PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")

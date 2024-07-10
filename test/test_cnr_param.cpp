@@ -157,8 +157,10 @@ TEST(CnrParam, MappedFileServerUsage)
   cnr::param::mapped_file::YAMLParser* yaml_parser = nullptr;
   cnr::param::mapped_file::YAMLStreamer* yaml_streamer = nullptr;
 
+  std::cout << "TEST_DIR: " << TEST_DIR << std::endl;
+
   // Parsing of program inputs
-  const int argc = 13;
+  const int argc = 11;
   const char* const argv[] = { "test", 
     "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
     "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
