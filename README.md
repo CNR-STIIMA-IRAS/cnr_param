@@ -1,4 +1,6 @@
 # cnr_param
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_param.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_param?ref=badge_shield)
+
 
 A package to read and write parameters for your C++ application.
 
@@ -26,3 +28,6 @@ Open Command Prompt and set the `CNR_PARAM_ROOT_DIRECTORY` environment variable 
 ```bash
 set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_param.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_param?ref=badge_large)
