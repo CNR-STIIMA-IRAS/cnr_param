@@ -17,7 +17,7 @@ function(add_coverage_target exclude)
     endif()
 
     if (LCOV AND GCOV AND GENHTML)
-        message(WARNING "Converage target added")
+        message(STATUS "Converage target added")
         set(covname cov.info)
         add_compile_options(-fprofile-arcs -ftest-coverage)
         add_link_options(--coverage)
