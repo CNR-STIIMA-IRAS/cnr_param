@@ -169,14 +169,16 @@ jobs:
           message(FATAL_ERROR "Running tests failed!")
         endif()
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: test_results_xml
-        path: ${{runner.workspace}}/build/test-results/**/*.xml
-
-    - uses: codecov/codecov-action@v3
+    - name: generate coverage
+      working-directory: ./build
+      run: |
+          make cov
+    - name: Generate JSON coverage report
+      working-directory: ./build
+      run: |
+          gcovr -r .. . --branches --xml > coverage.xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests # optional
@@ -184,4 +186,3 @@ jobs:
         name: codecov-umbrella # optional
         fail_ci_if_error: false # optional (default = false)
         verbose: false # optional (default = false)
-
