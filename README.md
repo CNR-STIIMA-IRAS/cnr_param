@@ -1,4 +1,3 @@
-
 [![Build Status - Plain CMake][p]][0] [![Build Status - ROS1][r]][1] [![Build Status - ROS1][r2]][2]
 [![codecov][c]][3] 
 [![Codacy Badge][y]][4]
