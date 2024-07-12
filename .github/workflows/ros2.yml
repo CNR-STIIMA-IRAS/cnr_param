@@ -27,15 +27,9 @@ jobs:
 
 
     steps:   
-    - uses: ros-tooling/setup-ros@v0.2
+    - uses: ros-tooling/setup-ros@v0.7
       with:
         required-ros-distributions: ${{ matrix.ros_distro }}
-
-    # - name: Install dependencies
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base python3-catkin-tools
-    #     sudo pip3 uninstall empy --yes
 
     - name: Setup catkin workspace
       run: | 
