@@ -1,0 +1,23 @@
+<launch>
+  <arg name="valgrind" default="false" />
+  <arg name="debug" default="false" />
+
+  <rosparam command="load" file="$(find cnr_param)/test/config/rosparameters.yaml" ns="parameters_server_node"/>
+  <rosparam command="load" file="$(find cnr_param)/test/config/par.yaml" ns="parameters_server_node" />
+    
+  <group if="$(arg valgrind)">
+    <arg unless="$(arg debug)" name="launch_prefix" value="" />
+    <arg     if="$(arg debug)" name="launch_prefix"
+        value="valgrind -v --track-origins=yes --tool=memcheck --leak-check=full --show-reachable=yes  --num-callers=20 --track-fds=yes  --log-file=~/a.txt" />
+        <test launch-prefix="$(arg launch_prefix)" test-name="test_ros_module" pkg="cnr_param" type="test_ros_module">
+        </test>
+  </group>
+
+  <group unless="$(arg valgrind)">
+    <arg unless="$(arg debug)" name="launch_prefix" value="" />
+    <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+
+    <test launch-prefix="$(arg launch_prefix)" test-name="test_ros_module" pkg="cnr_param" type="test_ros_module">
+    </test>
+  </group>
+</launch> 

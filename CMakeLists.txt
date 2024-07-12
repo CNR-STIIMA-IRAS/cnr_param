@@ -1,240 +1,222 @@
-#############################
-## PRELIMINARIES           ##
-#############################
 cmake_minimum_required(VERSION 3.16.0)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrConfigMacros.cmake)
+# ##############################################################################
+# PRELIMINARIES           ##
+# ##############################################################################
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrMacros.cmake)
 get_project_name("package.xml" extracted_name extracted_version)
 
-project(${extracted_name} VERSION ${extracted_version} LANGUAGES CXX)
+project(
+  ${extracted_name}
+  VERSION ${extracted_version}
+  LANGUAGES CXX)
 
 cnr_set_flags()
-#############################
-## END - PRELIMINARIES     ##
-#############################
+# ##############################################################################
+# END - PRELIMINARIES     ##
+# ##############################################################################
+
+# ##############################################################################
+# OPTIONS                 ##
+# ##############################################################################
+option(COMPILE_ROS1_MODULE "ROS 1 SUPPORT" OFF)
+option(COMPILE_ROS2_MODULE "ROS 2 SUPPORT" OFF)
+option(COMPILE_MAPPED_FILE_MODULE "MAPPED FILE SUPPORT" ON)
+option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
+option(BUILD_INTEGRATION_TESTS "Build the integration tests" OFF)
 
 
-#############################
-## OPTIONS                 ##
-#############################
-option(USE_ROS1                 "ROS SUPPORT" OFF)
-option(ENABLE_TESTING           "ENABLE TESTING" OFF)
-option(ENABLE_COVERAGE_TESTING  "ENABLE COVERAGE TESTING" OFF)
-option(COMPILE_EXAMPLE          "COMPILE THE EXAMPLE" OFF)
-
-if(USE_ROS1)
-  set(ENABLE_TESTING ${CATKIN_ENABLE_TESTING})
-endif()
-#############################
-## END - OPTIONS           ##
-#############################
-
-#############################
-## DEPENDANCIES            ##
-#############################
-find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 REQUIRED NO_MODULE)
-
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED COMPONENTS system filesystem program_options iostreams regex)
-
-if(USE_ROS1)
-  find_package(catkin REQUIRED COMPONENTS roscpp)
-  catkin_package(
-    INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS}
-    LIBRARIES cnr_param_utilities
-    CATKIN_DEPENDS roscpp
-  ) 
-endif()
-
-cnr_install_directories(USE_ROS1 
-  CNR_INSTALL_INCLUDE_DIR CNR_INSTALL_LIB_DIR CNR_INSTALL_BIN_DIR CNR_INSTALL_SHARE_DIR)
-cnr_enable_testing(ENABLE_TESTING ENABLE_COVERAGE USE_ROS1)
-#############################
-## END DEPENDANCIES        ##
-#############################
-
-#################
-## Build       ##
-#################
-list(APPEND DEPENDENCIES_INCLUDE_DIRS ${yaml-cpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
-if(USE_ROS1)
-  list(APPEND DEPENDENCIES_INCLUDE_DIRS ${catkin_INCLUDE_DIRS})
-endif()
-
-list(APPEND BUILD_INTERFACE_INCLUDE_DIRS ${DEPENDENCIES_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS include ${DEPENDENCIES_INCLUDE_DIRS} include)
-
-# ================================================
-add_library(cnr_param_utilities SHARED 
-  src/${PROJECT_NAME}/cnr_param.cpp
-    src/${PROJECT_NAME}/utils/colors.cpp
-      src/${PROJECT_NAME}/utils/filesystem.cpp
-        src/${PROJECT_NAME}/utils/interprocess.cpp
-          src/${PROJECT_NAME}/utils/string.cpp
-            src/${PROJECT_NAME}/utils/yaml.cpp
-              include/${PROJECT_NAME}/utils/eigen.h)
-target_include_directories(cnr_param_utilities PUBLIC
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
-    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
-
-target_link_libraries(cnr_param_utilities 
-  PUBLIC yaml-cpp
-  PUBLIC Boost::system
-  PUBLIC Boost::filesystem
-  PUBLIC Eigen3::Eigen
-)
-
-add_library(cnr_param_server_utilities SHARED 
-              src/cnr_param_server/utils/args_parser.cpp
-                src/cnr_param_server/utils/yaml_manager.cpp)
-target_include_directories(cnr_param_server_utilities PUBLIC
-  "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
-    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
-
-target_link_libraries(cnr_param_server_utilities 
-  PUBLIC cnr_param_utilities
-  PUBLIC Boost::program_options
-  PUBLIC Boost::iostreams
-  PUBLIC Boost::regex
-)
-
-add_executable(cnr_param_server 
-  src/cnr_param_server/param_server.cpp
-)
-target_include_directories(cnr_param_server PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-target_link_libraries(cnr_param_server 
-  PUBLIC cnr_param_server_utilities
-)
-#################
-## END - Build ##
-#################
-
-#############
-## Install ##
-#############
-install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION ${CNR_INSTALL_INCLUDE_DIR}
-        FILES_MATCHING PATTERN "*.h"
-        PATTERN ".git" EXCLUDE
-)
-
-install(TARGETS cnr_param_utilities cnr_param_server cnr_param_server_utilities
-        EXPORT export_cnr_param
-        ARCHIVE DESTINATION ${CNR_INSTALL_LIB_DIR}
-        LIBRARY DESTINATION ${CNR_INSTALL_LIB_DIR}
-        RUNTIME DESTINATION ${CNR_INSTALL_BIN_DIR}
-)
-
-# if(USE_ROS1)
-#   install(DIRECTORY launch/
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-#   PATTERN ".svn" EXCLUDE)
-# endif()
-###################
-## END - Install ##
-###################
-
-##################################
-## CMAKE CONFIG (IF NOT CATKIN) ##
-##################################
-if(NOT USE_ROS1) 
-  set(export_targets ${export_targets};cnr_param_utilities)
-  set(export_targets ${export_targets};cnr_param_server_utilities)
-  set(export_targets ${export_targets};cnr_param_server)
-  export(EXPORT export_cnr_param
-    FILE "${PROJECT_BINARY_DIR}/export_cnr_param.cmake")
-
-  # Create the cnr_paramConfig.cmake
-  set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-  configure_file(cnr_paramConfig.cmake.in
-    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake" @ONLY)
-
-  # Create the cnr_paramConfigVersion.cmake
-  configure_file(cnr_paramConfigVersion.cmake.in
-    "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake" @ONLY)
-  
-  install(FILES
-    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/cnr_paramConfig.cmake"
-    "${PROJECT_BINARY_DIR}/cnr_paramConfigVersion.cmake"
-    DESTINATION "share/${PROJECT_NAME}/cmake" COMPONENT dev
+if(COMPILE_ROS1_MODULE AND "$ENV{ROS_VERSION}" STREQUAL "1")
+  message(STATUS "The ROS 1 Module will be compiled")
+  set(ROS1_MODULE 1)
+else()
+  message(
+    STATUS
+      "The ROS 1 Module is not compiled (Running ROS version $ENV{ROS_VERSION})"
   )
-
-  install(EXPORT export_cnr_param
-    DESTINATION "share/${PROJECT_NAME}/cmake"
-    FILE export_cnr_param.cmake
-    COMPONENT dev
-  )
+  set(ROS1_MODULE 0)
 endif()
 
-
-##########################
-## Testing              ##
-##########################
-if(ENABLE_TESTING)
-  if(USE_ROS1)
-    # Test using ROS TIME
-    # add_rostest_gtest(${PROJECT_NAME}_test 
-    #   src/cnr_param_server/utils/args_parser.cpp
-    #   src/cnr_param_server/utils/yaml_manager.cpp
-    #   test/test_server.cpp)
-    # target_link_libraries(${PROJECT_NAME}_test 
-    #   cnr_param_utilities
-    #   cnr_param_server_utilities
-    #   ${rostest_LIBRARIES} 
-    #   yaml-cpp
-    #   Boost::system
-    #   Boost::filesystem
-    #   Eigen3::Eigen
-    # )
-    # cnr_target_compile_options(${PROJECT_NAME}_test)
-  else()
-    add_executable(${PROJECT_NAME}_test  
-      src/cnr_param_server/utils/args_parser.cpp
-      src/cnr_param_server/utils/yaml_manager.cpp
-      test/test_server.cpp)
-    if(${CMAKE_VERSION} VERSION_GREATER  "3.16.0")
-      target_link_libraries(${PROJECT_NAME}_test  cnr_param_utilities
-        Threads::Threads GTest::Main Boost::program_options Boost::system Boost::filesystem Boost::iostreams Boost::regex)
-    else()
-      target_link_libraries(${PROJECT_NAME}_test cnr_param_utilities GTest::Main)
-      if(THREADS_HAVE_PTHREAD_ARG)
-        target_compile_options(${PROJECT_NAME}_test PUBLIC "-pthread")
-      endif()
-      if(CMAKE_THREAD_LIBS_INIT)
-        target_link_libraries(${PROJECT_NAME}_test "${CMAKE_THREAD_LIBS_INIT}")
-      endif()
-    endif()
-    gtest_discover_tests(${PROJECT_NAME}_test )
-  endif()
-  target_compile_definitions(${PROJECT_NAME}_test PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}/test")  
-  target_include_directories(${PROJECT_NAME}_test PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+if(COMPILE_ROS2_MODULE AND "$ENV{ROS_VERSION}" STREQUAL "2")
+  message(STATUS "The ROS 2 Module will be compiled")
+  set(ROS2_MODULE 1)
+else()
+  message(
+    STATUS
+      "The ROS 2 Module is not compiled (Running ROS version $ENV{ROS_VERSION})"
   )
+  set(ROS2_MODULE 0)
+endif()
 
-endif(ENABLE_TESTING)
+if(COMPILE_MAPPED_FILE_MODULE)
+  set(MAPPED_FILE_MODULE 1)
+  message(STATUS "The Mapped File Module will be compiled")
+else()
+  set(MAPPED_FILE_MODULE 0)
+  message(STATUS "The Mapped File Module won't be compiled")
+endif()
+# ##############################################################################
+# END - OPTIONS           ##
+# ##############################################################################
 
+# ##############################################################################
+# DEPENDENCIES            ##
+# ##############################################################################
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake)
+# ##############################################################################
+# END DEPENDANCIES        ##
+# ##############################################################################
 
-##########################
-## Coverage Testing     ##
-##########################
-if( ENABLE_TESTING AND ENABLE_COVERAGE_TESTING AND NOT WIN32 )
-  if(USE_ROS)
-    message(STATUS "The coverage testing is enabled")
-    set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
-    add_code_coverage(
-      NAME coverage_report
-      DEPENDENCIES ${PROJECT_NAME}_test 
-    )
-  else()
-    ## NOTHING TO DO, SINCE GTEST ALREADY CREATES THE COVERAGE
-    ## IF THE COMPILING OPTIONS ARE SET
-  endif()
+# ##############################################################################
+# Build       ##
+# ##############################################################################
+configure_file("${PROJECT_SOURCE_DIR}/include/cnr_param/config.h.in"
+               "${PROJECT_SOURCE_DIR}/include/cnr_param/config.h" @ONLY)
+
+# Core Library
+set(SRC_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/core)
+list(APPEND cnr_param_SRC ${SRC_CORE_DIR}/colors.cpp
+     ${SRC_CORE_DIR}/filesystem.cpp ${SRC_CORE_DIR}/string.cpp)
+
+# ROS 1
+if(ROS1_MODULE)
+  set(SRC_ROS1_MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/ros)
+  list(APPEND cnr_param_SRC ${SRC_ROS1_MODULE_DIR}/param.cpp
+       ${SRC_ROS1_MODULE_DIR}/param_dictionary.cpp)
+endif()
+
+# ROS 2
+if(ROS2_MODULE)
+  set(SRC_ROS2_MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/ros2)
+  list(
+    APPEND cnr_param_SRC ${SRC_ROS2_MODULE_DIR}/param_dictionary.cpp
+    ${SRC_ROS2_MODULE_DIR}/param.cpp ${SRC_ROS2_MODULE_DIR}/param_retriever.cpp
+    ${SRC_ROS2_MODULE_DIR}/yaml_formatter.cpp)
+endif()
+
+# MAPPED FILE
+if(MAPPED_FILE_MODULE)
+  set(SRC_MAPPED_FILE_MODULE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/mapped_file)
+  list(
+    APPEND
+    cnr_param_SRC
+    ${SRC_MAPPED_FILE_MODULE_DIR}/interprocess.cpp
+    ${SRC_MAPPED_FILE_MODULE_DIR}/yaml_manager.cpp
+    ${SRC_MAPPED_FILE_MODULE_DIR}/args_parser.cpp
+    ${SRC_MAPPED_FILE_MODULE_DIR}/yaml_parser.cpp)
+endif()
+
+# cnr_param
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME})
+list(APPEND cnr_param_SRC ${SRC_DIR}/cnr_param.cpp)
+
+# ## add library
+add_library(cnr_param SHARED ${cnr_param_SRC})
+add_library(cnr_param_static STATIC ${cnr_param_SRC})
+
+# set PIC
+set_target_properties(
+  cnr_param
+  PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
+             INSTALL_RPATH_USE_LINK_PATH TRUE
+             OUTPUT_NAME cnr_param)
+set_target_properties(
+  cnr_param_static PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON OUTPUT_NAME
+                                                                 cnr_param)
+
+# Include DIRECTORIES: include and src
+list(APPEND BUILD_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
+     "${CMAKE_CURRENT_SOURCE_DIR}/include")
+list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
+     include)
+
+target_include_directories(
+  cnr_param PUBLIC "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+                   "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
+target_include_directories(
+  cnr_param_static PUBLIC 
+                    "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+                    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
+
+# ## link
+target_link_libraries(
+  cnr_param
+  PUBLIC cnr_yaml::cnr_yaml
+  PUBLIC "${DEPENDENCIES_LIBRARIES}")
+
+target_link_libraries(
+  cnr_param_static
+  PUBLIC cnr_yaml::cnr_yaml_static
+  PUBLIC "${DEPENDENCIES_LIBRARIES}")
+
+# ## definitions
+target_compile_definitions(
+  cnr_param PUBLIC ROS1_MODULE=${ROS1_MODULE} ROS2_MODULE=${ROS2_MODULE}
+                   MAPPED_FILE_MODULE=${MAPPED_FILE_MODULE})
+
+# ## definitions
+target_compile_definitions(
+  cnr_param_static PUBLIC ROS1_MODULE=${ROS1_MODULE} ROS2_MODULE=${ROS2_MODULE}
+                          MAPPED_FILE_MODULE=${MAPPED_FILE_MODULE})
+
+add_library(cnr_param::cnr_param ALIAS cnr_param)
+add_library(cnr_param::cnr_param_static ALIAS cnr_param_static)
+list(APPEND LIBRARY_TARGETS_LIST cnr_param cnr_param_static)
+# ##############################################################################
+
+if(ROS2_MODULE)
+  # EXECECUTABLES ############################################################
+  # ros2_yaml_converter
+  add_executable(ros2_yaml_converter
+                 ${SRC_ROS2_MODULE_DIR}/ros2_yaml_converter.cpp)
+  target_include_directories(
+    ros2_yaml_converter
+    PUBLIC "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
+           "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
+  target_link_libraries(ros2_yaml_converter PUBLIC cnr_param)
+  set_target_properties(
+    ros2_yaml_converter PROPERTIES LINK_FLAGS
+                                   "-Wl,-rpath,${CNR_INSTALL_LIB_DIR}")
+  list(APPEND EXECUTABLE_TARGETS_LIST ros2_yaml_converter)
+endif()
+
+if(MAPPED_FILE_MODULE)
+  # cnr_param_server
+  add_executable(cnr_param_server
+                 ${SRC_MAPPED_FILE_MODULE_DIR}/param_server.cpp)
+
+  target_include_directories(
+    cnr_param_server
+    PUBLIC "$<BUILD_INTERFACE:${MAPPED_FILE_BUILD_INTERFACE_INCLUDE_DIRS}>"
+           "$<INSTALL_INTERFACE:${MAPPED_FILE_INSTALL_INTERFACE_INCLUDE_DIRS}>")
+
+  target_link_libraries(cnr_param_server PUBLIC cnr_param::cnr_param)
+  list(APPEND EXECUTABLE_TARGETS_LIST cnr_param_server)
+  # cnr_param_server END #######################################################
+endif()
+# ##############################################################################
+# END - Build ##
+# ##############################################################################
+
+# ##############################################################################
+# INSTALL         ##
+# ##############################################################################
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrInstall.cmake)
+
+list(APPEND HEADERS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+     ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+cnr_install("${LIBRARY_TARGETS_LIST}" "${EXECUTABLE_TARGETS_LIST}"
+            "${HEADERS_DIRS}")
+# ##############################################################################
+# END INSTALL     ##
+# ##############################################################################
+
+if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
+  include(cmake/coverage.cmake)
+  add_coverage_target("*/test/*")
+
+  include(cmake/tests.cmake)
 endif()

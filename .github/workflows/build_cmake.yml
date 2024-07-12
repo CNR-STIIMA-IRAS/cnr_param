@@ -2,12 +2,12 @@ name: 'PLAIN CMake CI'
 
 on:
   push:
-    branches: [ master ]
+    branches: [ no-ament-only-cmake ]
     paths-ignore:
     - 'docs/**'
     - 'README.md'
   pull_request:
-    branches: [ master ]
+    branches: [ no-ament-only-cmake ]
 
 jobs:
   build:
@@ -27,9 +27,11 @@ jobs:
 
     - name: Install dependencies
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && sudo apt-get install -y --fix-missing  libboost-iostreams-dev libeigen3-dev libboost-program-options-dev libyaml-cpp-dev libboost-date-time-dev liblog4cxx-dev libgtest-dev cmake tree lcov gcovr  libboost-filesystem-dev
-      # python3-coverage
-
+      run: sudo apt-get update && 
+        sudo apt-get install -y --fix-missing git 
+        libboost-iostreams-dev libeigen3-dev libboost-program-options-dev libboost-filesystem-dev libboost-date-time-dev libyaml-cpp-dev
+        libgtest-dev cmake tree lcov gcovr python3-lxml 
+        
     - name: Download Ninja and CMake
       id: cmake_and_ninja
       shell: cmake -P {0}
@@ -81,6 +83,18 @@ jobs:
           )
         endif()
 
+    - name: Download cnr_yaml
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        git clone https://github.com/CNR-STIIMA-IRAS/cnr_yaml
+        cd cnr_yaml
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make
+        sudo make install
+        cd ../..
+        
     - name: Configure
       shell: cmake -P {0}
       run: |
@@ -107,10 +121,11 @@ jobs:
             -S .
             -B build
             -D CMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
-            -D USE_ROS1=OFF
-            -D ENABLE_TESTING=ON
-            -D ENABLE_COVERAGE_TESTING=ON
-            -D COMPILE_EXAMPLE=OFF
+            -D COMPILE_ROS1_MODULE=OFF
+            -D COMPILE_ROS2_MODULE=OFF
+            -D COMPILE_MAPPED_FILE_MODULE=ON
+            -D BUILD_UNIT_TESTS=ON
+            -D BUILD_INTEGRATION_TESTS=ON
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
@@ -156,19 +171,22 @@ jobs:
           message(FATAL_ERROR "Running tests failed!")
         endif()
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: test_results_xml
-        path: ${{runner.workspace}}/build/test-results/**/*.xml
-
-    - uses: codecov/codecov-action@v3
+    - name: generate coverage
+      working-directory: ./build
+      run: |
+          make cov
+    - name: Generate JSON coverage report
+      working-directory: ./build
+      run: |
+          gcovr -r .. . --branches --xml > coverage.xml
+    - name: Check Build Path
+      run: pwd && tree
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests # optional
-        files: ${{runner.workspace}}/build/test-results/**/*.xml
+        files: ${{runner.workspace}}/build/**/*.xml
         name: codecov-umbrella # optional
         fail_ci_if_error: false # optional (default = false)
         verbose: false # optional (default = false)
-
