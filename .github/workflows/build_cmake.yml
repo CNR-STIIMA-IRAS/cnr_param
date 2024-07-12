@@ -119,7 +119,6 @@ jobs:
             -S .
             -B build
             -D CMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
-            -D COMPILE=OFF
             -D COMPILE_ROS1_MODULE=OFF
             -D COMPILE_ROS2_MODULE=OFF
             -D COMPILE_MAPPED_FILE_MODULE=ON
