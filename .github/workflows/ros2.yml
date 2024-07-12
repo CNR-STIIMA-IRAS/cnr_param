@@ -1,4 +1,4 @@
-name: ros1
+name: ros2
 
 on:
   push:
