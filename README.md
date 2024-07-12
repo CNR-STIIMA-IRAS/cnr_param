@@ -245,7 +245,7 @@ set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 
 ## License
 
-[![FOSSA Status][o]][5]
+[![FOSSA Status][o]][6]
 
 [p]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/build_cmake.yml/badge.svg
 [0]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/build_cmake.yml
@@ -266,5 +266,5 @@ set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 [5]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2cnr_param?ref=badge_shield&issueType=license
 
 [o]:https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml.svg?type=large
-[5]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml?ref=badge_large
+[6]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml?ref=badge_large
 
