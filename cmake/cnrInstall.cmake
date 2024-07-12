@@ -29,7 +29,7 @@ macro(
   cnr_install_directories()
 
   list(APPEND TARGETS_LIST ${LIBRARY_TARGETS_LIST} ${EXECUTABLE_TARGETS_LIST})
-  
+
   # We create the congfig files for the package
   set(CONFIG_NAMESPACE               "${PROJECT_NAME}::")
   set(TARGETS_EXPORT_NAME            "${PROJECT_NAME}Targets")
@@ -52,21 +52,21 @@ macro(
     endif()
   endforeach()
 
-  list(APPEND DEPENDENCIES_LINK_LIBRARIES ${PROJECT_INSTALLED_LIBRARIES_FULL_PATH}) 
+  list(APPEND DEPENDENCIES_LINK_LIBRARIES ${PROJECT_INSTALLED_LIBRARIES_FULL_PATH})
   list(REMOVE_DUPLICATES DEPENDENCIES_LINK_LIBRARIES)
-  
+
   foreach( _EXE_TARGET ${EXECUTABLE_TARGETS_LIST})
     get_target_property(target_name ${_EXE_TARGET} OUTPUT_NAME)
     list(APPEND DEPENDENCIES_EXE "${CMAKE_INSTALL_PREFIX}/${PACKAGE_LIB_DESTINATION}/${target_name}")
   endforeach()
   list(REMOVE_DUPLICATES DEPENDENCIES_EXE)
-   
+
   set(EXPORTED_TARGET_INCLUDE_DIRS      "${DEPENDENCIES_INCLUDE_DIRS}")
   set(EXPORTED_LIBRARY_TARGETS_LIST     "${DEPENDENCIES_LINK_LIBRARIES}")
   set(EXPORTED_EXECUTABLE_TARGETS_LIST  "${DEPENDENCIES_EXE}")
 
   set(EXPORTED_LIBRARY_TARGET_RPATH     "${PACKAGE_LIB_DESTINATION}")
-  
+
   ##
   message(STATUS "CONFIG_NAMESPACE                = ${CONFIG_NAMESPACE}"                )
   message(STATUS "TARGETS_EXPORT_NAME             = ${TARGETS_EXPORT_NAME}"             )
@@ -99,7 +99,7 @@ macro(
   # ===================================================
   # configuration files
   # ===================================================
-  
+
   # 1) Create the ${PROJECT_NAME}ConfigVersion.cmake using the template
   include(CMakePackageConfigHelpers)
 
@@ -125,7 +125,7 @@ macro(
     DESTINATION "${PACKAGE_CONFIG_DESTINATION}"
     FILE ${TARGETS_EXPORT_NAME}.cmake
   )
-  
+
   #------------------------------------------------------------------------------
   # Install cmake config files
   install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake"
@@ -142,5 +142,6 @@ macro(
       CATKIN_DEPENDS roscpp
       DEPENDS cnr_yaml)
   endif()
-     
+
 endmacro()
+
