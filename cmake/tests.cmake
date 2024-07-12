@@ -100,8 +100,8 @@ if(BUILD_INTEGRATION_TESTS)
   if(ROS1_MODULE)
     add_rostest_gtest(
       test_ros_module 
-      launch/ros1_test.test
-      test_ros_module.cpp
+      test/launch/ros1_test.test
+      test/test_ros_module.cpp
     )
     target_link_libraries(test_ros_module  cnr_param::cnr_param ${catkin_LIBRARIES})
     list(APPEND TARGETS_LIST test_ros_module)
@@ -110,7 +110,7 @@ if(BUILD_INTEGRATION_TESTS)
     add_rostest_gtest(
        test_cnr_param_ros_and_mapped_file
        launch/cnr_param_test.test
-       test_cnr_param.cpp
+       test/test_cnr_param.cpp
     )
     target_link_libraries(test_cnr_param_ros_and_mapped_file  cnr_param::cnr_param ${catkin_LIBRARIES})
     target_compile_definitions(test_cnr_param_ros_and_mapped_file PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test/")

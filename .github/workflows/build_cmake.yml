@@ -179,12 +179,14 @@ jobs:
       working-directory: ./build
       run: |
           gcovr -r .. . --branches --xml > coverage.xml
+    - name: Check Build Path
+      run: pwd && tree
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests # optional
-        files: ${{runner.workspace}}/build/test-results/**/*.xml
+        files: ${{runner.workspace}}/build/**/*.xml
         name: codecov-umbrella # optional
         fail_ci_if_error: false # optional (default = false)
         verbose: false # optional (default = false)
