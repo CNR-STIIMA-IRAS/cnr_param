@@ -172,7 +172,7 @@ jobs:
         endif()
 
     - name: generate coverage
-      working-directory: ./build
+      working-directory: ./build/test
       run: |
           make cov
     - name: Generate JSON coverage report

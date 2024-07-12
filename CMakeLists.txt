@@ -215,7 +215,9 @@ cnr_install("${LIBRARY_TARGETS_LIST}" "${EXECUTABLE_TARGETS_LIST}"
 # ##############################################################################
 
 if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
+  message(WARNING "Tests Added")
   add_subdirectory(test)
+  message(WARNING "Converage target added")
   include(cmake/coverage.cmake)
   add_coverage_target("*/test/*")
 endif()
