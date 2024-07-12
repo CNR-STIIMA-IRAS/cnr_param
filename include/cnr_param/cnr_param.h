@@ -72,7 +72,7 @@ bool get(const std::string& key, T& value, std::string& what, const T& default_v
  */
 template <typename T>
 bool get(const std::string& key, T& value, std::string& what, const bool& implicit_cast_if_possible = false, 
-         const std::vector<ModulesID>& module = { ModulesID::ROS1,ModulesID::ROS2, ModulesID::MAPPED_FILE });
+         const std::vector<ModulesID>& module = { ModulesID::ROS1, ModulesID::ROS2, ModulesID::MAPPED_FILE });
 
 /**
  * @brief set the param, and return true if found and ok. Store the error(s) in 'what'. Typical error is the
