@@ -256,7 +256,7 @@ set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 [r2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml/badge.svg
 [2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml
 
-[c]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param/graph/badge.svg?token=fuuQUJHhaQ
+[c]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param/graph/badge.svg?token=IP1nDvLoMk
 [3]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param
 
 [y]:https://api.codacy.com/project/badge/Grade/7f1834c02aa84b959ee9b7529deb48d6
@@ -267,3 +267,4 @@ set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 
 [o]:https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml.svg?type=large
 [5]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml?ref=badge_large
+
