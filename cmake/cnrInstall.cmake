@@ -1,9 +1,6 @@
 macro(cnr_install_directories)
-# Catkin and Ament are fake dependencies. They are used to test the building environment and
-# configure CMake environment consequently. I do not call catkin_package() or ament_package()
-# since they introduce also the creation of other files that are not needed in this case.
-  if(${catkin_FOUND})
-    set(PACKAGE_LIB_DESTINATION     "${CATKIN_GLOBAL_LIB_DESTINATION}")
+  if(ROS1_MODULE)
+    set(PACKAGE_LIB_DESTINATION     "${CATKIN_GLOBAL_LIB_DESTINATION}/${PROJECT_NAME}")
     set(PACKAGE_BIN_DESTINATION     "${CATKIN_GLOBAL_LIBEXEC_DESTINATION}/${PROJECT_NAME}")
     set(PACKAGE_INCLUDE_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
     set(PACKAGE_CONFIG_DESTINATION  "share/${PROJECT_NAME}/cmake_alternative")
@@ -47,13 +44,15 @@ macro(
   foreach(_LIBRARY_TARGET ${LIBRARY_TARGETS_LIST})
     get_target_property(target_type ${_LIBRARY_TARGET} TYPE)
     if (target_type STREQUAL "SHARED_LIBRARY")
-    get_target_property(target_name ${_LIBRARY_TARGET} OUTPUT_NAME)
-      list(APPEND DEPENDENCIES_LINK_LIBRARIES "${CMAKE_INSTALL_PREFIX}/${PACKAGE_LIB_DESTINATION}/${CMAKE_SHARED_LIBRARY_PREFIX}${target_name}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      get_target_property(target_name ${_LIBRARY_TARGET} OUTPUT_NAME)
+      list(APPEND PROJECT_INSTALLED_LIBRARIES_FULL_PATH "${CMAKE_INSTALL_PREFIX}/${PACKAGE_LIB_DESTINATION}/${CMAKE_SHARED_LIBRARY_PREFIX}${target_name}${CMAKE_SHARED_LIBRARY_SUFFIX}")
     elseif (target_type STREQUAL "STATIC_LIBRARY")
       get_target_property(target_name ${_LIBRARY_TARGET} OUTPUT_NAME)
-      list(APPEND DEPENDENCIES_LINK_LIBRARIES "${CMAKE_INSTALL_PREFIX}/${PACKAGE_LIB_DESTINATION}/${CMAKE_STATIC_LIBRARY_PREFIX}${target_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+      list(APPEND PROJECT_INSTALLED_LIBRARIES_FULL_PATH "${CMAKE_INSTALL_PREFIX}/${PACKAGE_LIB_DESTINATION}/${CMAKE_STATIC_LIBRARY_PREFIX}${target_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
     endif()
   endforeach()
+
+  list(APPEND DEPENDENCIES_LINK_LIBRARIES ${PROJECT_INSTALLED_LIBRARIES_FULL_PATH}) 
   list(REMOVE_DUPLICATES DEPENDENCIES_LINK_LIBRARIES)
   
   foreach( _EXE_TARGET ${EXECUTABLE_TARGETS_LIST})
@@ -97,42 +96,51 @@ macro(
     LIBRARY DESTINATION "${PACKAGE_LIB_DESTINATION}"
     RUNTIME DESTINATION "${PACKAGE_BIN_DESTINATION}")
 
+  # ===================================================
+  # configuration files
+  # ===================================================
+  
+  # 1) Create the ${PROJECT_NAME}ConfigVersion.cmake using the template
+  include(CMakePackageConfigHelpers)
+
+  #------------------------------------------------------------------------------
+  # Configure <PROJECT_NAME>ConfigVersion.cmake common to build and install tree
+  write_basic_package_version_file(
+    "${VERSION_CONFIG}"
+    VERSION ${extracted_version}
+    COMPATIBILITY SameMajorVersion)
+
+  #------------------------------------------------------------------------------
+  # Create the ${PROJECT_NAME}Config.cmake using the template
+  # ${PROJECT_NAME}Config.cmake.in
+  configure_package_config_file(
+    "${PROJECT_CONFIG_INPUT_TEMPLATE}" "${PROJECT_CONFIG_OUTPUT}"
+    INSTALL_DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
+
+  #------------------------------------------------------------------------------
+  # Install cmake targets files
+  install(
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    NAMESPACE "${CONFIG_NAMESPACE}"
+    DESTINATION "${PACKAGE_CONFIG_DESTINATION}"
+    FILE ${TARGETS_EXPORT_NAME}.cmake
+  )
+  
+  #------------------------------------------------------------------------------
+  # Install cmake config files
+  install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake"
+          DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
+
+  # 2) In the case we are compiling using catkin, we also create the
+  #  ${PROJECT_NAME}ConfigVersion.cmake following catkin rules
+  # NOTE: This config file does not support the modern cmake features, i.e., it does not support
+  #       the IMPORTED targets. This is a limitation of catkin.
   if(ROS1_MODULE)
     catkin_package(
       INCLUDE_DIRS ${INSTALL_INTERFACE_INCLUDE_DIRS}
-      LIBRARIES ${LIBRARY_TARGETS_LIST}
+      LIBRARIES ${PROJECT_INSTALLED_LIBRARIES_FULL_PATH}
       CATKIN_DEPENDS roscpp
       DEPENDS cnr_yaml)
-  else()
-    include(CMakePackageConfigHelpers)
-
-    #------------------------------------------------------------------------------
-    # Configure <PROJECT_NAME>ConfigVersion.cmake common to build and install tree
-    write_basic_package_version_file(
-      "${VERSION_CONFIG}"
-      VERSION ${extracted_version}
-      COMPATIBILITY SameMajorVersion)
-
-    #------------------------------------------------------------------------------
-    # Create the ${PROJECT_NAME}Config.cmake using the template
-    # ${PROJECT_NAME}Config.cmake.in
-    configure_package_config_file(
-      "${PROJECT_CONFIG_INPUT_TEMPLATE}" "${PROJECT_CONFIG_OUTPUT}"
-      INSTALL_DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
-
-    #------------------------------------------------------------------------------
-    # Install cmake targets files
-    install(
-      EXPORT "${TARGETS_EXPORT_NAME}"
-      NAMESPACE "${CONFIG_NAMESPACE}"
-      DESTINATION "${PACKAGE_CONFIG_DESTINATION}"
-      FILE ${TARGETS_EXPORT_NAME}.cmake
-    )
-    
-    #------------------------------------------------------------------------------
-    # Install cmake config files
-    install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cnrDependencies.cmake"
-            DESTINATION "${PACKAGE_CONFIG_DESTINATION}")
   endif()
-
+     
 endmacro()
