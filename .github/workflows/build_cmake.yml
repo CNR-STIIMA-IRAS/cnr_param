@@ -164,7 +164,7 @@ jobs:
 
         execute_process(
           COMMAND ctest --rerun-failed --output-on-failure
-          WORKING_DIRECTORY build/test
+          WORKING_DIRECTORY build
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
@@ -172,7 +172,7 @@ jobs:
         endif()
 
     - name: generate coverage
-      working-directory: ./build/test
+      working-directory: ./build
       run: |
           make cov
     - name: Generate JSON coverage report
