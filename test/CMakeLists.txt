@@ -103,14 +103,15 @@ if(BUILD_INTEGRATION_TESTS)
     target_link_libraries(test_ros_module  cnr_param::cnr_param ${catkin_LIBRARIES})
     list(APPEND TARGETS_LIST test_ros_module)
 
-    # add_rostest_gtest(
-    #   test_cnr_param_ros_and_mapped_file
-    #   launch/cnr_param_test.test
-    #   test_cnr_param.cpp
-    # )
-    # target_link_libraries(test_cnr_param_ros_and_mapped_file  cnr_param::cnr_param ${catkin_LIBRARIES})
-    # target_compile_definitions(test_cnr_param_ros_and_mapped_file PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
-    # list(APPEND TARGETS_LIST test_cnr_param_ros_and_mapped_file)
+    message(STATUS "Compiling test_cnr_param_ros_and_mapped_file.cpp")
+    add_rostest_gtest(
+       test_cnr_param_ros_and_mapped_file
+       launch/cnr_param_test.test
+       test_cnr_param.cpp
+    )
+    target_link_libraries(test_cnr_param_ros_and_mapped_file  cnr_param::cnr_param ${catkin_LIBRARIES})
+    target_compile_definitions(test_cnr_param_ros_and_mapped_file PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+    list(APPEND TARGETS_LIST test_cnr_param_ros_and_mapped_file)
   endif()
 
   if(ROS2_MODULE)
