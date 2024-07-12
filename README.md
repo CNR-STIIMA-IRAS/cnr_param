@@ -1,3 +1,9 @@
+
+[![Build Status - Plain CMake][p]][0] [![Build Status - ROS1][r]][1] [![Build Status - ROS1][r2]][2]
+[![codecov][c]][3] 
+[![Codacy Badge][y]][4]
+[![FOSSA Status][f]][5]
+
 # cnr_param
 
 A package to read and write parameters for your C++ application.
@@ -235,3 +241,29 @@ Open Command Prompt and set the `CNR_PARAM_ROOT_DIRECTORY` environment variable 
 ```bash
 set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 ```
+
+
+## License
+
+[![FOSSA Status][o]][5]
+
+[p]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/build_cmake.yml/badge.svg
+[0]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/build_cmake.yml
+
+[r]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml/badge.svg
+[1]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml
+
+[r2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml/badge.svg
+[2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml
+
+[c]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param/graph/badge.svg?token=fuuQUJHhaQ
+[3]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param
+
+[y]:https://api.codacy.com/project/badge/Grade/7f1834c02aa84b959ee9b7529deb48d6
+[4]:https://app.codacy.com/gh/CNR-STIIMA-IRAS/cnr_param?utm_source=github.com&utm_medium=referral&utm_content=CNR-STIIMA-IRAS/cnr_param&utm_campaign=Badge_Grade_Dashboard
+
+[f]:https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_param.svg?type=shield&issueType=license
+[5]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2cnr_param?ref=badge_shield&issueType=license
+
+[o]:https://app.fossa.com/api/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml.svg?type=large
+[5]:https://app.fossa.com/projects/git%2Bgithub.com%2FCNR-STIIMA-IRAS%2Fcnr_yaml?ref=badge_large
