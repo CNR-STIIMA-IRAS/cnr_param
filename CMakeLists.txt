@@ -216,4 +216,6 @@ cnr_install("${LIBRARY_TARGETS_LIST}" "${EXECUTABLE_TARGETS_LIST}"
 
 if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
   add_subdirectory(test)
+  include(cmake/coverage.cmake)
+  add_coverage_target("*/tests/*")
 endif()

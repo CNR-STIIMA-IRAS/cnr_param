@@ -132,8 +132,3 @@ if(BUILD_INTEGRATION_TESTS)
                 PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
   endif()
 endif()
-
-if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
-  include(cmake/coverage.cmake)
-  add_coverage_target("*/tests/*")
-endif()
