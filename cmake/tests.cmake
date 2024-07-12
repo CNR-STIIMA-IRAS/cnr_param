@@ -45,7 +45,7 @@ macro(cnr_unit_gtest trg src deps)
   endif()
 
   if(TARGET ${trg})
-    target_compile_definitions(${trg} PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+    target_compile_definitions(${trg} PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test")
   endif()
     
 endmacro()
@@ -71,7 +71,7 @@ macro(cnr_integration_gtest trg src deps)
   )
   if(TARGET ${trg})
     target_link_libraries(${trg} PUBLIC ${TEST_DEPENDENCIES})
-    target_compile_definitions(${trg} PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+    target_compile_definitions(${trg} PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test/")
   endif()
     
 endmacro()
@@ -113,7 +113,7 @@ if(BUILD_INTEGRATION_TESTS)
        test_cnr_param.cpp
     )
     target_link_libraries(test_cnr_param_ros_and_mapped_file  cnr_param::cnr_param ${catkin_LIBRARIES})
-    target_compile_definitions(test_cnr_param_ros_and_mapped_file PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+    target_compile_definitions(test_cnr_param_ros_and_mapped_file PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test/")
     list(APPEND TARGETS_LIST test_cnr_param_ros_and_mapped_file)
   endif()
 
@@ -122,13 +122,13 @@ if(BUILD_INTEGRATION_TESTS)
     cnr_integration_gtest(test_ros2_module ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_module.cpp cnr_param::cnr_param)
 
     target_compile_definitions(test_ros2_module
-                PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+                PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test/")
     list(APPEND TARGETS_LIST test_ros2_module)
     # EXECUTABLE #################################################################
 
     cnr_integration_gtest(test_cnr_param ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cnr_param.cpp cnr_param::cnr_param)
 
     target_compile_definitions(test_cnr_param
-                PRIVATE TEST_DIR="${CMAKE_CURRENT_LIST_DIR}")
+                PRIVATE TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test/")
   endif()
 endif()
