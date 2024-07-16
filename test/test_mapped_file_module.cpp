@@ -150,7 +150,7 @@ TEST(MappedFileModule, ServerUsage)
     "--ns-and-path-to-file", "/ns1,"    TEST_DIR "/config/drape_cell_hw.yaml",
     "--ns-and-path-to-file", "/ns2,"    TEST_DIR "/config/drape_cell_hw.yaml",
     "--ns-and-path-to-file", "/ns1/ns2," TEST_DIR "/config/drape_cell_hw.yaml",
-    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/par.yaml",
+    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/par_with_null_value.yaml",
 };
 
   EXPECT_TRUE(does_not_throw([&] { args = new cnr::param::mapped_file::ArgParser(argc, argv, default_shmem_name); }));
