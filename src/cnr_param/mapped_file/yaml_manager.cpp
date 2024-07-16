@@ -10,6 +10,7 @@
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/interprocess/managed_mapped_file.hpp>
 
+#include <cnr_yaml/string.h>
 #include <cnr_yaml/node_utils.h>
 
 #include <cnr_param/core/string.h>
@@ -69,6 +70,7 @@ YAMLStreamer::YAMLStreamer(const YAML::Node& root, const std::string& path_to_sh
   {
     throw std::runtime_error("Error in creating the shared file mapping");
   }
+
   if(!YAMLStreamer::streamNodes(absolute_root_path.string()))
   {
     throw std::runtime_error("Error in creating the shared file mapping");
@@ -97,6 +99,11 @@ bool YAMLStreamer::streamLeaf(const std::string& absolute_root_path_string)
         
         auto keys = cnr::param::core::tokenize(rp.string(), "/");
         auto node = cnr::yaml::get_leaf(keys, root_);
+        if(node.begin()->second.Type() == YAML::NodeType::Null)
+        {
+          std::cerr << "WARNING: the node '" << node << "' has a NULL Value. The streaming to the mapped file value is skipped" << std::endl;
+          continue;
+        }
         std::string str = YAML::Dump(node);
 
         l = __LINE__;
@@ -149,6 +156,11 @@ bool YAMLStreamer::streamNodes(const std::string& absolute_root_path_string)
     {
       l = __LINE__;
       YAML::Node _node;
+      if(node.second.Type() == YAML::NodeType::Null)
+      {
+        std::cerr << "WARNING: the node '" << node.second << "' has a NULL Value. The streaming of the node to the mapped yaml file is skipped." << std::endl;
+        continue;
+      }
       _node[keys.back()] = node.second;
 
       l = __LINE__;
