@@ -23,7 +23,7 @@ std::string to_string(const ComplexType& c)
 }
 
 
-#include <cnr_param/cnr_param.h>
+#include <cnr_param/mapped_file/param.h>
 
 #if MAPPED_FILE_MODULE
 
@@ -123,7 +123,7 @@ template<typename T>
 bool call(const std::string& key, T& value)
 {
   std::string what;
-  if(!cnr::param::get(key, value, what))
+  if(!cnr::param::mapped_file::get(key, value, what))
   {
     std::cerr << "What: " << what << std::endl;
     return false;
@@ -190,18 +190,23 @@ TEST(MappedFileModule, ClientUsage)
     return ok && value == expected;
   };
 
+  std::cout << "Getting and empy value" << std::endl;
+  EXPECT_FALSE(cnr::param::mapped_file::has("/n1/n2/p1", what));
+  std::cout << "Getting and empy value: " << what << std::endl;
+  EXPECT_FALSE(f1("/n1/n2/p1", "p1"));
+
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic", "/joint_states"));
   value = value + "_CIAO";
-  EXPECT_TRUE(cnr::param::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::mapped_file::set("/ns1/ns2/plan_hw/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic", "/joint_states_CIAO"));
 
-  EXPECT_TRUE(cnr::param::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
+  EXPECT_TRUE(cnr::param::mapped_file::set("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", value, what));
   EXPECT_TRUE(f1("/ns1/ns3/plan_hw_NEW_NOT_IN_FILE/feedback_joint_state_topic", "/joint_states_CIAO"));
 
   int val = 9, before, after;
-  EXPECT_TRUE(cnr::param::set("/a", val, what));
+  EXPECT_TRUE(cnr::param::mapped_file::set("/a", val, what));
   EXPECT_TRUE(call("/a", before));
-  EXPECT_TRUE(cnr::param::set("/a", "0x0009", what));
+  EXPECT_TRUE(cnr::param::mapped_file::set("/a", "0x0009", what));
   EXPECT_TRUE(call("/a", after));
   EXPECT_TRUE(before - after == 0);
 
@@ -222,14 +227,7 @@ TEST(MappedFileModule, ClientNonExistentParam)
     return ok;
   };
 
-  auto f2 = [](const std::string& path, const std::string& defval) {
-    std::string topic;
-    std::string what;
-    bool ok = cnr::param::get(path, topic, what, defval);
-    return ok;
-  };
   EXPECT_FALSE(f1("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST"));
-  EXPECT_TRUE(f2("/ns1/ns2/plan_hw/feedback_joint_state_topic__NOT_EXIST", defval));
 }
 
 // ====================================================================================================================
