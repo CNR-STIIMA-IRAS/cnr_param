@@ -252,8 +252,8 @@ set CNR_PARAM_ROOT_DIRECTORY="your_directory_path"
 [r]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml/badge.svg
 [1]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml
 
-[r2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml/badge.svg
-[2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros1.yml
+[r2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros2.yml/badge.svg
+[2]:https://github.com/CNR-STIIMA-IRAS/cnr_param/actions/workflows/ros2.yml
 
 [c]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param/graph/badge.svg?token=IP1nDvLoMk
 [3]:https://codecov.io/gh/CNR-STIIMA-IRAS/cnr_param
