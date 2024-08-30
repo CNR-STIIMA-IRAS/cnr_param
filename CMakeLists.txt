@@ -116,6 +116,7 @@ list(APPEND cnr_param_SRC ${SRC_DIR}/cnr_param.cpp)
 add_library(cnr_param SHARED ${cnr_param_SRC})
 add_library(cnr_param_static STATIC ${cnr_param_SRC})
 
+target_compile_features(cnr_param PUBLIC cxx_std_20)
 # set PIC
 set_target_properties(
   cnr_param
