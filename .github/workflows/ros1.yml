@@ -2,9 +2,9 @@ name: ros1
 
 on:
   push:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
   pull_request:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)

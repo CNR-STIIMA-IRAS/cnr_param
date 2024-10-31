@@ -313,7 +313,7 @@ using namespace std::chrono_literals;
 class TestParams : public rclcpp::Node
 {
 public:
-  TestParams(const std::string& node_name)
+  explicit TestParams(const std::string& node_name)
     : Node(
           node_name,
           rclcpp::NodeOptions().allow_undeclared_parameters(true).automatically_declare_parameters_from_overrides(true))
@@ -356,36 +356,33 @@ int main(int argc, char** argv)
   auto parameters_client =  std::make_shared<rclcpp::AsyncParametersClient>(parameters_server_node);
   parameters_client->wait_for_service();
   
-  if(!yaml_files.empty())
+  auto it = yaml_files.begin();
+  while (it != yaml_files.end())
   {
-
-    auto it = yaml_files.begin();
-    while (it != yaml_files.end())
+    std::cout << "Reading yaml parameter files located at" <<  *it << std::endl;
+    auto params = parameters_client->load_parameters(*it);
+    std::chrono::milliseconds span(10000);
+    bool ok;
+    EXPECT_TRUE(ok = (params.wait_for(span) == std::future_status::ready) );
+    if (!ok)
     {
-      std::cout << "Reading yaml parameter files located at" <<  *it << std::endl;
-      auto params = parameters_client->load_parameters(*it);
-      std::chrono::milliseconds span(10000);
-      bool ok;
-      EXPECT_TRUE(ok = (params.wait_for(span) == std::future_status::ready) );
-      if (!ok)
+      std::cerr << "Timeout in reading yaml parameter files located at" <<  *it << ". Abort "<< std::endl;
+      return 0;
+    }
+
+    for(const auto & p : params.get())
+    {
+      EXPECT_TRUE(p.successful );
+      if(!p.successful)
       {
         std::cerr << "Timeout in reading yaml parameter files located at" <<  *it << ". Abort "<< std::endl;
         return 0;
       }
-
-      for(const auto & p : params.get())
-      {
-        EXPECT_TRUE(p.successful );
-        if(!p.successful)
-        {
-          std::cerr << "Timeout in reading yaml parameter files located at" <<  *it << ". Abort "<< std::endl;
-          return 0;
-        }
-        
-      }
-      it = yaml_files.erase(it);
+      
     }
+    it = yaml_files.erase(it);
   }
+
 
   std::vector<std::string> parameters_name;
   auto list = parameters_server_node->list_parameters({}, 1000);

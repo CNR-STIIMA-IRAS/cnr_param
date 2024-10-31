@@ -2,12 +2,12 @@ name: 'PLAIN CMake CI'
 
 on:
   push:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
     paths-ignore:
     - 'docs/**'
     - 'README.md'
   pull_request:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -27,9 +27,11 @@ jobs:
 
     - name: Install dependencies
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && sudo apt-get install -y --fix-missing  libboost-iostreams-dev libeigen3-dev libboost-program-options-dev libyaml-cpp-dev libboost-date-time-dev liblog4cxx-dev libgtest-dev cmake tree lcov gcovr  libboost-filesystem-dev git libyaml-cpp-dev
-      # python3-coverage
-
+      run: sudo apt-get update && 
+        sudo apt-get install -y --fix-missing git 
+        libboost-iostreams-dev libeigen3-dev libboost-program-options-dev libboost-filesystem-dev libboost-date-time-dev libyaml-cpp-dev
+        libgtest-dev cmake tree lcov gcovr python3-lxml 
+        
     - name: Download Ninja and CMake
       id: cmake_and_ninja
       shell: cmake -P {0}
@@ -162,26 +164,29 @@ jobs:
 
         execute_process(
           COMMAND ctest --rerun-failed --output-on-failure
-          WORKING_DIRECTORY build/test
+          WORKING_DIRECTORY build
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Running tests failed!")
         endif()
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: test_results_xml
-        path: ${{runner.workspace}}/build/test-results/**/*.xml
-
-    - uses: codecov/codecov-action@v3
+    - name: generate coverage
+      working-directory: ./build
+      run: |
+          make cov
+    - name: Generate JSON coverage report
+      working-directory: ./build
+      run: |
+          gcovr -r .. . --branches --xml > coverage.xml
+    - name: Check Build Path
+      run: pwd && tree
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests # optional
-        files: ${{runner.workspace}}/build/test-results/**/*.xml
+        files: ${{runner.workspace}}/build/**/*.xml
         name: codecov-umbrella # optional
         fail_ci_if_error: false # optional (default = false)
         verbose: false # optional (default = false)
-

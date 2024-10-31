@@ -31,11 +31,16 @@
 *.out
 *.app
 
+*.txt.user*
+*.orig*
+*.autosave*
+
 build/
 Testing/
 .cache/
 .vscode/
 
 compile_commands.json
+
 include/cnr_param/config.h
 cnr_param/include/cnr_param/config.h

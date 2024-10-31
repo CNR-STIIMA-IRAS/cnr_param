@@ -42,7 +42,7 @@ enum class ModulesID : uint8_t
  * @return true if ok, or if default value has been superimposed, false otherwise.
  */
 bool has(const std::string& key, std::string& what,
-         const std::vector<ModulesID>& module = { ModulesID::ROS2, ModulesID::MAPPED_FILE });
+         const std::vector<ModulesID>& module = { ModulesID::ROS1, ModulesID::ROS2, ModulesID::MAPPED_FILE });
 
 /**
  * @brief get the param, and return true if found and ok. Store the error(s) in 'what'. If a default value is present,
@@ -58,7 +58,7 @@ bool has(const std::string& key, std::string& what,
 template <typename T>
 bool get(const std::string& key, T& value, std::string& what, const T& default_val, 
          const bool& implicit_cast_if_possible = false, 
-         const std::vector<ModulesID>& module = { ModulesID::ROS2, ModulesID::MAPPED_FILE });
+         const std::vector<ModulesID>& module = { ModulesID::ROS1, ModulesID::ROS2, ModulesID::MAPPED_FILE });
 
 /**
  * @brief get the param, and return true if found and ok. Store the error(s) in 'what'. If a default value is present,
@@ -72,7 +72,7 @@ bool get(const std::string& key, T& value, std::string& what, const T& default_v
  */
 template <typename T>
 bool get(const std::string& key, T& value, std::string& what, const bool& implicit_cast_if_possible = false, 
-         const std::vector<ModulesID>& module = { ModulesID::ROS2, ModulesID::MAPPED_FILE });
+         const std::vector<ModulesID>& module = { ModulesID::ROS1, ModulesID::ROS2, ModulesID::MAPPED_FILE });
 
 /**
  * @brief set the param, and return true if found and ok. Store the error(s) in 'what'. Typical error is the
@@ -85,7 +85,7 @@ bool get(const std::string& key, T& value, std::string& what, const bool& implic
  */
 template <typename T>
 bool set(const std::string& key, const T& value, std::string& what,
-         const std::vector<ModulesID>& module = { ModulesID::ROS2, ModulesID::MAPPED_FILE });
+         const std::vector<ModulesID>& module = { ModulesID::ROS1, ModulesID::ROS2, ModulesID::MAPPED_FILE });
 
 }  // namespace param
 }  // namespace cnr

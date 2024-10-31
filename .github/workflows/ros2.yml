@@ -1,10 +1,10 @@
-name: ros1
+name: ros2
 
 on:
   push:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
   pull_request:
-    branches: [ no-ament-only-cmake ]
+    branches: [ master ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -25,17 +25,10 @@ jobs:
         - os: ubuntu-22.04
           ros_distro: 'humble'
 
-
     steps:   
-    - uses: ros-tooling/setup-ros@v0.2
+    - uses: ros-tooling/setup-ros@v0.7
       with:
         required-ros-distributions: ${{ matrix.ros_distro }}
-
-    # - name: Install dependencies
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base python3-catkin-tools
-    #     sudo pip3 uninstall empy --yes
 
     - name: Setup catkin workspace
       run: | 
@@ -58,7 +51,7 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/colcon_ws
-        olcon build --symlink-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
+        colcon build --symlink-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
 
     - name: colcon test
       run: |
