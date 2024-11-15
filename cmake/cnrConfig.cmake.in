@@ -20,13 +20,13 @@ set(cnr_param_RPATH        "@EXPORTED_LIBRARY_TARGET_RPATH@")
 include("${CMAKE_CURRENT_LIST_DIR}/cnr_paramTargets.cmake")
 
 set_target_properties(cnr_param::cnr_param PROPERTIES
-  # IMPORTED_LOCATION_NOCONFIG "${cnr_param_TARGET_LINK_DIRECTORIES}/libcnr_param.so"
+  IMPORTED_LOCATION_NOCONFIG "${cnr_param_RPATH}/libcnr_param.so"
   BUILD_RPATH "${cnr_param_RPATH}"
   INSTALL_RPATH "${cnr_param_RPATH}"
 )
 
 set_target_properties(cnr_param::cnr_param_static PROPERTIES
-  # IMPORTED_LOCATION_NOCONFIG "${cnr_param_TARGET_LINK_DIRECTORIES}/libcnr_param.a"
+  IMPORTED_LOCATION_NOCONFIG "${cnr_param_RPATH}/libcnr_param.a"
   BUILD_RPATH "${cnr_param_RPATH}"
   INSTALL_RPATH "${cnr_param_RPATH}"
 )
