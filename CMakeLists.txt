@@ -20,33 +20,38 @@ cnr_set_flags()
 # ##############################################################################
 # OPTIONS                 ##
 # ##############################################################################
-option(COMPILE_ROS1_MODULE "ROS 1 SUPPORT" OFF)
-option(COMPILE_ROS2_MODULE "ROS 2 SUPPORT" OFF)
-option(COMPILE_MAPPED_FILE_MODULE "MAPPED FILE SUPPORT" ON)
-option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
-option(BUILD_INTEGRATION_TESTS "Build the integration tests" OFF)
+option(BUILD_AS_A_CATKIN_PACKAGE  "Build the library as a CATKIN package"  OFF)
+option(BUILD_AS_AN_AMENT_PACKAGE  "Build the library as an AMENT package"  OFF)
+option(COMPILE_ROS1_MODULE        "ROS 1 INTEGRATION SUPPORT"              OFF)
+option(COMPILE_ROS2_MODULE        "ROS 2 INTEGRATION SUPPORT"              OFF)
+option(COMPILE_MAPPED_FILE_MODULE "MAPPED FILE SUPPORT"                    ON)
+option(BUILD_UNIT_TESTS           "Build the unit tests"                   OFF)
+option(BUILD_INTEGRATION_TESTS    "Build the integration tests"            OFF)
 
-
-if(COMPILE_ROS1_MODULE AND "$ENV{ROS_VERSION}" STREQUAL "1")
-  message(STATUS "The ROS 1 Module will be compiled")
-  set(ROS1_MODULE 1)
-else()
-  message(
-    STATUS
-      "The ROS 1 Module is not compiled (Running ROS version $ENV{ROS_VERSION})"
-  )
-  set(ROS1_MODULE 0)
-endif()
-
-if(COMPILE_ROS2_MODULE AND "$ENV{ROS_VERSION}" STREQUAL "2")
-  message(STATUS "The ROS 2 Module will be compiled")
-  set(ROS2_MODULE 1)
-else()
-  message(
-    STATUS
-      "The ROS 2 Module is not compiled (Running ROS version $ENV{ROS_VERSION})"
-  )
-  set(ROS2_MODULE 0)
+set(ROS1_MODULE 0)
+set(ROS2_MODULE 0)
+if(BUILD_AS_A_CATKIN_PACKAGE) 
+  if(BUILD_A_AN_AMENT_PACKAGE)
+    message(FATAL_ERROR 
+      "You selected both CATKIN and AMENT compilation options. Please, check your environment and select the proper configuration.")
+  endif()
+  if(NOT "$ENV{ROS_VERSION}" STREQUAL "1")
+    message(FATAL_ERROR
+      "You selected CATKIN compilation option, but ROS environment is not sourced.")
+  endif()
+  if(COMPILE_ROS1_MODULE)
+    message(STATUS "The ROS 1 Module will be compiled")
+    set(ROS1_MODULE 1)
+  endif()
+elseif(BUILD_A_AN_AMENT_PACKAGE)
+  if(NOT "$ENV{ROS_VERSION}" STREQUAL "2")
+    message(FATAL_ERROR
+      "You selected CATKIN compilation option, but ROS environment is not sourced.")
+  endif()
+  if(COMPILE_ROS2_MODULE)
+    message(STATUS "The ROS 2 Module will be compiled")
+    set(ROS2_MODULE 1)
+  endif()
 endif()
 
 if(COMPILE_MAPPED_FILE_MODULE)
@@ -109,12 +114,10 @@ if(MAPPED_FILE_MODULE)
 endif()
 
 # cnr_param
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME})
-list(APPEND cnr_param_SRC ${SRC_DIR}/cnr_param.cpp)
+list(APPEND cnr_param_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/cnr_param.cpp)
 
 # ## add library
 add_library(cnr_param SHARED ${cnr_param_SRC})
-add_library(cnr_param_static STATIC ${cnr_param_SRC})
 
 target_compile_features(cnr_param PUBLIC cxx_std_20)
 # set PIC
@@ -123,9 +126,6 @@ set_target_properties(
   PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON
              INSTALL_RPATH_USE_LINK_PATH TRUE
              OUTPUT_NAME cnr_param)
-set_target_properties(
-  cnr_param_static PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON OUTPUT_NAME
-                                                                 cnr_param)
 
 # Include DIRECTORIES: include and src
 list(APPEND BUILD_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
@@ -136,35 +136,19 @@ list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}"
 target_include_directories(
   cnr_param PUBLIC "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
                    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
-target_include_directories(
-  cnr_param_static PUBLIC 
-                    "$<BUILD_INTERFACE:${BUILD_INTERFACE_INCLUDE_DIRS}>"
-                    "$<INSTALL_INTERFACE:${INSTALL_INTERFACE_INCLUDE_DIRS}>")
 
 # ## link
 target_link_libraries(
   cnr_param
-  PUBLIC cnr_yaml::cnr_yaml
-  PUBLIC "${DEPENDENCIES_LIBRARIES}")
-
-target_link_libraries(
-  cnr_param_static
-  PUBLIC cnr_yaml::cnr_yaml_static
-  PUBLIC "${DEPENDENCIES_LIBRARIES}")
+  PUBLIC "${DEPENDENCIES_TARGETS}"
+  PUBLIC "${DEPENDENCIES_LINK_LIBRARIES}")
 
 # ## definitions
 target_compile_definitions(
   cnr_param PUBLIC ROS1_MODULE=${ROS1_MODULE} ROS2_MODULE=${ROS2_MODULE}
                    MAPPED_FILE_MODULE=${MAPPED_FILE_MODULE})
 
-# ## definitions
-target_compile_definitions(
-  cnr_param_static PUBLIC ROS1_MODULE=${ROS1_MODULE} ROS2_MODULE=${ROS2_MODULE}
-                          MAPPED_FILE_MODULE=${MAPPED_FILE_MODULE})
-
 add_library(cnr_param::cnr_param ALIAS cnr_param)
-add_library(cnr_param::cnr_param_static ALIAS cnr_param_static)
-list(APPEND LIBRARY_TARGETS_LIST cnr_param cnr_param_static)
 # ##############################################################################
 
 if(ROS2_MODULE)
