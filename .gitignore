@@ -44,3 +44,5 @@ compile_commands.json
 
 include/cnr_param/config.h
 cnr_param/include/cnr_param/config.h
+
+*.code-workspace

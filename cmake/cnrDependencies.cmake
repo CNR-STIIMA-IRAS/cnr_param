@@ -6,7 +6,7 @@
 include(CMakeFindDependencyMacro)
 
 if(${PROJECT_NAME} STREQUAL "cnr_param")
-  message(STATUS "Loading ''cnr_paramDependencies.cmake'' for the project '${PROJECT_NAME}'")
+  message(STATUS "Loading ''cnr_paramDependencies.cmake'' for the project ''${PROJECT_NAME}''")
   macro(_find_package)
     find_package(${ARGN})
   endmacro()
@@ -19,12 +19,12 @@ else()
   endmacro()
 endif()
 
+message(STATUS "The 'find_package' will look for modules under the following paths: ${CMAKE_PREFIX_PATH};${CMAKE_FRAMEWORK_PATH};${CMAKE_APPBUNDLE_PATH};${CMAKE_MODULE_PATH};${CMAKE_SYSTEM_PREFIX_PATH};${CMAKE_SYSTEM_FRAMEWORK_PATH};${CMAKE_SYSTEM_APPBUNDLE_PATH}")
+
 # ##########################################################################################
 if(cnr_param_ROS1_MODULE OR ROS1_MODULE)
-  message(STATUS "Find Catkin (REQUIRED) ...")
   _find_package(catkin REQUIRED COMPONENTS roscpp)
 elseif(cnr_param_ROS2_MODULE OR ROS2_MODULE)
-  message(STATUS "Find rclcpp (REQUIRED) ...")
   _find_package(rclcpp REQUIRED)
   _find_package(rmw REQUIRED)
   _find_package(rosidl_runtime_c REQUIRED)
@@ -46,7 +46,6 @@ _find_package(
   iostreams
   regex)
 
-message(STATUS "Find cnr_yaml (REQUIRED) ...")
 _find_package(cnr_yaml REQUIRED)
 
 ## In the case the cnr_yamlDependencies is imported from CMakeLists.txt of the 

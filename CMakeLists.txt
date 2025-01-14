@@ -17,9 +17,8 @@ cnr_set_flags()
 # END - PRELIMINARIES     ##
 # ##############################################################################
 
-
 # ##############################################################################
-# OPTIONS
+# OPTIONS                 ##
 # ##############################################################################
 option(BUILD_AS_A_CATKIN_PACKAGE  "Build the library as a CATKIN package"  OFF)
 option(BUILD_AS_AN_AMENT_PACKAGE  "Build the library as an AMENT package"  OFF)
@@ -120,6 +119,7 @@ list(APPEND cnr_param_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/cnr_pa
 # ## add library
 add_library(cnr_param SHARED ${cnr_param_SRC})
 
+target_compile_features(cnr_param PUBLIC cxx_std_20)
 # set PIC
 set_target_properties(
   cnr_param
