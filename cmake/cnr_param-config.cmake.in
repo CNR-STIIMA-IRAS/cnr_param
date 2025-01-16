@@ -4,13 +4,13 @@
 #  cnr_param_LIBRARIES    - libraries to link against
 #  cnr_param_EXECUTABLE   - the bar executable
 
-set(cnr_param_ROS1_MODULE @ROS1_MODULE_COMPILED@)
-set(cnr_param_ROS2_MODULE @ROS2_MODULE_COMPILED@)
-set(cnr_param_MAPPED_FILE @MAPPED_FILE_MODULE_COMPILED@)
+# Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-compile-options.cmake 
+@COMPILE_OPTIONS_FILE_CONTENT@
+# cnr_yaml-dependencies copied!d!
 
-# Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnrDependencies.cmake 
+# Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-dependencies.cmake 
 @DEPENDENCIES_FILE_CONTENT@
-# cnrDependencies copied!
+# cnr_param-dependencies copied!
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
 set(cnr_param_INCLUDE_DIRS "@EXPORTED_TARGET_INCLUDE_DIRS@")

@@ -7,11 +7,11 @@ else()
   message(FATAL_ERROR "unable to add gtest: missing pacakge GTest")
 endif()
 
-if(ROS1_MODULE)
+if(COMPILE_ROS1_MODULE)
   find_package(rostest REQUIRED)
 endif()
 
-if(ROS2_MODULE)
+if(COMPILE_ROS2_MODULE)
   find_package(ament_cmake_gtest REQUIRED)
 endif()
 #
@@ -21,7 +21,7 @@ macro(cnr_unit_gtest trg src deps)
   
   list(APPEND TEST_DEPENDENCIES ${deps})
   
-  if(ROS1_MODULE)
+  if(COMPILE_ROS1_MODULE)
     catkin_add_gtest(
       "${trg}"
       "${src}"
@@ -82,7 +82,7 @@ endmacro()
 
 if(BUILD_UNIT_TESTS)
   # EXECUTABLE #################################################################
-  if(ROS2_MODULE)
+  if(COMPILE_ROS2_MODULE)
     cnr_unit_gtest(test_ros2_yaml_formatter ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_yaml_formatter.cpp cnr_param::cnr_param)
     list(APPEND TARGETS_LIST test_ros2_yaml_formatter)
   endif()
@@ -97,7 +97,7 @@ endif()
 if(BUILD_INTEGRATION_TESTS)
 
   # EXECUTABLE #################################################################
-  if(ROS1_MODULE)
+  if(COMPILE_ROS1_MODULE)
     add_rostest_gtest(
       test_ros_module 
       test/launch/ros1_test.test
@@ -117,7 +117,7 @@ if(BUILD_INTEGRATION_TESTS)
     # list(APPEND TARGETS_LIST test_cnr_param_ros_and_mapped_file)
   endif()
 
-  if(ROS2_MODULE)
+  if(COMPILE_ROS2_MODULE)
     # EXECUTABLE #################################################################
     cnr_integration_gtest(test_ros2_module ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ros2_module.cpp cnr_param::cnr_param)
 

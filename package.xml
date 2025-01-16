@@ -14,6 +14,7 @@
   <build_depend>boost</build_depend>
   <build_depend>eigen</build_depend>
   <build_depend>cnr_yaml</build_depend>
+  <exec_depend condition="$ROS_VERSION == 1">cnr_yaml</exec_depend>
   
   <depend condition="$ROS_VERSION == 1">roscpp</depend>
   <depend condition="$ROS_VERSION == 2">rclcpp</depend>
