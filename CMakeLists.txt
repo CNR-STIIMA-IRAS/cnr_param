@@ -20,13 +20,18 @@ cnr_set_flags()
 # ##############################################################################
 # OPTIONS                 ##
 # ##############################################################################
+option(BUILD_UNIT_TESTS           "Build the unit tests"                   FALSE)
+option(BUILD_INTEGRATION_TESTS    "Build the integration tests"            FALSE)
+
 option(BUILD_AS_A_CATKIN_PACKAGE  "Build the library as a CATKIN package"  FALSE)
 option(BUILD_AS_AN_AMENT_PACKAGE  "Build the library as an AMENT package"  FALSE)
 option(COMPILE_ROS1_MODULE        "ROS 1 INTEGRATION SUPPORT"              FALSE)
 option(COMPILE_ROS2_MODULE        "ROS 2 INTEGRATION SUPPORT"              FALSE)
 option(COMPILE_MAPPED_FILE_MODULE "MAPPED FILE SUPPORT"                    TRUE)
-option(BUILD_UNIT_TESTS           "Build the unit tests"                   FALSE)
-option(BUILD_INTEGRATION_TESTS    "Build the integration tests"            FALSE)
+
+if(BUILD_UNIT_TESTS OR BUILD_INTEGRATION_TESTS)
+  set(CMAKE_BUILD_TYPE "Debug")
+endif()
 
 if(BUILD_AS_A_CATKIN_PACKAGE) 
   if(BUILD_A_AN_AMENT_PACKAGE)
@@ -132,8 +137,6 @@ endif()
 # ##############################################################################
 # Build       ##
 # ##############################################################################
-
-
 # Core Library
 set(SRC_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/core)
 list(APPEND cnr_param_SRC ${SRC_CORE_DIR}/colors.cpp

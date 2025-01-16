@@ -95,7 +95,6 @@ endif()
 
 
 if(BUILD_INTEGRATION_TESTS)
-
   # EXECUTABLE #################################################################
   if(COMPILE_ROS1_MODULE)
     add_rostest_gtest(

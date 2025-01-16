@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     param_root_directory = std::string(tempPath) + "cnr_param";
 #else
     // Linux/Unix/Mac
-    param_root_directory = "/tmp/cnr_param";
+    param_root_directory = "/tmp/cnr_param/";
 #endif
   }
 

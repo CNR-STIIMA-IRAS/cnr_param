@@ -117,7 +117,7 @@ std::map<std::string, std::map<std::string, std::vector<double>>> statistics;
 // === GLOBAL VARIABLES ===============================================================================================
 // ====================================================================================================================
 std::string param_root_directory;
-const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path();
+const std::string default_param_root_directory = boost::interprocess::ipcdetail::get_temporary_path()+"/cnr_param";
 
 template<typename T>
 bool call(const std::string& key, T& value)
@@ -143,15 +143,14 @@ TEST(MappedFileModule, ServerUsage)
   cnr::param::mapped_file::YAMLStreamer* yaml_streamer = nullptr;
 
   // Parsing of program inputs
-  const int argc = 13;
+  const int argc = 11;
   const char* const argv[] = { "test", 
-    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
-    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/mqtt_config.yaml",
-    "--ns-and-path-to-file", "/ns1,"    TEST_DIR "/config/drape_cell_hw.yaml",
-    "--ns-and-path-to-file", "/ns2,"    TEST_DIR "/config/drape_cell_hw.yaml",
-    "--ns-and-path-to-file", "/ns1/ns2," TEST_DIR "/config/drape_cell_hw.yaml",
+    "--ns-and-path-to-file", "/,"       TEST_DIR "/config/simple_params.yaml",
+    "--ns-and-path-to-file", "/ns1,"    TEST_DIR "/config/rooted_params.yaml",
+    "--ns-and-path-to-file", "/ns2,"    TEST_DIR "/config/rooted_params.yaml",
+    "--ns-and-path-to-file", "/ns1/ns2," TEST_DIR "/config/rooted_params.yaml",
     "--ns-and-path-to-file", "/,"       TEST_DIR "/config/par_with_null_value.yaml",
-};
+  };
 
   EXPECT_TRUE(does_not_throw([&] { args = new cnr::param::mapped_file::ArgParser(argc, argv, default_shmem_name); }));
 
@@ -325,54 +324,6 @@ struct convert<ComplexType>
 }  // namespace YAML
 
 
-// namespace cnr
-// {
-// namespace param
-// {
-// namespace core
-// {
-// template <>
-// bool get_map(const YAML::Node& node, ComplexType& ret, std::string& what, const bool& )
-// {
-//   try
-//   {
-//     if (node["name"] && node["value"])
-//     {
-//       ret.name = node["name"].as<std::string>();
-//       ret.value = node["value"].as<double>();
-//       return true;
-//     }
-//   }
-//   catch (YAML::Exception& e)
-//   {
-//     std::stringstream err;
-//     err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-//          << "YAML Exception, Error in the extraction of an object of type '"
-//          << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-//          << "Node: " << std::endl
-//          << node << std::endl
-//          << "What: " << std::endl
-//          << e.what() << std::endl;
-//     what = err.str();
-//   }
-//   catch (std::exception& e)
-//   {
-//     std::stringstream err;
-//     err  << __PRETTY_FUNCTION__ << ":" << __LINE__ << ": "
-//          << "Exception, Error in the extraction of an object of type '"
-//          << boost::typeindex::type_id_with_cvr<decltype(ret)>().pretty_name() << "'" << std::endl
-//          << "Node: " << std::endl
-//          << node << std::endl
-//          << "What: " << std::endl
-//          << e.what() << std::endl;
-//     what = err.str();
-//   }
-//   return false;
-// }
-
-// }  // namespace core
-// }  // namespace param
-// }  // namespace cnr
 
 TEST(MappedFileModule, GetComplexType)
 {
@@ -404,6 +355,17 @@ int main(int argc, char** argv)
   if (rc != 0)
   {
     std::cerr << "Errono" << rc << ": " << strerror(rc) << std::endl;
+  }
+
+  // Check if param_root_directory exists; if not, create it
+  boost::filesystem::path dir(param_root_directory);
+  if (!boost::filesystem::exists(dir))
+  {
+    if (!boost::filesystem::create_directories(dir))
+    {
+      std::cerr << "Failed to create directory: " << param_root_directory << std::endl;
+      return 1;
+    }
   }
 
   ::testing::InitGoogleTest(&argc, argv);
