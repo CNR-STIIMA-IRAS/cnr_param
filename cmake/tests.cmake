@@ -21,7 +21,7 @@ macro(cnr_unit_gtest trg src deps)
   
   list(APPEND TEST_DEPENDENCIES ${deps})
   
-  if(COMPILE_ROS1_MODULE)
+  if(COMPILE_ROS1_MODULE AND BUILD_AS_A_CATKIN_PACKAGE)
     catkin_add_gtest(
       "${trg}"
       "${src}"
