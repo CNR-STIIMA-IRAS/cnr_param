@@ -124,7 +124,7 @@ if(BUILD_AS_A_CATKIN_PACKAGE)
   catkin_package(
     INCLUDE_DIRS include
     LIBRARIES cnr_param
-    CATKIN_DEPENDS cnr_yaml
+    CATKIN_DEPENDS cnr_yaml roscpp
     DEPENDS Boost
     CFG_EXTRAS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}-compile-options.cmake
   )
