@@ -1,12 +1,18 @@
 # - Config file for the cnr_param package
 # It defines the following variables
+#  cnr_param_BUILD_AS_A_CATKIN_PACKAGE
+#  cnr_param_BUILD_AS_AN_AMENT_PACKAGE
+#  cnr_param_COMPILE_ROS1_MODULE
+#  cnr_param_COMPILE_ROS2_MODULE
+#  cnr_param_COMPILE_MAPPED_FILE_MODULE
 #  cnr_param_INCLUDE_DIRS - include directories for FooBar
 #  cnr_param_LIBRARIES    - libraries to link against
-#  cnr_param_EXECUTABLE   - the bar executable
+#  cnr_param_EXECUTABLES  - the bar executable
+#  cnr_param_RPATH        - the installation rpath
 
 # Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-compile-options.cmake 
 @COMPILE_OPTIONS_FILE_CONTENT@
-# cnr_yaml-dependencies copied!d!
+# cnr_yaml-dependencies copied!
 
 # Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-dependencies.cmake 
 @DEPENDENCIES_FILE_CONTENT@
@@ -19,7 +25,7 @@ set(cnr_param_EXECUTABLES  "@EXPORTED_EXECUTABLE_TARGETS_LIST@")
 set(cnr_param_RPATH        "@EXPORTED_LIBRARY_TARGET_RPATH@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("@PACKAGE_CONFIG_DESTINATION@/cnr_paramTargets.cmake")
+include("${CMAKE_INSTALL_PREFIX}/@CNR_PACKAGE_CONFIG_DESTINATION@/cnr_paramTargets.cmake")
 
 set_target_properties(cnr_param::cnr_param PROPERTIES
   IMPORTED_LOCATION_NOCONFIG "${cnr_param_RPATH}/libcnr_param.so"
