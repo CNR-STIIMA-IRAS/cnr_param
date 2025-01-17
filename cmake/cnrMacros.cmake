@@ -184,16 +184,16 @@ macro(cnr_configure_gtest trg deps)
   endif()
 endmacro()
 
-set(CONFIG_NAMESPACE "${PROJECT_NAME}::")
-set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
-set(VERSION_CONFIG "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
-set(PROJECT_CONFIG_OUTPUT "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
-set(PROJECT_CONFIG_INPUT_TEMPLATE "cmake/cnrConfig.cmake.in")
-
 #
 # cnr_cmake_package_file
 #
 macro(cnr_cmake_package_file LIBRARY_TARGETS_LIST EXECUTABLE_TARGETS_LIST)
+
+  set(CONFIG_NAMESPACE "${PROJECT_NAME}::")
+  set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+  set(VERSION_CONFIG "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+  set(PROJECT_CONFIG_OUTPUT "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
+  set(PROJECT_CONFIG_INPUT_TEMPLATE "cmake/${PROJECT_NAME}-config.cmake.in")
 
   # Parameter template in the PROJECT_CONFIG_INPUT_TEMPLATE
   list(APPEND DEPENDENCIES_INCLUDE_DIRS

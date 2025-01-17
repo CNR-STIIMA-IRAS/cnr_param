@@ -6,12 +6,10 @@
 include(CMakeFindDependencyMacro)
 
 if(${PROJECT_NAME} STREQUAL "cnr_param")
-  message(STATUS "Loading ''cnr_paramDependencies.cmake'' for the project ''${PROJECT_NAME}''")
   macro(_find_package)
     find_package(${ARGN})
   endmacro()
 else()
-  message(STATUS "Running Project: ${PROJECT_NAME}. Loading cnr_paramDependencies.cmake from cnr_paramConfig.cmake")
   include(CMakeFindDependencyMacro)
 
   macro(_find_package)
