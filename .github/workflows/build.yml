@@ -1,4 +1,4 @@
-name: 'PLAIN CMake CI'
+name: 'Build using palin cmake'
 
 on:
   push:
