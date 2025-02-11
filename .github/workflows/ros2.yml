@@ -39,11 +39,6 @@ jobs:
 
     - uses: actions/checkout@v2
       with:
-        repository: 'CNR-STIIMA-IRAS/cnr_yaml'
-        path: 'colcon_ws/src/cnr_yaml'
-
-    - uses: actions/checkout@v2
-      with:
         repository: 'CNR-STIIMA-IRAS/cnr_param'
         path: 'colcon_ws/src/cnr_param'
 
@@ -51,7 +46,7 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/colcon_ws
-        colcon build --symlink-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
+        colcon build --symlink-install --merge-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DRETRIVE_DEPENDENCIES=ON -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
 
     - name: colcon test
       run: |

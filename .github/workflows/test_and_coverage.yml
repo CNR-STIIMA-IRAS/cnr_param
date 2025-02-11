@@ -1,0 +1,61 @@
+name: 'Unit Tests and Coverage'
+
+on:
+  push:
+    branches: [ master, catkin-support-revise ]
+    paths-ignore:
+    - 'docs/**'
+    - 'README.md'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Coverage Ubuntu 24.04
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: sudo apt-get update && 
+       sudo apt-get install -y --fix-missing libeigen3-dev libyaml-cpp-dev 
+          libboost-iostreams-dev libboost-date-time-dev libboost-filesystem-dev libboost-program-options-dev 
+          libgtest-dev cmake tree lcov gcovr python3-lxml cmake
+    - name: Configure
+      run: cmake
+            -S .
+            -B build
+            -D CMAKE_BUILD_TYPE=Debug
+            -DRETRIVE_DEPENDENCIES=ON
+            -D BUILD_AS_A_CATIKIN_PACKAGE=OFF
+            -D COMPILE_ROS1_MODULE=OFF
+            -D COMPILE_ROS2_MODULE=OFF
+            -D COMPILE_MAPPED_FILE_MODULE=ON
+            -D BUILD_UNIT_TESTS=ON
+            -D BUILD_INTEGRATION_TESTS=OFF
+    - name: Build
+      run: 
+        cmake --build build
+    - name: Run tests
+      working-directory: ./build
+      run: ctest . --rerun-failed --output-on-failure
+    - name: generate coverage
+      working-directory: ./build
+      run: make cov
+    - name: Generate JSON coverage report
+      working-directory: ./build
+      run: gcovr -r .. . --branches --xml > coverage.xml
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test_results_xml
+        path: ${{runner.workspace}}/build/test-results/**/*.xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: unittests # optional
+        files: ${{runner.workspace}}/build/test-results/**/*.xml
+        name: codecov-umbrella # optional
+        fail_ci_if_error: false # optional (default = false)
+        verbose: false # optional (default = false)

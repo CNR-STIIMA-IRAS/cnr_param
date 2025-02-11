@@ -18,8 +18,21 @@ jobs:
       matrix:
         config:
         - {
-            name: "Ubuntu Debug", artifact: "Linux.tar.xz",
+            name: "Ubuntu 22.04", 
+            artifact: "Linux.tar.xz",
             os: ubuntu-22.04,
+            build_type: "Debug", cc: "gcc", cxx: "g++", cmake_version_used: "3.16.2"
+          }
+        - {
+            name: "Ubuntu 24.04", 
+            artifact: "Linux.tar.xz",
+            os: ubuntu-24.04,
+            build_type: "Debug", cc: "gcc", cxx: "g++", cmake_version_used: "3.16.2"
+          }
+        - {
+            name: "Ubuntu 20.04", 
+            artifact: "Linux.tar.xz",
+            os: ubuntu-24.04,
             build_type: "Debug", cc: "gcc", cxx: "g++", cmake_version_used: "3.16.2"
           }
     steps:
@@ -29,8 +42,6 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get update && 
         sudo apt-get install -y --fix-missing git 
-        libboost-iostreams-dev libeigen3-dev libboost-program-options-dev libboost-filesystem-dev libboost-date-time-dev libyaml-cpp-dev
-        libgtest-dev cmake tree lcov gcovr python3-lxml 
         
     - name: Download Ninja and CMake
       id: cmake_and_ninja
@@ -83,18 +94,6 @@ jobs:
           )
         endif()
 
-    - name: Download cnr_yaml
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        git clone https://github.com/CNR-STIIMA-IRAS/cnr_yaml
-        cd cnr_yaml
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        make
-        sudo make install
-        cd ../..
-        
     - name: Configure
       shell: cmake -P {0}
       run: |
@@ -121,11 +120,13 @@ jobs:
             -S .
             -B build
             -D CMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+            -DRETRIVE_DEPENDENCIES=ON
+            -D BUILD_AS_A_CATIKIN_PACKAGE=OFF
             -D COMPILE_ROS1_MODULE=OFF
             -D COMPILE_ROS2_MODULE=OFF
             -D COMPILE_MAPPED_FILE_MODULE=ON
-            -D BUILD_UNIT_TESTS=ON
-            -D BUILD_INTEGRATION_TESTS=ON
+            -D BUILD_UNIT_TESTS=OFF
+            -D BUILD_INTEGRATION_TESTS=OFF
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
@@ -152,41 +153,3 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
-
-    - name: Check Path
-      run: pwd && ls
-
-    - name: Run tests
-      shell: cmake -P {0}
-      run: |
-        include(ProcessorCount)
-        ProcessorCount(N)
-
-        execute_process(
-          COMMAND ctest --rerun-failed --output-on-failure
-          WORKING_DIRECTORY build
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Running tests failed!")
-        endif()
-
-    - name: generate coverage
-      working-directory: ./build
-      run: |
-          make cov
-    - name: Generate JSON coverage report
-      working-directory: ./build
-      run: |
-          gcovr -r .. . --branches --xml > coverage.xml
-    - name: Check Build Path
-      run: pwd && tree
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        flags: unittests # optional
-        files: ${{runner.workspace}}/build/**/*.xml
-        name: codecov-umbrella # optional
-        fail_ci_if_error: false # optional (default = false)
-        verbose: false # optional (default = false)
