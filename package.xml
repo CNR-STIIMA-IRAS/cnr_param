@@ -18,6 +18,11 @@
   
   <depend condition="$ROS_VERSION == 1">roscpp</depend>
   <depend condition="$ROS_VERSION == 2">rclcpp</depend>
+
+  <test_depend>gcovr</test_depend>
+  <test_depend>lcov</test_depend>
+  <test_depend>gtest</test_depend>
+  <test_depend>python3-lxml</test_depend>
   
   <export>
     <build_type condition="$ROS_VERSION != 1">cmake</build_type>

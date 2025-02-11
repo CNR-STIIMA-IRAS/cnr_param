@@ -32,13 +32,10 @@ _find_package(
   iostreams
   regex)
 
-# ##########################################################################################
-if(cnr_param_COMPILE_ROS1_MODULE OR BUILD_AS_A_CATKIN_PACKAGE)
-  _find_package(catkin REQUIRED COMPONENTS cnr_yaml roscpp)
-else()
-  _find_package(cnr_yaml REQUIRED)
-endif()
+# cnr_param
+_find_package(cnr_yaml REQUIRED)
 
+# ros2 dependencies
 if(cnr_param_COMPILE_ROS2_MODULE)
   _find_package(rclcpp REQUIRED)
   _find_package(rmw REQUIRED)

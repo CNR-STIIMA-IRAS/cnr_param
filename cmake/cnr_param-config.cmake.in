@@ -10,13 +10,16 @@
 #  cnr_param_EXECUTABLES  - the bar executable
 #  cnr_param_RPATH        - the installation rpath
 
-# Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-compile-options.cmake 
-@COMPILE_OPTIONS_FILE_CONTENT@
-# cnr_yaml-dependencies copied!
+# Build Options 
+set(cnr_param_BUILD_AS_A_CATKIN_PACKAGE  @BUILD_AS_A_CATKIN_PACKAGE@ )
+set(cnr_param_COMPILE_ROS1_MODULE        @ROS1_MODULE@ )
+set(cnr_param_COMPILE_ROS2_MODULE        @ROS2_MODULE@ )
+set(cnr_param_COMPILE_MAPPED_FILE_MODULE @MAPPED_FILE_MODULE@ )
+# 
 
-# Here I copy the content of the file ${CMAKE_CURRENT_LIST_DIR}/cnr_param-dependencies.cmake 
+# dependencies
 @DEPENDENCIES_FILE_CONTENT@
-# cnr_param-dependencies copied!
+# END - dependencies
 
 # These are IMPORTED targets created by cnr_paramTargets.cmake
 set(cnr_param_INCLUDE_DIRS "@EXPORTED_TARGET_INCLUDE_DIRS@")

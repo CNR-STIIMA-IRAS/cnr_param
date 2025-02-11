@@ -258,3 +258,78 @@ macro(cnr_cmake_package_file LIBRARY_TARGETS_LIST EXECUTABLE_TARGETS_LIST)
     INSTALL_DESTINATION "${CNR_PACKAGE_CONFIG_DESTINATION}")
 endmacro()
 
+#
+# cnr_vcs_download_and_install
+# 
+macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
+
+  message(STATUS "[retrive VCS dependencies] Check if COLCON is installed")
+
+  execute_process(
+    COMMAND colcon --help
+    RESULT_VARIABLE EXIT_CODE
+    OUTPUT_QUIET
+  )
+  if(${EXIT_CODE} EQUAL 127)
+    message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
+      execute_process(
+        COMMAND pip install -U colcon-common-extensions
+      )
+  endif()
+
+  # Set the name of the temporary directory
+  set(VCS_TMP_DIR "${CMAKE_BINARY_DIR}/vcs_repos")
+
+  # Create the temporary directory
+  file(MAKE_DIRECTORY ${VCS_TMP_DIR})
+
+  # Optionally, you can add a message to confirm the creation
+  message(STATUS "[retrive VCS dependencies] Temporary directory created at: ${VCS_TMP_DIR}")
+
+  message(STATUS "[retrive VCS dependencies] Downloading and installing VCS repositories. Extracted from file: ${CMAKE_SOURCE_DIR}/${VCS_REPO_FILE}")
+  execute_process(
+    COMMAND vcs import --input ${CMAKE_SOURCE_DIR}/${VCS_REPO_FILE}
+    WORKING_DIRECTORY "${VCS_TMP_DIR}"
+    RESULT_VARIABLE EXIT_CODE
+    OUTPUT_QUIET
+  )
+  if(${EXIT_CODE} GREATER 0)
+    message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
+  endif()
+
+  execute_process(
+    COMMAND rosdep --help
+    RESULT_VARIABLE EXIT_CODE
+    OUTPUT_QUIET
+  )
+  if(${EXIT_CODE} EQUAL 127)
+    message(WARNING "[retrive VCS dependencies] rosdep not found. We'll try to install it.")
+      execute_process(
+        COMMAND pip install -U rosdep
+      )
+  endif()
+
+  execute_process(
+    COMMAND rosdep install --from-paths . --ignore-src -y -i 
+    WORKING_DIRECTORY "${VCS_TMP_DIR}"
+    RESULT_VARIABLE LIST_OF_DEPENDENCIES
+    OUTPUT_QUIET
+  )
+
+  message(STATUS "[retrive VCS dependencies] Build dependencies with COLCON and install them in ${INSTALL_DESTINATION}")
+  execute_process(
+      COMMAND sudo colcon build --symlink-install --merge-install --install-base ${INSTALL_DESTINATION}
+      WORKING_DIRECTORY "${VCS_TMP_DIR}"
+      RESULT_VARIABLE EXIT_CODE
+      OUTPUT_QUIET
+  )
+  if(${EXIT_CODE} GREATER 0)
+    message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
+  endif()
+
+  message(STATUS "[retrive VCS dependencies] Remove temporary files")
+  execute_process(
+      COMMAND sudo rm -fr "${VCS_TMP_DIR}")
+  
+  message(STATUS "[retrive VCS dependencies] Done")
+endmacro()
