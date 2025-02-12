@@ -268,10 +268,15 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
   execute_process(
     COMMAND colcon --help
     RESULT_VARIABLE EXIT_CODE
+    OUTPUT_VARIABLE OUTPUT_VAR_STR
+    ERROR_VARIABLE  ERROR_VAR_STR
     #OUTPUT_QUIET
   )
-  message(STATUS "[retrive VCS dependencies] COLCON exit_code= ${EXIT_CODE}")
-  if(${EXIT_CODE} GREATER 0)
+  string(COMPARE EQUAL "${ERROR_VAR_STR}" "" ERROR_VAR_BOOL)
+  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_STR= ${ERROR_VAR_STR}")
+  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_BOOL= ${ERROR_VAR_BOOL}")
+  message(STATUS "[retrive VCS dependencies] COLCON EXIT_CODE= ${EXIT_CODE}")
+  if(${EXIT_CODE} GREATER 0 OR ${ERROR_VAR_BOOL})
     message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
       execute_process(
         COMMAND pip install -U colcon-common-extensions
