@@ -32,6 +32,10 @@ _find_package(
   iostreams
   regex)
 
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 # cnr_param
 _find_package(cnr_yaml REQUIRED)
 
