@@ -53,7 +53,14 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/catkin_ws
-        catkin build -p 1 -i --verbose --cmake-args -DRETRIVE_DEPENDENCIES=ON -DBUILD_AS_A_CATKIN_PACKAGE=ON -DCOMPILE_ROS1_MODULE=ON -DCOMPILE_ROS2_MODULE=OFF -DCOMPILE_MAPEED_FILE_MODULE=ON -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON
+        catkin build -p 1 -i --verbose --cmake-args \
+        -DRETRIVE_DEPENDENCIES=ON \
+        -DBUILD_AS_A_CATKIN_PACKAGE=ON \
+        -DCOMPILE_ROS1_MODULE=ON \
+        -DCOMPILE_ROS2_MODULE=OFF \
+        -DCOMPILE_MAPEED_FILE_MODULE=ON \
+        -DBUILD_UNIT_TESTS=ON\ 
+        -DBUILD_INTEGRATION_TESTS=ON
 
     - name: caktkin test
       run: |

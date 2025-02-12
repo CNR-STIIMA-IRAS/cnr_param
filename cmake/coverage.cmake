@@ -24,7 +24,7 @@ function(add_coverage_target exclude)
         add_custom_target(cov DEPENDS ${covname})
         add_custom_command(
             OUTPUT  ${covname}
-            COMMAND ${LCOV} -c -o ${covname} -d . -b . --gcov-tool ${GCOV}
+            COMMAND ${LCOV} -c -o ${covname} -d . -b . --gcov-tool ${GCOV} --ignore-errors mismatch
             COMMAND ${LCOV} -r ${covname} -o ${covname} ${exclude}
             COMMAND ${LCOV} -l ${covname}
             COMMAND ${GENHTML} ${covname} -output coverage
