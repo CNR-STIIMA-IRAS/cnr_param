@@ -139,3 +139,186 @@ macro(cnr_target_compile_options TARGET_NAME)
   endif()
 endmacro()
 
+
+#
+# cnr_configure_gtest
+#
+macro(cnr_configure_gtest trg deps)
+
+  find_package(GTest REQUIRED)
+
+  if(${GTest_FOUND})
+    include(GoogleTest)
+    enable_testing()
+    include(CTest REQUIRED)
+
+    gtest_discover_tests(${trg})
+
+    if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
+      target_link_libraries(
+        ${trg}
+        PUBLIC
+        ${deps}
+        Threads::Threads
+        GTest::Main
+        Boost::program_options
+        Boost::system
+        Boost::filesystem
+        Boost::iostreams
+        Boost::regex)
+    else()
+      target_link_libraries(${trg}
+        ${dep} GTest::Main)
+      if(THREADS_HAVE_PTHREAD_ARG)
+        target_compile_options(${trg} PUBLIC "-pthread")
+      endif()
+      if(CMAKE_THREAD_LIBS_INIT)
+        target_link_libraries(${trg}
+                              "${CMAKE_THREAD_LIBS_INIT}")
+      endif()
+    endif()
+  else()
+
+    message(WARNING "unable to add gtest: missing pacakge GTest")
+
+  endif()
+endmacro()
+
+#
+# cnr_cmake_package_file
+#
+macro(cnr_cmake_package_file LIBRARY_TARGETS_LIST EXECUTABLE_TARGETS_LIST)
+
+  set(CONFIG_NAMESPACE "${PROJECT_NAME}::")
+  set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+  set(VERSION_CONFIG "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+  set(PROJECT_CONFIG_OUTPUT "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
+  set(PROJECT_CONFIG_INPUT_TEMPLATE "cmake/${PROJECT_NAME}-config.cmake.in")
+
+  # Parameter template in the PROJECT_CONFIG_INPUT_TEMPLATE
+  list(APPEND DEPENDENCIES_INCLUDE_DIRS
+       "${CMAKE_INSTALL_PREFIX}/${CNR_PACKAGE_INCLUDE_DESTINATION}")
+
+  # Merge targets
+  foreach(_LIBRARY_TARGET ${LIBRARY_TARGETS_LIST})
+    get_target_property(target_type ${_LIBRARY_TARGET} TYPE)
+    if(target_type STREQUAL "SHARED_LIBRARY")
+      get_target_property(target_name ${_LIBRARY_TARGET} OUTPUT_NAME)
+      list(
+        APPEND
+        DEPENDENCIES_LINK_LIBRARIES
+        "${CMAKE_INSTALL_PREFIX}/${CNR_PACKAGE_LIB_DESTINATION}/${CMAKE_SHARED_LIBRARY_PREFIX}${target_name}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      )
+    elseif(target_type STREQUAL "STATIC_LIBRARY")
+      get_target_property(target_name ${_LIBRARY_TARGET} OUTPUT_NAME)
+      list(
+        APPEND
+        DEPENDENCIES_LINK_LIBRARIES
+        "${CMAKE_INSTALL_PREFIX}/${CNR_PACKAGE_LIB_DESTINATION}/${CMAKE_STATIC_LIBRARY_PREFIX}${target_name}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      )
+    endif()
+  endforeach()
+
+  foreach(_EXE_TARGET ${EXECUTABLE_TARGETS_LIST})
+    get_target_property(target_name ${_EXE_TARGET} OUTPUT_NAME)
+    list(
+      APPEND DEPENDENCIES_EXE
+      "${CMAKE_INSTALL_PREFIX}/${CNR_PACKAGE_LIB_DESTINATION}/${target_name}")
+  endforeach()
+
+  list(REMOVE_DUPLICATES DEPENDENCIES_LINK_LIBRARIES)
+  list(REMOVE_DUPLICATES DEPENDENCIES_INCLUDE_DIRS)
+  list(REMOVE_DUPLICATES DEPENDENCIES_EXE)
+
+  set(EXPORTED_TARGET_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}")
+  set(EXPORTED_LIBRARY_TARGETS_LIST "${DEPENDENCIES_LINK_LIBRARIES}")
+  set(EXPORTED_EXECUTABLE_TARGETS_LIST "${DEPENDENCIES_EXE}")
+  set(EXPORTED_LIBRARY_TARGET_RPATH
+      "${CMAKE_INSTALL_PREFIX}/${CNR_PACKAGE_LIB_DESTINATION}")
+
+  include(CMakePackageConfigHelpers)
+
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-compile-options.cmake"
+      COMPILE_OPTIONS_FILE_CONTENT) 
+
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-dependencies.cmake"
+       DEPENDENCIES_FILE_CONTENT)
+    # ------------------------------------------------------------------------------
+  # Configure <PROJECT_NAME>ConfigVersion.cmake common to build and install tree
+  write_basic_package_version_file(
+    "${VERSION_CONFIG}"
+    VERSION ${extracted_version}
+    COMPATIBILITY SameMajorVersion)
+
+  # ------------------------------------------------------------------------------
+  # Create the ${PROJECT_NAME}Config.cmake using the template
+  # ${PROJECT_NAME}Config.cmake.in
+  configure_package_config_file(
+    "${PROJECT_CONFIG_INPUT_TEMPLATE}" "${PROJECT_CONFIG_OUTPUT}"
+    INSTALL_DESTINATION "${CNR_PACKAGE_CONFIG_DESTINATION}")
+endmacro()
+
+#
+# cnr_vcs_download_and_install
+# 
+macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
+
+  message(STATUS "[retrive VCS dependencies] Check if COLCON is installed")
+  list(APPEND tools_list "colcon" "rosdep" "vcs")
+  foreach(tool ${tools_list})
+    execute_process(
+      COMMAND ${tool} --help
+      RESULT_VARIABLE EXIT_CODE
+      OUTPUT_VARIABLE OUTPUT_VAR_STR
+      ERROR_VARIABLE  ERROR_VAR_STR
+      #OUTPUT_QUIET
+    )
+    if(EXIT_CODE AND NOT EXIT_CODE EQUAL 0)
+      message(FATAL_ERROR "${tool} not found: ${EXIT_CODE}. Please intall it before continue!")
+    endif()
+  endforeach()
+
+  # Set the name of the temporary directory
+  set(VCS_TMP_DIR "${CMAKE_BINARY_DIR}/vcs_repos")
+
+  # Create the temporary directory
+  file(MAKE_DIRECTORY ${VCS_TMP_DIR})
+
+  # Optionally, you can add a message to confirm the creation
+  message(STATUS "[retrive VCS dependencies] Temporary directory created at: ${VCS_TMP_DIR}")
+
+  message(STATUS "[retrive VCS dependencies] Downloading and installing VCS repositories. Extracted from file: ${CMAKE_SOURCE_DIR}/${VCS_REPO_FILE}")
+  execute_process(
+    COMMAND vcs import --input ${CMAKE_SOURCE_DIR}/${VCS_REPO_FILE}
+    WORKING_DIRECTORY "${VCS_TMP_DIR}"
+    RESULT_VARIABLE EXIT_CODE
+    OUTPUT_QUIET
+  )
+  if(EXIT_CODE AND NOT EXIT_CODE EQUAL 0)
+    message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
+  endif()
+
+  execute_process(
+    COMMAND rosdep install --from-paths . --ignore-src -y -i 
+    WORKING_DIRECTORY "${VCS_TMP_DIR}"
+    RESULT_VARIABLE LIST_OF_DEPENDENCIES
+    OUTPUT_QUIET
+  )
+
+  message(STATUS "[retrive VCS dependencies] Build dependencies with COLCON and install them in ${INSTALL_DESTINATION}")
+  execute_process(
+      COMMAND sudo colcon build --symlink-install --merge-install --install-base ${INSTALL_DESTINATION}
+      WORKING_DIRECTORY "${VCS_TMP_DIR}"
+      RESULT_VARIABLE EXIT_CODE
+      OUTPUT_QUIET
+  )
+  if(${EXIT_CODE} GREATER 0)
+    message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
+  endif()
+
+  message(STATUS "[retrive VCS dependencies] Remove temporary files")
+  execute_process(
+      COMMAND sudo rm -fr "${VCS_TMP_DIR}")
+  
+  message(STATUS "[retrive VCS dependencies] Done")
+endmacro()

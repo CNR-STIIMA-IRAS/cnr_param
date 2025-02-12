@@ -8,16 +8,22 @@
 
 #include <cnr_param/config.h>
 
+#if defined (ROS1_MODULE)
 #if ROS1_MODULE == 1
 #include <cnr_param/ros/param.h>
 #endif
+#endif
 
+#if defined(ROS2_MODULE)
 #if ROS2_MODULE == 1
 #include <cnr_param/ros2/param.h>
 #endif
+#endif
 
+#if defined(MAPPED_FILE_MODULE)
 #if MAPPED_FILE_MODULE == 1
 #include <cnr_param/mapped_file/param.h>
+#endif
 #endif
 
 namespace cnr

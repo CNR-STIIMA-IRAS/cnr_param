@@ -30,17 +30,22 @@ jobs:
       with:
         required-ros-distributions: ${{ matrix.ros_distro }}
 
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing git python3-pip sudo
+        sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base
+        sudo pip3 uninstall empy --yes
+        python3 -m pip install colcon-common-extensions
+        python3 -m pip install vcstool
+        python3 -m pip install rosdep
+        rosdep update
     - name: Setup catkin workspace
       run: | 
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         mkdir -p ${{github.workspace}}/colcon_ws/src
         cd ${{github.workspace}}/colcon_ws/src
         cd ..
-
-    - uses: actions/checkout@v2
-      with:
-        repository: 'CNR-STIIMA-IRAS/cnr_yaml'
-        path: 'colcon_ws/src/cnr_yaml'
 
     - uses: actions/checkout@v2
       with:
@@ -51,7 +56,7 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/colcon_ws
-        colcon build --symlink-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
+        colcon build --symlink-install --merge-install --packages-up-to cnr_param --cmake-arg -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DRETRIVE_DEPENDENCIES=ON -DBUILD_UNIT_TESTS=ON -DBUILD_INTEGRATION_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCOMPILE_MAPPED_FILE_MODULE=ON -DCOMPILE_ROS2_MODULE=ON
 
     - name: colcon test
       run: |
