@@ -270,7 +270,8 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
     RESULT_VARIABLE EXIT_CODE
     OUTPUT_QUIET
   )
-  if(${EXIT_CODE} GREATER 0)
+  if(${EXIT_CODE} GREATER 0
+  )
     message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
       execute_process(
         COMMAND pip install -U colcon-common-extensions
@@ -302,7 +303,7 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
     RESULT_VARIABLE EXIT_CODE
     OUTPUT_QUIET
   )
-  if(${EXIT_CODE} EQUAL 127)
+  if(${EXIT_CODE} GREATER 0)
     message(WARNING "[retrive VCS dependencies] rosdep not found. We'll try to install it.")
       execute_process(
         COMMAND pip install -U rosdep

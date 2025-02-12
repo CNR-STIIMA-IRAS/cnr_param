@@ -1,4 +1,4 @@
-name: 'Build using palin cmake'
+name: 'Build using plain cmake'
 
 on:
   push:
