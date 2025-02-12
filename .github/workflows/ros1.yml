@@ -39,7 +39,6 @@ jobs:
         python3 -m pip install colcon-common-extensions
         python3 -m pip install vcstool
         python3 -m pip install rosdep
-        sudo rosdep init 
         rosdep update
     
     - name: Setup catkin workspace
