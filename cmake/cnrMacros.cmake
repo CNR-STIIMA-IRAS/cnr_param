@@ -270,7 +270,7 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
     RESULT_VARIABLE EXIT_CODE
     #OUTPUT_QUIET
   )
-  message(STATUS "[retrive VCS dependencies] Check if COLCON is installed: ${EXIT_CODE}")
+  message(STATUS "[retrive VCS dependencies] COLCON exit_code= ${EXIT_CODE}")
   if(${EXIT_CODE} GREATER 0)
     message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
       execute_process(
