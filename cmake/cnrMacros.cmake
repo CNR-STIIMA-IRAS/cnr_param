@@ -308,6 +308,12 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
       execute_process(
         COMMAND pip install -U rosdep
       )
+      execute_process(
+        COMMAND rosdep init
+      )
+      execute_process(
+        COMMAND rosdep update
+      )
   endif()
 
   execute_process(
