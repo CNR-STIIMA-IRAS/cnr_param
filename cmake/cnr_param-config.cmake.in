@@ -28,7 +28,7 @@ set(cnr_param_EXECUTABLES  "@EXPORTED_EXECUTABLE_TARGETS_LIST@")
 set(cnr_param_RPATH        "@EXPORTED_LIBRARY_TARGET_RPATH@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("${CMAKE_INSTALL_PREFIX}/@CNR_PACKAGE_CONFIG_DESTINATION@/cnr_paramTargets.cmake")
+include("@CMAKE_INSTALL_PREFIX@/@CNR_PACKAGE_CONFIG_DESTINATION@/cnr_paramTargets.cmake")
 
 set_target_properties(cnr_param::cnr_param PROPERTIES
   IMPORTED_LOCATION_NOCONFIG "${cnr_param_RPATH}/libcnr_param.so"

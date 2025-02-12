@@ -58,7 +58,7 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/catkin_ws
-        catkin build -p 1 -i --verbose --cmake-args \
+        catkin build -p 1 -i --cmake-args \
         -DRETRIVE_DEPENDENCIES=ON \
         -DBUILD_AS_A_CATKIN_PACKAGE=ON \
         -DCOMPILE_ROS1_MODULE=ON \

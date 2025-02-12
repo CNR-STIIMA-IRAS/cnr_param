@@ -293,12 +293,12 @@ if(NOT BUILD_AS_A_CATKIN_PACKAGE)
   # Install cmake config files
   install(FILES "${PROJECT_CONFIG_OUTPUT}" "${VERSION_CONFIG}"
     DESTINATION "${CNR_PACKAGE_CONFIG_DESTINATION}")
-endif()
 
-set(INSTALL_SHAREDIR ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
-install(CODE "string(REPLACE \";\" \"\\n\" MY_CMAKE_INSTALL_MANIFEST_CONTENT \"\$\{CMAKE_INSTALL_MANIFEST_FILES\}\")\n\
-                file(WRITE ${CMAKE_BINARY_DIR}/MANIFEST.txt \"\$\{MY_CMAKE_INSTALL_MANIFEST_CONTENT\}\\n${INSTALL_SHAREDIR}/MANIFEST.txt\")")
-install(FILES "${CMAKE_BINARY_DIR}/MANIFEST.txt" DESTINATION ${INSTALL_SHAREDIR})
-# ##############################################################################
+  set(INSTALL_SHAREDIR ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+  install(CODE "string(REPLACE \";\" \"\\n\" MY_CMAKE_INSTALL_MANIFEST_CONTENT \"\$\{CMAKE_INSTALL_MANIFEST_FILES\}\")\n\
+                  file(WRITE ${CMAKE_BINARY_DIR}/MANIFEST.txt \"\$\{MY_CMAKE_INSTALL_MANIFEST_CONTENT\}\\n${INSTALL_SHAREDIR}/MANIFEST.txt\")")
+  install(FILES "${CMAKE_BINARY_DIR}/MANIFEST.txt" DESTINATION ${INSTALL_SHAREDIR})
+  # ##############################################################################
+endif()
 # END INSTALL                                                                 ##
 # ##############################################################################
