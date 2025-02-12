@@ -64,7 +64,7 @@ jobs:
         -DCOMPILE_ROS1_MODULE=ON \
         -DCOMPILE_ROS2_MODULE=OFF \
         -DCOMPILE_MAPEED_FILE_MODULE=ON \
-        -DBUILD_UNIT_TESTS=ON\ 
+        -DBUILD_UNIT_TESTS=ON\
         -DBUILD_INTEGRATION_TESTS=ON
 
     - name: caktkin test
