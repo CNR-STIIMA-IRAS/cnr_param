@@ -38,14 +38,14 @@ jobs:
       run: cmake
             -S .
             -B build
-            -D CMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+            -D CMAKE_BUILD_TYPE=Debug
             -D RETRIVE_DEPENDENCIES=ON
             -D BUILD_AS_A_CATIKIN_PACKAGE=OFF
             -D COMPILE_ROS1_MODULE=OFF
             -D COMPILE_ROS2_MODULE=OFF
             -D COMPILE_MAPPED_FILE_MODULE=ON
-            -D BUILD_UNIT_TESTS=OFF
-            -D BUILD_INTEGRATION_TESTS=OFF
+            -D BUILD_UNIT_TESTS=ON
+            -D BUILD_INTEGRATION_TESTS=ON
     - name: Build
       run: cmake --build build
     - name: Run tests
