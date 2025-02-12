@@ -34,7 +34,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y --fix-missing git python3-pip sudo
-        sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base python3-catkin-tools
+        sudo apt-get -y install ros-${{ matrix.ros_distro }}-ros-base
         sudo pip3 uninstall empy --yes
         python3 -m pip install colcon-common-extensions
         python3 -m pip install vcstool
