@@ -44,9 +44,10 @@ jobs:
             sudo apt-get install -y --fix-missing git python3-pip sudo &&
               python -m pip install -U colcon-common-extensions &&
                 python -m pip install -U vcstool &&  
-                  python -m pip install -U rosdep &&
-                    sudo rosdep init && 
-                      rosdep update
+                  python -m pip install -U rosdep
+    - name: Install dependencies
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo rosdep init && rosdep update
     - name: Install Windows dependencies
       if: ${{ runner.os == 'Windows' }}
       run: winget install Git.Git Kitware.CMake Python.Python.3.13 cURL.cURL Ninja-build.Ninja
