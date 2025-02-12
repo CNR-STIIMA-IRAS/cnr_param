@@ -273,9 +273,9 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
     #OUTPUT_QUIET
   )
   string(COMPARE EQUAL "${ERROR_VAR_STR}" "" ERROR_VAR_BOOL)
-  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_STR= ${ERROR_VAR_STR}")
-  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_BOOL= ${ERROR_VAR_BOOL}")
-  message(STATUS "[retrive VCS dependencies] COLCON EXIT_CODE= ${EXIT_CODE}")
+  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_STR  = '${ERROR_VAR_STR}'")
+  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_BOOL = '${ERROR_VAR_BOOL}'")
+  message(STATUS "[retrive VCS dependencies] COLCON EXIT_CODE      = '${EXIT_CODE}'")
   if(${EXIT_CODE} GREATER 0 OR ${ERROR_VAR_BOOL})
     message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
       execute_process(
