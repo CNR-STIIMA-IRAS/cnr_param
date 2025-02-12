@@ -42,9 +42,9 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get update && 
             sudo apt-get install -y --fix-missing git python3-pip sudo &&
-              python -m pip install -U colcon-common-extensions &&
-                python -m pip install -U vcstool &&  
-                  python -m pip install -U rosdep
+              sudo python -m pip install colcon-common-extensions &&
+                sudo python -m pip install vcstool &&  
+                  sudo python -m pip install rosdep
     - name: Install dependencies
       if: ${{ runner.os == 'Linux' }}
       run: rosdep init && rosdep update
