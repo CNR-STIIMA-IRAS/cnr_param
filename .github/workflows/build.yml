@@ -41,8 +41,17 @@ jobs:
     - name: Install dependencies
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get update && 
-        sudo apt-get install -y --fix-missing git python3-colcon-common-extensions python3-vcstool python3-pip sudo
-        
+            sudo apt-get install -y --fix-missing git python3-pip sudo &&
+              python -m pip install colcon vcstool rosdep
+    - name: Install Windows dependencies
+      if: ${{ runner.os == 'Windows' }}
+      run: winget install Git.Git Kitware.CMake Python.Python.3.13 cURL.cURL
+    - name: Install Python PIP for windows
+      if: ${{ runner.os == 'Windows' }}
+      run: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py
+    - name: Install Python modules via PIP
+      if: ${{ runner.os == 'Windows' }}
+      run: python -m pip install colcon vcstool rosdep
     - name: Download Ninja and CMake
       id: cmake_and_ninja
       shell: cmake -P {0}
