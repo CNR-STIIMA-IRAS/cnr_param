@@ -264,24 +264,19 @@ endmacro()
 macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
 
   message(STATUS "[retrive VCS dependencies] Check if COLCON is installed")
-
-  execute_process(
-    COMMAND colcon --help
-    RESULT_VARIABLE EXIT_CODE
-    OUTPUT_VARIABLE OUTPUT_VAR_STR
-    ERROR_VARIABLE  ERROR_VAR_STR
-    #OUTPUT_QUIET
-  )
-  string(COMPARE EQUAL "${ERROR_VAR_STR}" "" ERROR_VAR_BOOL)
-  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_STR  = '${ERROR_VAR_STR}'")
-  message(STATUS "[retrive VCS dependencies] COLCON ERROR_VAR_BOOL = '${ERROR_VAR_BOOL}'")
-  message(STATUS "[retrive VCS dependencies] COLCON EXIT_CODE      = '${EXIT_CODE}'")
-  if(${EXIT_CODE} GREATER 0 OR ${ERROR_VAR_BOOL})
-    message(WARNING "[retrive VCS dependencies] COLCON not found. We'll try to install it.")
-      execute_process(
-        COMMAND pip install -U colcon-common-extensions
-      )
-  endif()
+  list(APPEND tools_list "colcon" "rosdep" "vcs")
+  foreach(tool ${tools_list})
+    execute_process(
+      COMMAND ${tool} --help
+      RESULT_VARIABLE EXIT_CODE
+      OUTPUT_VARIABLE OUTPUT_VAR_STR
+      ERROR_VARIABLE  ERROR_VAR_STR
+      #OUTPUT_QUIET
+    )
+    if(EXIT_CODE AND NOT EXIT_CODE EQUAL 0)
+      message(FATAL_ERROR "${tool} not found: ${EXIT_CODE}. Please intall it before continue!")
+    endif()
+  endforeach()
 
   # Set the name of the temporary directory
   set(VCS_TMP_DIR "${CMAKE_BINARY_DIR}/vcs_repos")
@@ -299,26 +294,8 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
     RESULT_VARIABLE EXIT_CODE
     OUTPUT_QUIET
   )
-  if(${EXIT_CODE} GREATER 0)
+  if(EXIT_CODE AND NOT EXIT_CODE EQUAL 0)
     message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
-  endif()
-
-  execute_process(
-    COMMAND rosdep --help
-    RESULT_VARIABLE EXIT_CODE
-    OUTPUT_QUIET
-  )
-  if(${EXIT_CODE} GREATER 0)
-    message(WARNING "[retrive VCS dependencies] rosdep not found. We'll try to install it.")
-      execute_process(
-        COMMAND pip install -U rosdep
-      )
-      execute_process(
-        COMMAND rosdep init
-      )
-      execute_process(
-        COMMAND rosdep update
-      )
   endif()
 
   execute_process(
