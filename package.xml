@@ -22,7 +22,7 @@
   <test_depend>gcovr</test_depend>
   <test_depend>lcov</test_depend>
   <test_depend>gtest</test_depend>
-  <test_dependd>python3-lxml</build_depend>
+  <test_dependd>python3-lxml</test_dependd>
   
   <export>
     <build_type condition="$ROS_VERSION != 1">cmake</build_type>
