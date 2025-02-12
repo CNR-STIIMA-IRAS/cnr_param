@@ -38,14 +38,13 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Install dependencies
+    - name: Install linux dependencies
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get update && 
-            sudo apt-get install -y --fix-missing git python3-pip sudo &&
+            sudo apt-get install -y --fix-missing git python3-pip sudo python3-rosdep &&
               python -m pip install -U colcon-common-extensions &&
-                python -m pip install -U vcstool &&  
-                  python -m pip install -U rosdep
-    - name: Install dependencies
+                python -m pip install -U vcstool
+    - name: Run rosdep
       if: ${{ runner.os == 'Linux' }}
       run: sudo rosdep init && rosdep update
     - name: Install Windows dependencies
