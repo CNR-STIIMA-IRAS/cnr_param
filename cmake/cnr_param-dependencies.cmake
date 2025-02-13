@@ -42,7 +42,7 @@ _find_package(
 _find_package(cnr_yaml REQUIRED)
 
 # ros2 dependencies
-if(cnr_param_COMPILE_ROS2_MODULE)
+if(cnr_param_COMPILE_ROS2_MODULE OR COMPILE_ROS2_MODULE)
   _find_package(rclcpp REQUIRED)
   _find_package(rmw REQUIRED)
   _find_package(rosidl_runtime_c REQUIRED)
