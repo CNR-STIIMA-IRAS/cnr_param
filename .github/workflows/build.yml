@@ -40,23 +40,19 @@ jobs:
 
     - name: Install linux dependencies
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && 
-            sudo apt-get install -y --fix-missing git python3-pip sudo &&
-              sudo python -m pip install colcon-common-extensions &&
-                sudo python -m pip install vcstool &&  
-                  sudo python -m pip install rosdep
-    - name: Install dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: sudo rosdep init && rosdep update
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing git python3-pip sudo
+        sudo python -m pip install colcon-common-extensions
+        sudo python -m pip install vcstool
+        sudo python -m pip install rosdep
+        sudo rosdep init && rosdep update
     - name: Install Windows dependencies
       if: ${{ runner.os == 'Windows' }}
-      run: winget install Git.Git Kitware.CMake Python.Python.3.13 cURL.cURL Ninja-build.Ninja
-    - name: Install Python PIP for windows
-      if: ${{ runner.os == 'Windows' }}
-      run: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py
-    - name: Install Python modules via PIP
-      if: ${{ runner.os == 'Windows' }}
-      run: python -m pip install colcon vcstool rosdep
+      run: |
+        winget install Git.Git Kitware.CMake Python.Python.3.13 cURL.cURL Ninja-build.Ninja
+        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py
+        python -m pip install colcon vcstool rosdep
     - name: Configure
       run: cmake
             -S .
@@ -71,3 +67,10 @@ jobs:
             -D BUILD_INTEGRATION_TESTS=OFF
     - name: Build
       run: cmake --build build
+    - name: Example Usage Test
+      run: |
+        mkdir -p example/src
+        cd example/src
+        git clone https://github.com/CNR-STIIMA-IRAS/cnr_param_example.git
+        cd ..
+        colcon build --symlink-install --merge-install
