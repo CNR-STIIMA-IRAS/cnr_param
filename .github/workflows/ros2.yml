@@ -69,4 +69,4 @@ jobs:
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         cd ${{github.workspace}}/colcon_ws
-        colcon test --packages-select cnr_param
+        colcon test --merge-install --packages-select cnr_param
