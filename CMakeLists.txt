@@ -51,7 +51,7 @@ endif()
 if(COMPILE_ROS2_MODULE)
   if(NOT "$ENV{ROS_VERSION}" STREQUAL "2")
     message(FATAL_ERROR
-      "You selected COMPILE_ROS1_MODULE compilation option, but ROS environment is not sourced.")
+      "You selected COMPILE_ROS2_MODULE compilation option, but ROS environment is not sourced.")
   endif()
   message(STATUS "The ROS 2 Module will be compiled")
   set(ROS2_MODULE 1)
@@ -279,7 +279,7 @@ install(
   PATTERN ".svn" EXCLUDE)
 
 install(
-  TARGETS ${PROJECT_NAME} "${EXECUTABLE_TARGETS_LIST}"
+  TARGETS ${PROJECT_NAME} ${EXECUTABLE_TARGETS_LIST}
   EXPORT "${TARGETS_EXPORT_NAME}"
   ARCHIVE DESTINATION ${CNR_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CNR_PACKAGE_LIB_DESTINATION}
