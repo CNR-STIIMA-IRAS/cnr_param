@@ -66,7 +66,9 @@ jobs:
             -D BUILD_UNIT_TESTS=OFF
             -D BUILD_INTEGRATION_TESTS=OFF
     - name: Build
-      run: cmake --build build
+      run: cmake --build build --install-prefix /usr/local
+    - name: Install
+      run: sudo cmake --install
     - name: Checkout example repo
       uses: actions/checkout@v4
       with:
