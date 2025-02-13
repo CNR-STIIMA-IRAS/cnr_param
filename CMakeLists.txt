@@ -20,6 +20,7 @@ option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
 option(BUILD_INTEGRATION_TESTS "Build the integration tests" OFF)
 
 option(RETRIVE_DEPENDENCIES "Download and install dependencies" ON)
+set(INSTALL_DEPENDENCIES_LOCATION "/usr/local" CACHE STRING "Where the dependencies will be installed")
 
 option(BUILD_AS_A_CATKIN_PACKAGE "Build the library as a CATKIN package" OFF)
 option(COMPILE_ROS1_MODULE "ROS 1 INTEGRATION SUPPORT" OFF)
@@ -82,8 +83,12 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}-compile-options.cmak
 if(RETRIVE_DEPENDENCIES)
   find_file(CNR_YAML_CONFIG_FOUND cnr_yamlConfig.cmake PATH_SUFFIXES share/cnr_yaml/cmake)
   if(NOT CNR_YAML_CONFIG_FOUND)
-    message(STATUS "We did not find 'cnr_yaml' in the standard locations.. We will  dowonload it, compile and install under /usr/local")
-    cnr_vcs_download_and_install(.repos /usr/local)
+    message(STATUS 
+"We did not find 'cnr_yaml' in the standard locations.\
+ We will  dowonload it, compile and install under\
+ INSTALL_DEPENDENCIES_LOCATION=${INSTALL_DEPENDENCIES_LOCATION}"
+    )
+    cnr_vcs_download_and_install(.repos ${INSTALL_DEPENDENCIES_LOCATION})
   endif()
 endif()
 
@@ -170,8 +175,8 @@ set_target_properties(
 list(APPEND INSTALL_INTERFACE_INCLUDE_DIRS "${DEPENDENCIES_INCLUDE_DIRS}")
 
 target_include_directories(${PROJECT_NAME}
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+  PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+          $<INSTALL_INTERFACE:include>
   PUBLIC "${DEPENDENCIES_INCLUDE_DIRS}")
 
 # ## link

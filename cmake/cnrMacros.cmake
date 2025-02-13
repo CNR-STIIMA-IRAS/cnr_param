@@ -310,7 +310,7 @@ macro(cnr_vcs_download_and_install VCS_REPO_FILE INSTALL_DESTINATION)
       COMMAND sudo colcon build --symlink-install --merge-install --install-base ${INSTALL_DESTINATION}
       WORKING_DIRECTORY "${VCS_TMP_DIR}"
       RESULT_VARIABLE EXIT_CODE
-      OUTPUT_QUIET
+      #OUTPUT_QUIET
   )
   if(${EXIT_CODE} GREATER 0)
     message(FATAL_ERROR "[retrive VCS dependencies] Error during the build of the dependencies")
