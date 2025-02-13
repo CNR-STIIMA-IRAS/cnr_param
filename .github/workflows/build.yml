@@ -74,5 +74,5 @@ jobs:
         path: cnr_param_examples # Store in $GITHUB_WORKSPACE/other-repo
     - name: build examples
       run: |
-        cd  $GITHUB_WORKSPACE/other-repo
+        cd  $GITHUB_WORKSPACE/cnr_param_examples
         colcon build --symlink-install --merge-install
