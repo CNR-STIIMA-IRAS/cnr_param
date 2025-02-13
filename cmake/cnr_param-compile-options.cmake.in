@@ -1,0 +1,6 @@
+# Build Options 
+set(cnr_param_BUILD_AS_A_CATKIN_PACKAGE  @BUILD_AS_A_CATKIN_PACKAGE@ )
+set(cnr_param_COMPILE_ROS1_MODULE        @ROS1_MODULE@ )
+set(cnr_param_COMPILE_ROS2_MODULE        @ROS2_MODULE@ )
+set(cnr_param_COMPILE_MAPPED_FILE_MODULE @MAPPED_FILE_MODULE@ )
+# 

@@ -44,5 +44,6 @@ compile_commands.json
 
 include/cnr_param/config.h
 cnr_param/include/cnr_param/config.h
+cmake/cnr_param-compile-options.cmake
 
 *.code-workspace

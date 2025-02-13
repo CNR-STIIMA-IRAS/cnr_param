@@ -100,23 +100,6 @@ mqtt_hw:
     D_r: [100,100,100,1,1,2] # damping values [x,y,z,Rx,Ry,Rz]
     damping_is_ratio: false  # false if stiffness is null
 
-    
-    ### to use only the translation for the deformation
-    ### [NOTE] all values are WRT base frame
-    #n_dofs: 3
-    
-    #Qhh: [1,1,1,0.0001,0.0001,0.0001]
-    #Qhr: [0,0,0,0,0,0]
-    
-    #Qrh: [0,0,0,0,0,0]
-    #Qrr: [1,1,1,0.0001,0.0001,0.0001]
-    
-    #Rh: [0.0005,0.0005,0.0005]
-    #Rr: [0.0001,0.0001,0.0001]
-    
-    #mask: [1,1,1,0,0,0]
-    
-    
     ### to deform the trtajectory in x-y-z directions and around vertical axis
     ### [NOTE] all values are WRT base frame
     n_dofs: 6

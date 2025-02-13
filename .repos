@@ -1,6 +1,5 @@
 repositories:
-  vcstool:
+  cnr_yaml:
     type: git
-    url: git@github.com:CNR-STIIMA-IRAS/cnr_yaml.git
+    url: https://github.com/CNR-STIIMA-IRAS/cnr_yaml.git
     version: master
-  
