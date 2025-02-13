@@ -67,10 +67,12 @@ jobs:
             -D BUILD_INTEGRATION_TESTS=OFF
     - name: Build
       run: cmake --build build
-    - name: Example Usage Test
+    - name: Checkout example repo
+      uses: actions/checkout@v4
+      with:
+        repository: CNR-STIIMA-IRAS/cnr_param_examples
+        path: cnr_param_examples # Store in $GITHUB_WORKSPACE/other-repo
+    - name: build examples
       run: |
-        mkdir -p example/src
-        cd example/src
-        git clone https://github.com/CNR-STIIMA-IRAS/cnr_param_example.git
-        cd ..
+        cd  $GITHUB_WORKSPACE/other-repo
         colcon build --symlink-install --merge-install
